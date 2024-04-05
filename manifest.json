@@ -1,0 +1,32 @@
+{
+  "name": "MaestroDMX Enhancer Extension",
+  "description": "Add add-on features to enable more functionaity than is built into the current version.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "page_action/page_action.html",
+    "default_icon": "favicon-maestro.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "service_worker": "src/bg/bg-loader.js"
+  },
+  "permissions": ["storage", "tabs", "contextMenus", "webNavigation"],
+  "host_permissions": ["*://*/*"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://maestro.mierzyn.com/*",
+        "*://10.10.100.10/*"],
+      "exclude_matches": [],
+      "js": ["src/inject/js/inject.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/inject/js/maestro-main.js"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}
