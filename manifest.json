@@ -8,9 +8,6 @@
     "default_icon": "favicon-maestro.png"
   },
   "default_locale": "en",
-  "background": {
-    "service_worker": "src/bg/bg-loader.js"
-  },
   "permissions": ["storage", "tabs", "contextMenus", "webNavigation"],
   "host_permissions": ["*://*/*"],
   "content_scripts": [
