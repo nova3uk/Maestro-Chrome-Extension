@@ -19,3 +19,5 @@ Setup Instructions.
 6. In Chrome, go to Extension, Manage Extensions. Then you need to select the option to "Load unpacked", usually in the top left of the page, then select the folder you extracted in point 5.
 
 Et voila - the plugin should be installed, configured and active. If it is not working, then the reason will be one of either you have not correctly put the web address of your maestro in the manifest, or you have not correctly renamed the fixtures to have only one underscore, and the correct dmx values, or worse that you are trying to effect fixtures without a colorwheel and shutter.
+
+Please Note: This plugin was developed in a couple of hours one evening, the code is neither clean nor perfect, but it does work well enough for my purposes - if you want to use it you do so at your own RISK, i offer no warranty of any kind whatsoever implied nor otherwise. Copilot was used to help speedup the build and check for problems.
