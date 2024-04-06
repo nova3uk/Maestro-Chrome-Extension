@@ -1,3 +1,14 @@
+MaestroDMX is an autonomous lighting designer-in-a-box that listens to music and makes decisions like a professional lighting designer. 
+See https://www.maestrodmx.com/ for more information.
+
+This Chrome Extension is currently only for the purpose of temporarily adding functionaity not yet available in the official software, by means of manipulation of the web interface. It is of course only available on versions of Chrome which can run Extensions, therefore desktop only not mobile.
+
+Currently it supports 1 main function, adding the possibility to Strobe fixtures which depend on a Shutter, fixtures using normal RGB values will already work. In general this usually means moving head fixtures or similar with a color wheel. 
+
+Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
+
+
+
 Setup Instructions.
 
 1. Manifest must be edited to modify content_scripts/matches so that it has the url/ip of your maestro so that it will run on the maestro web control panel. if it is wrong it will not run.
