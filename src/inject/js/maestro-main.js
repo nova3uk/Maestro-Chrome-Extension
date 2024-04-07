@@ -87,7 +87,7 @@ class App {
                 continue;
             }
 
-            // Find the attribute
+            // Find the attribute, fixed.
             for (let attr in fixture.attribute) {
                 if (fixture.attribute[attr].type == "SHUTTER") {
                     attributeId = attr;
