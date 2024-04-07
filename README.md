@@ -21,9 +21,10 @@ Setup Instructions.
 Et voila - the plugin should be installed, configured and active. If it is not working, then the reason will be one of either you have not correctly put the web address of your maestro in the manifest, or you have not correctly renamed the fixtures to have only one underscore, and the correct dmx values, or worse that you are trying to effect fixtures without a colorwheel and shutter.
 
 How does it work?
-The plugin scrapes data from the web interface, in order to understand the id of the stage. It then calls the maestro API to download the fixture list, and searches for fixgtures with a shutter and a color wheel, which also contain the attributes required in point 4 above in the name. It also ignores any fixture with the word IGNORE in the name. 
+The plugin scrapes data from the web interface, in order to understand the id of the stage. It then calls the maestro API to download the fixture list, and searches for fixtures with a shutter and a color wheel, which also contain the attributes required in point 4 above in the name. It also ignores any fixture with the word IGNORE in the name. 
 
 Once it has built a list of the fixtures it needs to modify, it then searches for the Strobe button on the page, and adds a hook into its click and unclick events(mousdown, mouseup). Therefore it does not interfere with the usual functionality of the web interface, it meerly piggy backs on to it, so that when you click the Strobe button it sends an api call to the Maestro changing the dmx value of the strobe to the value in the parameter set in the name, when you let go it sends another message reverting the change back. The maestro reacts instantly to these changes and the effect is seemless. It only modifies those fixtures it should and always reverts the value when you stop.
+
 If for any reason it gets "stuck" simply reload the page, wait a couple of seconds then click the button and release again it should clear everything and work as normal, although this has not happened in testing so far.
 
 Please Note: 
