@@ -91,7 +91,7 @@ class App {
 
                 let setValue = onOrOff == 1 ? strobeValue : normalValue;
 
-                this.putAttribute(fixture.id, attributeId, setValue);
+                this.updateAttribute(fixture.id, attributeId, setValue);
 
                 if (this.logging)
                     console.log(`Fixture ${fixture.name}, attribue ${attributeId} set to ${setValue}`);
@@ -99,7 +99,7 @@ class App {
             }
         }
     };
-    putAttribute = async (fixtureId, attributeId, value) => {
+    updateAttribute = async (fixtureId, attributeId, value) => {
         let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
 
         let options = {
@@ -125,8 +125,10 @@ class App {
                 console.error('Fatal error updating fixture data:', error);
         }
     };
-    findByText = (needle, haystack = document) => {
-        return [...haystack.querySelectorAll('*')].filter(val =>
+    //the document is using dynamic css and labels, without ids.
+    //so its required to search for the button by text
+    findByText = (needle, query = "*", haystack = document) => {
+        return [...haystack.querySelectorAll(query)].filter(val =>
             Array.from(val.childNodes).some(({ nodeType, textContent, parentElement }) =>
                 nodeType === 3 && textContent.includes(needle) && !(parentElement.tagName === 'SCRIPT')
             )
@@ -150,7 +152,7 @@ class App {
     };
     findButton = (callback) => {
         try {
-            this.strobeBtn = this.findByText('Strobe')[0];
+            this.strobeBtn = this.findByText('Strobe', 'button')[0];
 
             if (this.strobeBtn === undefined) {
                 throw new Error("Strobe button not found");
