@@ -1,7 +1,12 @@
 var maestro = maestro || {};
 
 class App {
-    constructor(scriptSource) {
+    constructor(scriptSource, loggingOn = false) {
+        if (loggingOn) {
+            this.logging = true
+            console.log("Maestro Interceptor Logging Enabled!")
+        };
+
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
@@ -9,6 +14,7 @@ class App {
     }
 
     // Public variables
+    logging = false;
     btnTimer;
     timerInterval;
     ready = false;
@@ -27,7 +33,8 @@ class App {
             const responseJson = await response.json();
             return responseJson;
         } catch (e) {
-            console.log("Cannot connect to the API, is Maestro running?", e);
+            if (this.logging)
+                console.error("Cannot connect to the API, is Maestro running?", e);
         }
     }
     clearStage = () => {
@@ -80,6 +87,10 @@ class App {
                 let setValue = onOrOff == 1 ? strobeValue : normalValue;
 
                 this.putAttribute(fixture.id, attributeId, setValue);
+
+                if (this.logging)
+                    console.log(`Fixture ${fixture.name}, attribue ${attributeId} set to ${setValue}`);
+
             }
         }
     };
@@ -105,7 +116,8 @@ class App {
             }
             return response.json();
         } catch (error) {
-            console.error('Fatal error updating fixture data:', error);
+            if (this.logging)
+                console.error('Fatal error updating fixture data:', error);
         }
     };
     findByText = (needle, haystack = document) => {
@@ -123,9 +135,11 @@ class App {
             this.strobeBtn.addEventListener('mouseup', () => this.setStrobe(0), false);
             this.ready = true;
             this.onReady();
-            console.log("Maestro Interceptor Loaded!")
+            if (this.logging)
+                console.log("Maestro Interceptor Loaded OK!");
         } catch (e) {
-            console.log("Could not bind Strobe Button onClick event!")
+            if (this.logging)
+                console.error("Could not bind Strobe Button onClick event!")
         }
     };
     findButton = (callback) => {
@@ -159,7 +173,8 @@ class App {
             }
         } catch (e) {
             // Button has been lost
-            //console.log("Strobe Button Lost!")
+            if (this.logging)
+                console.log("Strobe Button Lost!");
             this.clearTimer();
             this.ready = false;
             this.clearStage();
@@ -172,12 +187,13 @@ class App {
             let btnFound = await this.findButton(this.bindButton);
             if (btnFound) {
                 this.getStage();
-            }else{
+            } else {
                 this.startTimer();
             }
         } catch (e) {
             this.startTimer();
-            console.log(e, "Error loading stage!");
+            if (this.logging)
+                console.error(e, "Error loading stage!");
         }
     };
     onReady = () => {
@@ -188,5 +204,5 @@ class App {
 }
 
 // Initialize & assign to global object
-maestro.App = new App(document.currentScript.src);
+maestro.App = new App(document.currentScript.src, true);
 maestro.App.startUp();
