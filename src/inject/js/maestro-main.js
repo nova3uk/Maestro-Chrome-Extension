@@ -21,9 +21,13 @@ class App {
     getFilePath = (fileName) => `chrome-extension://${this.ExtensionId}/${fileName}`;
 
     getUrl = async (url) => {
-        const response = await fetch(url);
-        const responseJson = await response.json();
-        return responseJson;
+        try {
+            const response = await fetch(url);
+            const responseJson = await response.json();
+            return responseJson;
+        } catch (e) {
+            console.log("Cannot connect to the API, is Maestro running?", e);
+        }
     }
 
     clearStage = () => {
@@ -37,90 +41,41 @@ class App {
 
     getStage = async () => {
         this.clearStage();
-        const state = await this.getUrl("/api/v1/output/stage");
-        this.stageId = state.activeStageId;
-        this.stage = state;
-        this.fixtures = state.stage.filter(ele => ele.id == state.activeStageId)[0].fixture;
+        const stage = await this.getUrl("/api/v1/output/stage");
+        this.stageId = stage.activeStageId;
+        this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
 
-        for (let fixture of this.fixtures) {
-            let hasColorWheel = false;
-            let hasShutter = false;
-
-            if (fixture.enabled == false)
-                continue;
-
-            for (let attr of fixture.attribute) {
-                if (attr.type == "SHUTTER") {
-                    hasShutter = true;
-                }
-                if (attr.type == "COLOR_WHEEL") {
-                    hasColorWheel = true;
-                }
-                if (hasColorWheel == true && hasShutter == true) {
-                    this.shutterFixtures.push(fixture);
-                    break;
-                }
-            }
-        }
+        this.shutterFixtures = this.fixtures.filter(fixture =>
+            fixture.enabled &&
+            ["SHUTTER", "COLOR_WHEEL"].every(type =>
+                fixture.attribute.some(attr => attr.type === type)
+            )
+        );
     };
-
     setStrobe = async (onOrOff) => {
-        let fixtures = this.shutterFixtures;
+        for (let fixture of this.shutterFixtures) {
+            let [fixtureName, shutterValues] = fixture.name.split("_");
+            let [normalValue, strobeValue] = shutterValues ? shutterValues.split(":") : [];
 
-        for (let fixture of fixtures) {
-            let fixtureId = fixture.id;
-            let fixtureName = fixture.name;
-            let hasProps = fixtureName.indexOf("_");
-            let ignore = fixtureName.toUpperCase().indexOf("IGNORE");
-            let shutterValues;
-            let strobeValue;
-            let normalValue;
-            let attributeId;
-            let setValue;
+            if (!shutterValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
 
-            // Get shutter value to set from name
-            if (hasProps !== -1) {
-                shutterValues = fixtureName.split("_")[1].split(":");
-                normalValue = shutterValues[0];
-                strobeValue = shutterValues[1];
-            } else {
-                continue;
-            }
+            let attributeId = fixture.attribute.findIndex(attr => attr.type === "SHUTTER");
+            if (!attributeId) continue;
 
-            // Find the attribute, fixed.
-            for (let attr in fixture.attribute) {
-                if (fixture.attribute[attr].type == "SHUTTER") {
-                    attributeId = attr;
-                    break;
-                }
-            }
+            let setValue = onOrOff == 1 ? strobeValue : normalValue;
 
-            // Skip on if no attributeid found
-            if (!attributeId || ignore !== -1) continue;
-
-            if (onOrOff == 1) {
-                setValue = strobeValue;
-            } else {
-                setValue = normalValue;
-            }
-
-            let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
-
-            let dataToUpdate = {
-                "attribute": {
-                    "staticValue": {
-                        "value": setValue
-                    }
-                }
-            };
-            let jsonString = JSON.stringify(dataToUpdate);
+            let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixture.id}/attribute/${attributeId}`;
 
             let options = {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonString
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "attribute": {
+                        "staticValue": {
+                            "value": setValue
+                        }
+                    }
+                })
             };
 
             try {
@@ -130,18 +85,17 @@ class App {
                 }
                 const updatedData = await response.json();
             } catch (error) {
-                console.error('Error updating data:', error);
+                console.error('Fatal error updating fixture data:', error);
             }
         }
     };
 
     findByText = (needle, haystack = document) => {
-        return [...haystack.querySelectorAll('*')].reduce((acc, val) => {
-            for (const { nodeType, textContent, parentElement } of val.childNodes) {
-                if (nodeType === 3 && textContent.includes(needle) && !(parentElement.tagName === 'SCRIPT')) acc.push(parentElement);
-            }
-            return acc;
-        }, []);
+        return [...haystack.querySelectorAll('*')].filter(val =>
+            Array.from(val.childNodes).some(({ nodeType, textContent, parentElement }) =>
+                nodeType === 3 && textContent.includes(needle) && !(parentElement.tagName === 'SCRIPT')
+            )
+        );
     };
 
     bindButton = () => {
@@ -169,9 +123,10 @@ class App {
             if (typeof callback === 'function') {
                 callback();
             }
+            return true;
         } catch (e) {
-            //console.log("Couldn't find the Strobe button!");
             this.startTimer();
+            return false;
         }
     };
 
@@ -192,7 +147,7 @@ class App {
             }
         } catch (e) {
             // Button has been lost
-            console.log("Strobe Button Lost!")
+            //console.log("Strobe Button Lost!")
             this.clearTimer();
             this.ready = false;
             this.clearStage();
@@ -200,11 +155,13 @@ class App {
         }
     };
 
-    startup = () => {
+    startup = async () => {
         try {
             // Try to load the stage and fixtures.
-            this.getStage();
-            this.findButton(this.bindButton);
+            let btnFound = await this.findButton(this.bindButton);
+            if (btnFound) {
+                this.getStage();
+            }
         } catch (e) {
             //console.log(e, "Error loading stage!");
         }
