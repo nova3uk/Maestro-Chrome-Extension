@@ -24,6 +24,7 @@ class App {
     fixtures = [];
     shutterFixtures = [];
     strobeFixtures = [];
+    buttonActive = false;
 
     getFilePath = (fileName) => `chrome-extension://${this.ExtensionId}/${fileName}`;
 
@@ -69,6 +70,10 @@ class App {
         );
     };
     setStrobe = async (onOrOff) => {
+        if (onOrOff == 0 && !this.buttonActive) return;
+
+        this.buttonActive = onOrOff == 1 ? true : false;
+
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
             { fixtures: this.strobeFixtures, attributeType: "STROBE" }
@@ -76,10 +81,10 @@ class App {
 
         for (let { fixtures, attributeType } of allFixtures) {
             for (let fixture of fixtures) {
-                let [fixtureName, shutterValues] = fixture.name.split("_");
-                let [normalValue, strobeValue] = shutterValues ? shutterValues.split(":") : [];
+                let [fixtureName, dmxValues] = fixture.name.split("_");
+                let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
 
-                if (!shutterValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
+                if (!dmxValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
 
                 let attributeId = fixture.attribute.findIndex(attr => attr.type === attributeType);
                 if (!attributeId) continue;
@@ -132,7 +137,8 @@ class App {
 
         try {
             this.strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
-            this.strobeBtn.addEventListener('mouseup', () => this.setStrobe(0), false);
+            document.addEventListener('mouseup', () => this.setStrobe(0), false);
+
             this.ready = true;
             this.onReady();
             if (this.logging)
