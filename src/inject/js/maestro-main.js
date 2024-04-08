@@ -103,7 +103,7 @@ class App {
             if (!response.ok) {
                 throw new Error(`HTTP error ${response.status}`);
             }
-            const updatedData = await response.json();
+            return response.json();
         } catch (error) {
             console.error('Fatal error updating fixture data:', error);
         }
