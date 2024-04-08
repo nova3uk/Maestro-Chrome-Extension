@@ -181,6 +181,8 @@ class App {
         }
     };
     onReady = () => {
+        //timer will run every 1s looking to see if the button has been lost
+        //if it is lost it keeps trying to find it, for example when you change tabs
         this.timerInterval = setInterval(this.buttonLostWatcher, 1000);
     }
 }
