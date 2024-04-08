@@ -1,20 +1,25 @@
 var maestro = maestro || {};
 
 class App {
-    constructor(scriptSource, loggingOn = false) {
+    constructor(scriptSource, loggingOn = false, overlayOn = false) {
         if (loggingOn) {
             this.logging = true
             console.log("Maestro Interceptor Logging Enabled!")
         };
-
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
+            this.Origin = src.origin;
         }
+        if (overlayOn) {
+            this.overlay = true;
+            this.injectOverlay();
+        };
     }
 
     // Public variables
     logging = false;
+    overlay = false;
     btnTimer;
     timerInterval;
     ready = false;
@@ -25,6 +30,7 @@ class App {
     shutterFixtures = [];
     strobeFixtures = [];
     buttonActive = false;
+    eventManual;
 
     getFilePath = (fileName) => `chrome-extension://${this.ExtensionId}/${fileName}`;
 
@@ -125,6 +131,30 @@ class App {
                 console.error('Fatal error updating fixture data:', error);
         }
     };
+
+    manualOverride = async (mode, onOrOff) => {
+        let url = 'api/v1/global/manual_override';
+
+        let options = {
+            method: onOrOff == true ? 'PUT' : 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "mode": mode.toUpperCase()
+            })
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+        } catch (error) {
+            if (this.logging)
+                console.error('Fatal error sending manual overide:', error);
+        }
+    };
+
+
     //the document is using dynamic css and labels, without ids.
     //so its required to search for the button by text
     findByText = (needle, query = "*", haystack = document) => {
@@ -188,6 +218,12 @@ class App {
             this.clearStage();
             this.startTimer();
         }
+    };
+
+    injectOverlay = function () {
+        var s = document.createElement("script");
+        s.src = `${this.Origin}/src/inject/js/overlay.js`;
+        (document.head || document.documentElement).appendChild(s);
     };
     startUp = async () => {
         try {

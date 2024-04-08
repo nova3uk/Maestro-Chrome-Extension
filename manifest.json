@@ -12,9 +12,7 @@
   "host_permissions": ["*://*/*"],
   "content_scripts": [
     {
-      "matches": [
-        "*://maestro.mierzyn.com/*",
-        "*://10.10.100.10/*"],
+      "matches": ["*://maestro.mierzyn.com/*", "*://10.10.100.10/*"],
       "exclude_matches": [],
       "js": ["src/inject/js/inject.js"],
       "run_at": "document_end"
@@ -22,7 +20,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/inject/js/maestro-main.js"],
+      "resources": [
+        "src/inject/js/maestro-main.js",
+        "src/inject/js/overlay.js",
+        "src/inject/css/overlay.css"
+      ],
       "matches": ["*://*/*"]
     }
   ]
