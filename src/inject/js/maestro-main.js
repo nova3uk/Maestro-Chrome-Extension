@@ -141,12 +141,11 @@ class App {
             }
             return true;
         } catch (e) {
-            this.startTimer();
             return false;
         }
     };
     startTimer = () => {
-        this.btnTimer = setTimeout(this.startup, 1000);
+        this.btnTimer = setTimeout(this.startUp, 1000);
     };
     clearTimer = () => {
         clearTimeout(this.btnTimer);
@@ -167,15 +166,18 @@ class App {
             this.startTimer();
         }
     };
-    startup = async () => {
+    startUp = async () => {
         try {
-            // Try to load the stage and fixtures.
+            // Try to find the Strobe buttono then load the stage and fixtures.
             let btnFound = await this.findButton(this.bindButton);
             if (btnFound) {
                 this.getStage();
+            }else{
+                this.startTimer();
             }
         } catch (e) {
-            //console.log(e, "Error loading stage!");
+            this.startTimer();
+            console.log(e, "Error loading stage!");
         }
     };
     onReady = () => {
@@ -185,4 +187,4 @@ class App {
 
 // Initialize & assign to global object
 maestro.App = new App(document.currentScript.src);
-maestro.App.startup();
+maestro.App.startUp();
