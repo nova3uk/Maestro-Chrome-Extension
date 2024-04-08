@@ -204,5 +204,5 @@ class App {
 }
 
 // Initialize & assign to global object
-maestro.App = new App(document.currentScript.src, true);
+maestro.App = new App(document.currentScript.src);
 maestro.App.startUp();
