@@ -19,7 +19,7 @@ overlayApp.createContainer = function (overlay) {
     container.style.display = 'flex';
     container.style.justifyContent = 'flex-end';
     container.style.marginRight = '30px';
-    container.innerHTML = '<span style="color: white; margin-right: 10px;font-weight:bold;">Manual Overrides:</span>';
+    container.innerHTML = '<span style="color: white; margin-right: 10px;font-weight:bold;">Latching Manual Overrides:</span>';
     overlay.appendChild(container);
     return container;
 }
@@ -29,13 +29,16 @@ overlayApp.createCheckbox = function (id, text, onChange) {
     let checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = id;
+    checkbox.style.cursor = 'pointer';
     checkbox.addEventListener('change', function () {
+        overlayApp.clearCheckboxes(id);
         onChange(this.checked);
     });
 
     let label = document.createElement('label');
     label.htmlFor = id;
     label.textContent = text;
+    label.style.cursor = 'pointer';
 
     let checkboxContainer = document.createElement('div');
     checkboxContainer.style.marginRight = '10px';
@@ -77,13 +80,24 @@ overlayApp.clearCheckbox = function (btnId) {
     let checkbox = document.getElementById(btnId);
     checkbox.checked = false;
 };
+overlayApp.clearCheckboxes = function (checkedBox) {
+    const buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
+    for(let item of buttonNames){
+        let btnId = 'maestro_ext_' + item.toLowerCase();
+      
+        if(btnId === checkedBox)
+            continue;
+      
+        let checkbox = document.getElementById(btnId);
+        if (checkbox)
+            checkbox.checked = false;
+    }
+};
 (function () {
     let buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
 
     buttonNames.forEach((buttonName) => {
         let btn = maestro.App.findByText(buttonName, 'button')[0];
-        let btnId = 'maestro_ext_' + buttonName.toLowerCase();
-
-        btn.addEventListener('mousedown', () => overlayApp.clearCheckbox(btnId), false);
+        btn.addEventListener('mousedown', () => overlayApp.clearCheckboxes(), false);
     });
 })();
