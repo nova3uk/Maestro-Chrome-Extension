@@ -30,6 +30,7 @@ class App {
     strobeFixtures = [];
     buttonActive = false;
     eventManual;
+    pageObserver;
 
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
 
@@ -190,12 +191,12 @@ class App {
     };
     bindStrobeButton = () => {
         try {
-            let observer = new MutationObserver((mutations) => {
-                if (!this.strobeBtn) this.strobeBtn = this.findByText('Strobe', 'button')[0];
+            this.pageObserver = new MutationObserver((mutations) => {
+                let strobeBtn = this.findByText('Strobe', 'button')[0];
 
-                if (this.strobeBtn && !this.strobeBtn.mousedownEventAdded) {
-                    this.strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
-                    this.strobeBtn.mousedownEventAdded = true;
+                if (strobeBtn && !strobeBtn.mousedownEventAdded) {
+                    strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
+                    strobeBtn.mousedownEventAdded = true;
                     if (this.logging) console.log('Strobe button found.');
                 }
                 if (!document.mouseupEventAdded) {
@@ -205,7 +206,7 @@ class App {
                 }
             });
 
-            observer.observe(document, { childList: true, subtree: true });
+            this.pageObserver.observe(document, { childList: true, subtree: true });
 
             if (this.logging)
                 console.log("Maestro Interceptor Loaded OK!");
@@ -229,12 +230,33 @@ class App {
         try {
             this.getStage();
             this.bindStrobeButton();
+            //this.reloadMonitor();
         } catch (e) {
             this.startTimer();
             if (this.logging)
                 console.error(e, "Error loading stage!");
         }
     };
+    reloadMonitor = function(){     
+        if(window.maestroOnReloadMonitor) return;  
+
+        window.onload = function() {
+            if (isPageReloaded()) {
+                this.startUp();
+            }
+        };
+        window.maestroOnReloadMonitor = true;
+    }
+    isPageReloaded = function() {
+        var perfEntries = performance.getEntriesByType("navigation");
+    
+        for (var i=0; i < perfEntries.length; i++) {
+            if (perfEntries[i].type === "reload") {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 // Initialize & assign to global object
