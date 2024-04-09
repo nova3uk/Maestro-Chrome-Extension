@@ -1,5 +1,6 @@
-var overlayApp = overlayApp || {};
-
+var maestro = maestro || {};
+var overlayApp = maestro.App.overlayApp;
+debugger
 // Function to create an overlay
 overlayApp.createOverlay = function () {
     let overlay = document.createElement('div');

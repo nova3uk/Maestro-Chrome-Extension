@@ -28,6 +28,7 @@ class App {
     overlay = false;
     colorPicker = false;
     latchedOn = false;
+    overlayApp = {};
     btnTimer;
     strobeBtn;
     strobeActive = false;
@@ -342,10 +343,6 @@ class App {
             }
         }
         return false;
-    }
-    clearCheckboxes = function () {
-        if (overlayApp && overlayApp.clearCheckboxes)
-            overlayApp.clearCheckboxes();
     }
 }
 
