@@ -16,11 +16,17 @@ class App {
             if (this.logging)
                 console.log("Footer loaded.")
         };
+        if(scriptSource.indexOf("color=true") !== -1){
+            this.colorPicker = true;
+            if (this.logging)
+                console.log("Color picker loaded.")
+        }
     }
 
     // Public variables
     logging = false;
     overlay = false;
+    colorPicker = false;
     btnTimer;
     strobeBtn;
     stageId = null;
@@ -28,10 +34,31 @@ class App {
     fixtures = [];
     shutterFixtures = [];
     strobeFixtures = [];
-    buttonActive = false;
     eventManual;
     pageObserver;
-
+    maxDmxVal = 1;
+    minDmxVal = 0;
+    allColors = [
+        "RED",
+        "GREEN",
+        "BLUE",
+        "COOL_WHITE",
+        "WARM_WHITE",
+        "CYAN",
+        "MAGENTA",
+        "YELLOW",
+        "AMBER",
+        "UV"
+    ];
+    commonColors = [
+        "RED",
+        "GREEN",
+        "BLUE",
+        "COOL_WHITE",
+        "AMBER",
+        "UV"
+    ];
+    
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
 
     getUrl = async (url) => {
@@ -47,7 +74,7 @@ class App {
     isNumeric = function (value) {
         return !isNaN(parseFloat(value)) && isFinite(value);
     };
-    getQueryStringParameter(querystring = window.Location.search, key) {
+    getQueryStringParameter = function(querystring = window.Location.search, key) {
         const urlParams = new URLSearchParams(querystring);
         return urlParams.get(key);
     };
@@ -81,11 +108,26 @@ class App {
             )
         );
     };
+    setColorAll = async (onOrOff, color = [...this.allColors]) => {
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        for(let fixture of this.fixtures){
+            for(let attr in fixture.attribute){
+                if(this.allColors.includes(fixture.attribute[attr].type)){
+                    if(onOrOff == 1){
+                        if(fixture.attribute[attr].type == color){
+                            await this.updateAttributeRange(fixture.id, attr, this.maxDmxVal,this.maxDmxVal);
+                        }else{
+                            await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.minDmxVal);
+                        }
+                    }else{
+                        await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.maxDmxVal);
+                    }
+                    //await delay(50);
+                }
+            }
+        }
+    };
     setStrobe = async (onOrOff) => {
-        if (onOrOff == 0 && !this.buttonActive) return;
-
-        this.buttonActive = onOrOff == 1 ? true : false;
-
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
             { fixtures: this.strobeFixtures, attributeType: "STROBE" }
@@ -122,6 +164,31 @@ class App {
                 if (this.logging)
                     console.error("Error setting strobe:", e);
             }
+        }
+    };
+    updateAttributeRange = async (fixtureId, attributeId, lowValue, highValue) => {
+        let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
+
+        let options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "attribute": {
+                    "range": {
+                        "lowValue": lowValue, "highValue": highValue
+                    }
+                }
+            })
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            return response.json();
+        } catch (error) {
+            if (this.logging)
+                console.error('Fatal error updating fixture data:', error);
         }
     };
     updateAttribute = async (fixtureId, attributeId, value) => {

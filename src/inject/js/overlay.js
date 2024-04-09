@@ -52,6 +52,39 @@ overlayApp.createCheckbox = function (id, text, onChange) {
 overlayApp.overlay = overlayApp.createOverlay();
 overlayApp.container = overlayApp.createContainer(overlayApp.overlay);
 
+//Create dropdown
+overlayApp.createDropdown = function(id, onChange) {
+    let select = document.createElement('select');
+    select.id = id;
+    
+    let option = document.createElement('option');
+    option.value = "";
+    option.text = "-";
+    select.appendChild(option);
+
+    for(let color of maestro.App.commonColors){
+        let option = document.createElement('option');
+        option.value = color;
+        option.text = color;
+        select.appendChild(option);
+    }
+
+    select.addEventListener('change', function() {
+        onChange(this.value);
+    });
+
+    return select;
+};
+
+// Create the dropdown
+overlayApp.colorDropdown = overlayApp.createDropdown('maestro_ext_color', function (selectedColor) {
+    if(selectedColor === ""){
+        maestro.App.setColorAll(false);
+    }else{
+        maestro.App.setColorAll(true, selectedColor);
+    }    
+});
+
 // Create the checkboxes
 overlayApp.blackoutCheckbox = overlayApp.createCheckbox('maestro_ext_blackout', 'Blackout', function (checked) {
     maestro.App.manualOverride("BLACKOUT", checked);
@@ -69,7 +102,10 @@ overlayApp.effectCheckbox = overlayApp.createCheckbox('maestro_ext_effect', 'Eff
     maestro.App.manualOverride("EFFECT_ON", checked);
 });
 
-// Append the checkboxes to the container
+// Append the controls to the container
+if(maestro.App.colorPicker)
+    overlayApp.container.appendChild(overlayApp.colorDropdown);
+
 overlayApp.container.appendChild(overlayApp.blackoutCheckbox);
 overlayApp.container.appendChild(overlayApp.blinderCheckbox);
 overlayApp.container.appendChild(overlayApp.strobeCheckbox);

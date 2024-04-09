@@ -14,6 +14,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
         chrome.storage.sync.set({ enabledToggle: true });
         chrome.storage.sync.set({ loggingToggle: false });
+        chrome.storage.sync.set({ colorToggle: false });
         chrome.storage.sync.set({ footerToggle: true });
     } else if (details.reason == "update") {
         var thisVersion = chrome.runtime.getManifest().version;

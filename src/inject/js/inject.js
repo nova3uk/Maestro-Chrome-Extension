@@ -15,10 +15,11 @@ const getFromStore = async (key) => {
         var enabled = await getFromStore("enabledToggle");
         var logging = await getFromStore("loggingToggle");
         var footer = await getFromStore("footerToggle");
+        var color = await getFromStore("colorToggle");
 
         if (enabled) {
             let s = document.createElement("script");
-            s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?logging=${logging}&footer=${footer}`);
+            s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?logging=${logging}&footer=${footer}&color=${color}`);
             (document.head || document.documentElement).appendChild(s);
         }
     } catch (e) { console.error(e); }
