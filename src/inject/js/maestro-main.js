@@ -168,7 +168,7 @@ class App {
             }
 
             //now set manual strobes
-            this.setStrobe(onOrOff);
+            if(mode == "STROBE_ON") this.setStrobe(onOrOff);
 
             if (this.logging)
                 console.log(`Manual override ${mode} set to ${onOrOff}`);
