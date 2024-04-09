@@ -1,8 +1,11 @@
 {
   "name": "MaestroDMX Enhancer Extension",
   "description": "Add add-on features to enable more functionaity than is built into the current version.",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
+  "background": {
+    "service_worker": "src/bg/bg-loader.js"
+  },
   "action": {
     "default_popup": "page_action/page_action.html",
     "default_icon": "favicon-maestro.png"

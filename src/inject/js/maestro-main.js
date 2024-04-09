@@ -1,19 +1,20 @@
 var maestro = maestro || {};
 
 class App {
-    constructor(scriptSource, loggingOn = false, overlayOn = false) {
-        if (loggingOn) {
-            this.logging = true
-            console.log("Maestro Interceptor Logging Enabled!")
-        };
+    constructor(scriptSource, loggingOn = false) {
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
             this.Origin = src.origin;
         }
-        if (overlayOn) {
-            this.overlay = true;
+        if (scriptSource.indexOf("logging=true") !== -1) {
+            this.logging = true
+            console.log("Maestro Interceptor Logging Enabled!")
+        };
+        if (scriptSource.indexOf("footer=true") !== -1) {
             this.injectOverlay();
+            if (this.logging)
+                console.log("Footer loaded.")
         };
     }
 
@@ -32,7 +33,7 @@ class App {
     buttonActive = false;
     eventManual;
 
-    getFilePath = (fileName) => `chrome-extension://${this.ExtensionId}/${fileName}`;
+    getFilePath = (fileName) => `${this.Origin}/${fileName}`;
 
     getUrl = async (url) => {
         try {
@@ -44,6 +45,10 @@ class App {
                 console.error("Cannot connect to the API, is Maestro running?", e);
         }
     }
+    getQueryStringParameter(querystring = window.Location.search, key) {
+        const urlParams = new URLSearchParams(querystring);
+        return urlParams.get(key);
+    };
     clearStage = () => {
         this.ready = false;
         this.strobeBtn = null;
@@ -148,6 +153,8 @@ class App {
             if (!response.ok) {
                 throw new Error(`HTTP error ${response.status}`);
             }
+            if (this.logging)
+                console.log(`Manual override ${mode} set to ${onOrOff}`);
         } catch (error) {
             if (this.logging)
                 console.error('Fatal error sending manual overide:', error);
@@ -222,7 +229,7 @@ class App {
 
     injectOverlay = function () {
         var s = document.createElement("script");
-        s.src = `${this.Origin}/src/inject/js/overlay.js`;
+        s.src = this.getFilePath("src/inject/js/overlay.js");
         (document.head || document.documentElement).appendChild(s);
     };
     startUp = async () => {
