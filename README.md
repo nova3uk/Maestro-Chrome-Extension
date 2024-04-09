@@ -29,3 +29,4 @@ If for any reason it gets "stuck" simply reload the page, wait a couple of secon
 
 Please Note: 
 This plugin was developed in a couple of hours one evening, the code is neither clean nor perfect, but it does work well enough for my purposes - if you want to use it you do so at your own RISK, i offer no warranty of any kind whatsoever implied nor otherwise. Copilot was used to help speedup the build and check for problems.
+Any logos or tradenames referring to MaestroDMX are the property of MaestroDMX and I am in no way affiliated with MaestroDMX whatsoever.
