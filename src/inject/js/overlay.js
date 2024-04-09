@@ -183,12 +183,12 @@ overlayApp.colorDropdown = overlayApp.createDropdown('maestro_ext_color', functi
 overlayApp.checkBoxClick = function (item, status, id) {
     if (status === true) {
         let div = document.getElementById(id);
-        div.style.color = overlayApp.btnColors.font;
-        this.style.backgroundColor = overlayApp.btnColors.active;
+        div.style.color = maestro.App.overlayApp.btnColors.font;
+        div.style.backgroundColor = maestro.App.overlayApp.btnColors.active;
     } else {
         let div = document.getElementById(id);
         div.style.color = '';
-        this.style.backgroundColor = overlayApp.btnColors.backgroundColor;
+        div.style.backgroundColor = maestro.App.overlayApp.btnColors.backgroundColor;
     }
 
     maestro.App.manualOverride(item, status);
