@@ -4,12 +4,16 @@ var overlayApp = maestro.App.overlayApp;
 // Function to create an overlay
 overlayApp.createOverlay = function () {
     let overlay = document.createElement('div');
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.justifyContent = 'center';
     overlay.style.position = 'fixed';
     overlay.style.bottom = '0';
     overlay.style.width = '100%';
-    overlay.style.height = '30px';
+    overlay.style.height = '50px';
     overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
     overlay.style.zIndex = '100000';
+    overlay.style.fontSize = '1.2em';
     document.body.appendChild(overlay);
     return overlay;
 }
@@ -20,7 +24,6 @@ overlayApp.createContainer = function (overlay, leftOrRight = 'right') {
     container.style.display = 'flex';
     container.style.justifyContent = leftOrRight == "right" ? 'flex-end' : 'flex-start';
     container.style.marginRight = '30px';
-    container.innerHTML = '<span style="color: white; margin-right: 10px;font-weight:bold;">Latching Manual Overrides:</span>';
     overlay.appendChild(container);
     return container;
 }
@@ -31,7 +34,7 @@ overlayApp.container = overlayApp.createContainer(overlayApp.overlay);
 overlayApp.createText = function (text) {
     let textElement = document.createElement('span');
     textElement.textContent = text;
-    textElement.style.color = 'white';
+    textElement.style.color = '#f4f5f5';
     textElement.style.marginLeft = '10px';
     return textElement;
 }
@@ -42,6 +45,8 @@ overlayApp.createCheckbox = function (id, text, onChange) {
     checkbox.type = 'checkbox';
     checkbox.id = id;
     checkbox.style.cursor = 'pointer';
+    checkbox.style.width = '17px';
+    checkbox.style.height = '17px';
     checkbox.addEventListener('change', function () {
         overlayApp.clearCheckboxes(id);
         onChange(this.checked);
@@ -53,7 +58,14 @@ overlayApp.createCheckbox = function (id, text, onChange) {
     label.style.cursor = 'pointer';
 
     let checkboxContainer = document.createElement('div');
-    checkboxContainer.style.marginRight = '10px';
+    checkboxContainer.style.display = 'flex';
+    checkboxContainer.style.justifyContent = 'center';
+    checkboxContainer.style.alignItems = 'center';
+    checkboxContainer.style.width = '150px';
+    checkboxContainer.style.marginLeft = '10px';
+    checkboxContainer.style.backgroundColor = '#788899';
+    checkboxContainer.style.padding = '5px';
+    checkboxContainer.style.borderRadius = '3px';
     checkboxContainer.appendChild(checkbox);
     checkboxContainer.appendChild(label);
 
@@ -94,19 +106,19 @@ overlayApp.colorDropdown = overlayApp.createDropdown('maestro_ext_color', functi
 });
 
 // Create the checkboxes
-overlayApp.blackoutCheckbox = overlayApp.createCheckbox('maestro_ext_blackout', 'Blackout', function (checked) {
+overlayApp.blackoutCheckbox = overlayApp.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {
     maestro.App.manualOverride("BLACKOUT", checked);
 });
-overlayApp.blinderCheckbox = overlayApp.createCheckbox('maestro_ext_blinder', 'Blinder', function (checked) {
+overlayApp.blinderCheckbox = overlayApp.createCheckbox('maestro_ext_blinder', 'BLINDER', function (checked) {
     maestro.App.manualOverride("WHITEOUT", checked);
 });
-overlayApp.strobeCheckbox = overlayApp.createCheckbox('maestro_ext_strobe', 'Strobe', function (checked) {
+overlayApp.strobeCheckbox = overlayApp.createCheckbox('maestro_ext_strobe', 'STROBE', function (checked) {
     maestro.App.manualOverride("STROBE_ON", checked);
 });
-overlayApp.fogCheckbox = overlayApp.createCheckbox('maestro_ext_fog', 'Fog', function (checked) {
+overlayApp.fogCheckbox = overlayApp.createCheckbox('maestro_ext_fog', 'FOG', function (checked) {
     maestro.App.manualOverride("FOG_ON", checked);
 });
-overlayApp.effectCheckbox = overlayApp.createCheckbox('maestro_ext_effect', 'Effect', function (checked) {
+overlayApp.effectCheckbox = overlayApp.createCheckbox('maestro_ext_effect', 'EFFECT', function (checked) {
     maestro.App.manualOverride("EFFECT_ON", checked);
 });
 
@@ -165,7 +177,7 @@ overlayApp.clearCheckboxes = function (checkedBox) {
     cornerText.style.position = 'fixed';
     cornerText.style.bottom = '0';
     cornerText.style.left = '20px';
-    cornerText.style.color = 'white';
+    cornerText.style.color = '#f4f5f5';
     cornerText.style.width = '100px';
     cornerText.style.height = '30px';
     cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
