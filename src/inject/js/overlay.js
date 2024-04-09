@@ -14,14 +14,25 @@ overlayApp.createOverlay = function () {
 }
 
 // Function to create a container for the checkboxes and labels
-overlayApp.createContainer = function (overlay) {
+overlayApp.createContainer = function (overlay, leftOrRight = 'right') {
     let container = document.createElement('div');
     container.style.display = 'flex';
-    container.style.justifyContent = 'flex-end';
+    container.style.justifyContent = leftOrRight == "right" ? 'flex-end' : 'flex-start';
     container.style.marginRight = '30px';
     container.innerHTML = '<span style="color: white; margin-right: 10px;font-weight:bold;">Latching Manual Overrides:</span>';
     overlay.appendChild(container);
     return container;
+}
+// Create the overlay and container for right items
+overlayApp.overlay = overlayApp.createOverlay();
+overlayApp.container = overlayApp.createContainer(overlayApp.overlay);
+
+overlayApp.createText = function (text) {
+    let textElement = document.createElement('span');
+    textElement.textContent = text;
+    textElement.style.color = 'white';
+    textElement.style.marginLeft = '10px';
+    return textElement;
 }
 
 // Function to create a checkbox with a label and an event listener
@@ -48,28 +59,24 @@ overlayApp.createCheckbox = function (id, text, onChange) {
     return checkboxContainer;
 }
 
-// Create the overlay and container
-overlayApp.overlay = overlayApp.createOverlay();
-overlayApp.container = overlayApp.createContainer(overlayApp.overlay);
-
 //Create dropdown
-overlayApp.createDropdown = function(id, onChange) {
+overlayApp.createDropdown = function (id, onChange) {
     let select = document.createElement('select');
     select.id = id;
-    
+
     let option = document.createElement('option');
     option.value = "";
     option.text = "-";
     select.appendChild(option);
 
-    for(let color of maestro.App.commonColors){
+    for (let color of maestro.App.commonColors) {
         let option = document.createElement('option');
         option.value = color;
         option.text = color;
         select.appendChild(option);
     }
 
-    select.addEventListener('change', function() {
+    select.addEventListener('change', function () {
         onChange(this.value);
     });
 
@@ -78,11 +85,11 @@ overlayApp.createDropdown = function(id, onChange) {
 
 // Create the dropdown
 overlayApp.colorDropdown = overlayApp.createDropdown('maestro_ext_color', function (selectedColor) {
-    if(selectedColor === ""){
+    if (selectedColor === "") {
         maestro.App.setColorAll(false);
-    }else{
+    } else {
         maestro.App.setColorAll(true, selectedColor);
-    }    
+    }
 });
 
 // Create the checkboxes
@@ -103,7 +110,7 @@ overlayApp.effectCheckbox = overlayApp.createCheckbox('maestro_ext_effect', 'Eff
 });
 
 // Append the controls to the container
-if(maestro.App.colorPicker)
+if (maestro.App.colorPicker)
     overlayApp.container.appendChild(overlayApp.colorDropdown);
 
 overlayApp.container.appendChild(overlayApp.blackoutCheckbox);
@@ -117,6 +124,10 @@ overlayApp.clearCheckbox = function (btnId) {
     checkbox.checked = false;
 };
 overlayApp.clearCheckboxes = function (checkedBox) {
+    if (checkedBox !== "maestro_ext_strobe" && checkedBox.toLowerCase() !== "strobe") {
+        maestro.App.latchedOn = false;
+        maestro.App.setStrobe(false, false);
+    }
     const buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
     for (let item of buttonNames) {
         let btnId = 'maestro_ext_' + item.toLowerCase();
@@ -131,14 +142,14 @@ overlayApp.clearCheckboxes = function (checkedBox) {
     if (maestro.App.logging)
         console.log('Cleared checkboxes');
 };
-(function () {
+(async function () {
     let buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
 
     buttonNames.forEach((buttonName) => {
         let observer = new MutationObserver(function (mutations) {
             let btn = maestro.App.findByText(buttonName, 'button')[0];
             if (btn && !btn.clearCheckboxesMousedownEventAdded) {
-                btn.addEventListener('mousedown', () => overlayApp.clearCheckboxes(), false);
+                btn.addEventListener('mousedown', () => overlayApp.clearCheckboxes(buttonName), false);
                 btn.clearCheckboxesMousedownEventAdded = true;
 
                 if (maestro.App.logging) console.log('Overlay button found:', buttonName);
@@ -147,4 +158,22 @@ overlayApp.clearCheckboxes = function (checkedBox) {
         });
         observer.observe(document, { childList: true, subtree: true });
     });
+})();
+(async function () {
+    let cornerText = document.createElement('div');
+    cornerText.style.position = 'fixed';
+    cornerText.style.bottom = '0';
+    cornerText.style.left = '20px';
+    cornerText.style.color = 'white';
+    cornerText.style.width = '100px';
+    cornerText.style.height = '30px';
+    cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    cornerText.style.zIndex = '100001';
+    document.body.appendChild(cornerText);
+
+    let systemInfo = await maestro.App.getSystemInfo();
+    if (systemInfo) {
+        let systemInfoContainer = overlayApp.createText(`v${systemInfo.version}`);
+        cornerText.appendChild(systemInfoContainer);
+    }
 })();

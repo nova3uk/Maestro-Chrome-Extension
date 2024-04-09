@@ -16,7 +16,7 @@ class App {
             if (this.logging)
                 console.log("Footer loaded.")
         };
-        if(scriptSource.indexOf("color=true") !== -1){
+        if (scriptSource.indexOf("color=true") !== -1) {
             this.colorPicker = true;
             if (this.logging)
                 console.log("Color picker loaded.")
@@ -27,8 +27,10 @@ class App {
     logging = false;
     overlay = false;
     colorPicker = false;
+    latchedOn = false;
     btnTimer;
     strobeBtn;
+    strobeActive = false;
     stageId = null;
     stage = null;
     fixtures = [];
@@ -58,7 +60,7 @@ class App {
         "AMBER",
         "UV"
     ];
-    
+
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
 
     getUrl = async (url) => {
@@ -74,7 +76,7 @@ class App {
     isNumeric = function (value) {
         return !isNaN(parseFloat(value)) && isFinite(value);
     };
-    getQueryStringParameter = function(querystring = window.Location.search, key) {
+    getQueryStringParameter = function (querystring = window.Location.search, key) {
         const urlParams = new URLSearchParams(querystring);
         return urlParams.get(key);
     };
@@ -108,18 +110,22 @@ class App {
             )
         );
     };
+    getSystemInfo = async () => {
+        const info = await this.getUrl("/api/v1/system_info");
+        return info;
+    }
     setColorAll = async (onOrOff, color = [...this.allColors]) => {
         const delay = ms => new Promise(res => setTimeout(res, ms));
-        for(let fixture of this.fixtures){
-            for(let attr in fixture.attribute){
-                if(this.allColors.includes(fixture.attribute[attr].type)){
-                    if(onOrOff == 1){
-                        if(fixture.attribute[attr].type == color){
-                            await this.updateAttributeRange(fixture.id, attr, this.maxDmxVal,this.maxDmxVal);
-                        }else{
+        for (let fixture of this.fixtures) {
+            for (let attr in fixture.attribute) {
+                if (this.allColors.includes(fixture.attribute[attr].type)) {
+                    if (onOrOff == 1) {
+                        if (fixture.attribute[attr].type == color) {
+                            await this.updateAttributeRange(fixture.id, attr, this.maxDmxVal, this.maxDmxVal);
+                        } else {
                             await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.minDmxVal);
                         }
-                    }else{
+                    } else {
                         await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.maxDmxVal);
                     }
                     //await delay(50);
@@ -127,7 +133,14 @@ class App {
             }
         }
     };
-    setStrobe = async (onOrOff) => {
+    setStrobe = async (onOrOff, latched = false) => {
+        if (this.strobeActive == false && onOrOff == false) return;
+        if (this.latchedOn == true && onOrOff == false) return;
+
+        this.strobeActive = onOrOff;
+
+        this.latchedOn = latched;
+
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
             { fixtures: this.strobeFixtures, attributeType: "STROBE" }
@@ -236,7 +249,13 @@ class App {
             }
 
             //now set manual strobes
-            if(mode == "STROBE_ON") this.setStrobe(onOrOff);
+            if (mode == "STROBE_ON") {
+                this.latchedOn = onOrOff;
+                this.setStrobe(onOrOff, true)
+            } else {
+                this.latchedOn = false;
+                this.setStrobe(false);
+            }
 
             if (this.logging)
                 console.log(`Manual override ${mode} set to ${onOrOff}`);
@@ -262,12 +281,12 @@ class App {
                 let strobeBtn = this.findByText('Strobe', 'button')[0];
 
                 if (strobeBtn && !strobeBtn.mousedownEventAdded) {
-                    strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
+                    strobeBtn.addEventListener('mousedown', () => this.setStrobe(true, false), false);
                     strobeBtn.mousedownEventAdded = true;
                     if (this.logging) console.log('Strobe button found.');
                 }
                 if (!document.mouseupEventAdded) {
-                    document.addEventListener('mouseup', () => this.setStrobe(0), false);
+                    document.addEventListener('mouseup', () => this.setStrobe(false), false);
                     document.mouseupEventAdded = true;
                     if (this.logging) console.log('Document mouseup event added.');
                 }
@@ -297,32 +316,36 @@ class App {
         try {
             this.getStage();
             this.bindStrobeButton();
-            //this.reloadMonitor();
+            this.reloadMonitor();
         } catch (e) {
             this.startTimer();
             if (this.logging)
                 console.error(e, "Error loading stage!");
         }
     };
-    reloadMonitor = function(){     
-        if(window.maestroOnReloadMonitor) return;  
+    reloadMonitor = function () {
+        if (window.maestroOnReloadMonitor) return;
 
-        window.onload = function() {
+        window.onload = function () {
             if (isPageReloaded()) {
                 this.startUp();
             }
         };
         window.maestroOnReloadMonitor = true;
     }
-    isPageReloaded = function() {
+    isPageReloaded = function () {
         var perfEntries = performance.getEntriesByType("navigation");
-    
-        for (var i=0; i < perfEntries.length; i++) {
+
+        for (var i = 0; i < perfEntries.length; i++) {
             if (perfEntries[i].type === "reload") {
                 return true;
             }
         }
         return false;
+    }
+    clearCheckboxes = function () {
+        if (overlayApp && overlayApp.clearCheckboxes)
+            overlayApp.clearCheckboxes();
     }
 }
 
