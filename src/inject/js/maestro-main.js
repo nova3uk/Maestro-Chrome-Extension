@@ -22,8 +22,6 @@ class App {
     logging = false;
     overlay = false;
     btnTimer;
-    timerInterval;
-    ready = false;
     strobeBtn;
     stageId = null;
     stage = null;
@@ -45,12 +43,14 @@ class App {
                 console.error("Cannot connect to the API, is Maestro running?", e);
         }
     }
+    isNumeric = function (value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
+    };
     getQueryStringParameter(querystring = window.Location.search, key) {
         const urlParams = new URLSearchParams(querystring);
         return urlParams.get(key);
     };
     clearStage = () => {
-        this.ready = false;
         this.strobeBtn = null;
         this.stageId = null;
         this.stage = null;
@@ -91,22 +91,35 @@ class App {
         ];
 
         for (let { fixtures, attributeType } of allFixtures) {
-            for (let fixture of fixtures) {
-                let [fixtureName, dmxValues] = fixture.name.split("_");
-                let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
+            try {
+                for (let fixture of fixtures) {
+                    try {
+                        let [fixtureName, dmxValues] = fixture.name.split("_");
+                        let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
 
-                if (!dmxValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
+                        if (!dmxValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
 
-                let attributeId = fixture.attribute.findIndex(attr => attr.type === attributeType);
-                if (!attributeId) continue;
+                        if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
+                            throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
+                        }
 
-                let setValue = onOrOff == 1 ? strobeValue : normalValue;
+                        let attributeId = fixture.attribute.findIndex(attr => attr.type === attributeType);
+                        if (!attributeId) continue;
 
-                this.updateAttribute(fixture.id, attributeId, setValue);
+                        let setValue = onOrOff == 1 ? strobeValue : normalValue;
 
+                        this.updateAttribute(fixture.id, attributeId, setValue);
+
+                        if (this.logging)
+                            console.log(`Fixture ${fixture.name}, attribue ${attributeId} set to ${setValue}`);
+                    } catch (e) {
+                        if (this.logging)
+                            console.log("Error setting strobe:", e);
+                    }
+                }
+            } catch (e) {
                 if (this.logging)
-                    console.log(`Fixture ${fixture.name}, attribue ${attributeId} set to ${setValue}`);
-
+                    console.error("Error setting strobe:", e);
             }
         }
     };
@@ -153,6 +166,10 @@ class App {
             if (!response.ok) {
                 throw new Error(`HTTP error ${response.status}`);
             }
+
+            //now set manual strobes
+            this.setStrobe(onOrOff);
+
             if (this.logging)
                 console.log(`Manual override ${mode} set to ${onOrOff}`);
         } catch (error) {
@@ -171,15 +188,25 @@ class App {
             )
         );
     };
-    bindButton = () => {
-        if (this.ready) return;
-
+    bindStrobeButton = () => {
         try {
-            this.strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
-            document.addEventListener('mouseup', () => this.setStrobe(0), false);
+            let observer = new MutationObserver((mutations) => {
+                if (!this.strobeBtn) this.strobeBtn = this.findByText('Strobe', 'button')[0];
 
-            this.ready = true;
-            this.onReady();
+                if (this.strobeBtn && !this.strobeBtn.mousedownEventAdded) {
+                    this.strobeBtn.addEventListener('mousedown', () => this.setStrobe(1), false);
+                    this.strobeBtn.mousedownEventAdded = true;
+                    if (this.logging) console.log('Strobe button found.');
+                }
+                if (!document.mouseupEventAdded) {
+                    document.addEventListener('mouseup', () => this.setStrobe(0), false);
+                    document.mouseupEventAdded = true;
+                    if (this.logging) console.log('Document mouseup event added.');
+                }
+            });
+
+            observer.observe(document, { childList: true, subtree: true });
+
             if (this.logging)
                 console.log("Maestro Interceptor Loaded OK!");
         } catch (e) {
@@ -187,46 +214,12 @@ class App {
                 console.error("Could not bind Strobe Button onClick event!")
         }
     };
-    findButton = (callback) => {
-        try {
-            this.strobeBtn = this.findByText('Strobe', 'button')[0];
-
-            if (this.strobeBtn === undefined) {
-                throw new Error("Strobe button not found");
-            }
-
-            if (typeof callback === 'function') {
-                callback();
-            }
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
     startTimer = () => {
         this.btnTimer = setTimeout(this.startUp, 1000);
     };
     clearTimer = () => {
         clearTimeout(this.btnTimer);
-        clearInterval(this.timerInterval);
     };
-    buttonLostWatcher = () => {
-        try {
-            let btn = this.findByText('Strobe')[0];
-            if (btn === undefined) {
-                throw new Error
-            }
-        } catch (e) {
-            // Button has been lost
-            if (this.logging)
-                console.log("Strobe Button Lost!");
-            this.clearTimer();
-            this.ready = false;
-            this.clearStage();
-            this.startTimer();
-        }
-    };
-
     injectOverlay = function () {
         var s = document.createElement("script");
         s.src = this.getFilePath("src/inject/js/overlay.js");
@@ -234,24 +227,14 @@ class App {
     };
     startUp = async () => {
         try {
-            // Try to find the Strobe buttono then load the stage and fixtures.
-            let btnFound = await this.findButton(this.bindButton);
-            if (btnFound) {
-                this.getStage();
-            } else {
-                this.startTimer();
-            }
+            this.getStage();
+            this.bindStrobeButton();
         } catch (e) {
             this.startTimer();
             if (this.logging)
                 console.error(e, "Error loading stage!");
         }
     };
-    onReady = () => {
-        //timer will run every 1s looking to see if the button has been lost
-        //if it is lost it keeps trying to find it, for example when you change tabs
-        this.timerInterval = setInterval(this.buttonLostWatcher, 1000);
-    }
 }
 
 // Initialize & assign to global object

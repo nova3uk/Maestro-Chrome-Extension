@@ -82,22 +82,33 @@ overlayApp.clearCheckbox = function (btnId) {
 };
 overlayApp.clearCheckboxes = function (checkedBox) {
     const buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
-    for(let item of buttonNames){
+    for (let item of buttonNames) {
         let btnId = 'maestro_ext_' + item.toLowerCase();
-      
-        if(btnId === checkedBox)
+
+        if (btnId === checkedBox)
             continue;
-      
+
         let checkbox = document.getElementById(btnId);
         if (checkbox)
             checkbox.checked = false;
     }
+    if (maestro.App.logging)
+        console.log('Cleared checkboxes');
 };
 (function () {
     let buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
 
     buttonNames.forEach((buttonName) => {
-        let btn = maestro.App.findByText(buttonName, 'button')[0];
-        btn.addEventListener('mousedown', () => overlayApp.clearCheckboxes(), false);
+        let observer = new MutationObserver(function (mutations) {
+            let btn = maestro.App.findByText(buttonName, 'button')[0];
+            if (btn && !btn.clearCheckboxesMousedownEventAdded) {
+                btn.addEventListener('mousedown', () => overlayApp.clearCheckboxes(), false);
+                btn.clearCheckboxesMousedownEventAdded = true;
+
+                if (maestro.App.logging) console.log('Overlay button found:', buttonName);
+
+            }
+        });
+        observer.observe(document, { childList: true, subtree: true });
     });
 })();
