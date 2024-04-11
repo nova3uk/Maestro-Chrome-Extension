@@ -9,7 +9,6 @@ class OverlayApp extends Globals {
     btnColors = {};
 
     start = async () => {
-
         this.btnColors.backgroundColor = "#308fe8";
         this.btnColors.hover = "#0f1827";
         this.btnColors.active = "#0f1827";
@@ -22,7 +21,6 @@ class OverlayApp extends Globals {
         this.loadCornerText();
 
         await this.getButtonNames();
-
 
         // Create the dropdown
         this.colorDropdown = this.createDropdown('maestro_ext_color', function (selectedColor) {
