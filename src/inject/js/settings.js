@@ -1,5 +1,3 @@
-
-
 var maestro = maestro || {};
 class SettingsApp extends Globals {
     constructor(scriptSource, loggingOn = false) {
@@ -51,35 +49,51 @@ class SettingsApp extends Globals {
     retrieveFixtureProfile = async (macroName, fixtureId) => {
         return await this.getLocalSetting("fixtureProfile_" + macroName + "_" + fixtureId);
     };
+    retrieveAllKeys = async () => {
+        return new Promise((resolve, reject) => {
+            chrome.storage.local.get(null, function (items) {
+                resolve(Object.keys(items));
+            });
+        });
+    }
     deleteFixtureProfile = async (macroName, fixtureId) => {
         this.deleteLocalSetting("fixtureProfile_" + macroName + "_" + fixtureId);
     };
-    applyMacro = async (macroName) => {
-        await this.loadMacros().then(macros => {
+
+    applyMacro = async function (macroName) {
+        var keys = await this.retrieveAllKeys()
+
+        this.loadMacros().then(macros => {
             macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
 
             if (macros) {
-                for (let macro of macros) {
-                    for (let fixture of macro.macro.fixtures) {
-                        this.storeFixtureProfile(macroName, fixture).then(nextAction => {
-                            let fixtureProfile = {
-                                fixture: fixture
-                            };
+                const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
+                const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key.endsWith(id)));
 
-                            this.patchFixture(fixture.id, fixtureProfile);
+                //const commonIds = pendingMacroIds.filter(id => runningMacroIds.includes(id));
 
-                            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-                            applyButton.disabled = true;
-                            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-                            clearButton.disabled = false;
-                        });
+                if (runningMacroIds.length > 0) {
+                    return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
+                }
+            }
+            for (let macro of macros) {
+                for (let fixture of macro.macro.fixtures) {
+                    this.storeFixtureProfile(macroName, fixture).then(nextAction => {
+                        let fixtureProfile = {
+                            fixture: fixture
+                        };
 
+                        this.patchFixture(fixture.id, fixtureProfile);
 
-                    }
+                        const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+                        applyButton.disabled = true;
+                        const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+                        clearButton.disabled = false;
+                    });
                 }
             }
         });
-    };
+    }
     revertMacro = async (macroName) => {
 
         await this.loadMacros().then(macros => {
