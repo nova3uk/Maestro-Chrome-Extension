@@ -9,7 +9,7 @@ class SettingsApp extends Globals {
         this.maestroUrl = this.parseMaestroUrl();
     }
     start = async () => {
-        await this.getStage();
+        await this.getStages();
         this.controlPageLink();
 
         this.stageTable(this.stage);
@@ -22,6 +22,10 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.checkRunningMacros(macros)
         });
     }
+    backupAllFixtures = async () => {
+        let fixtures = await this.getActiveStage();
+        await this.saveLocalSetting("fixtures", fixtures);
+    }
     controlPageLink = function () {
         var link = document.getElementById('controlPageLink')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
@@ -31,6 +35,9 @@ class SettingsApp extends Globals {
             if (!macros) {
                 return;
             }
+            //only for currently active stage
+            macros = macros.filter(macro => macro.macro.stageId == this.stageId);
+
             if (typeof callback == "function") {
                 callback(macros);
             }
@@ -49,7 +56,7 @@ class SettingsApp extends Globals {
     };
     applyMacro = async (macroName) => {
         await this.loadMacros().then(macros => {
-            macros = macros.filter(macro => macro.macro.name == macroName);
+            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
 
             if (macros) {
                 for (let macro of macros) {
@@ -76,7 +83,7 @@ class SettingsApp extends Globals {
     revertMacro = async (macroName) => {
 
         await this.loadMacros().then(macros => {
-            macros = macros.filter(macro => macro.macro.name == macroName);
+            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
             if (macros) {
                 var fixtures = macros[0].macro.fixtures;
                 for (let fixture of fixtures) {
@@ -94,7 +101,7 @@ class SettingsApp extends Globals {
     };
     deleteMacro = async (macroName) => {
         await this.loadMacros().then(macros => {
-            macros = macros.filter(macro => macro.macro.name !== macroName);
+            macros = macros.filter(macro => macro.macro.name !== macroName && macro.macro.stageId == this.stageId);
             maestro.SettingsApp.saveLocalSetting("macros", macros);
 
             const macroRow = document.querySelector('tr[data-id="' + macroName + '"]');
@@ -106,6 +113,8 @@ class SettingsApp extends Globals {
     checkRunningMacros = async (macros) => {
         if (!macros)
             macros = await this.loadMacros();
+
+        macros = macros.filter(macro => macro.macro.stageId == this.stageId);
 
         for (let macro of macros) {
             for (let fixture of macro.macro.fixtures) {
@@ -126,7 +135,7 @@ class SettingsApp extends Globals {
 
         await this.prepareFetch(
             this.httpMethods.PATCH,
-            `${maestro.SettingsApp.maestroUrl}api/v1/output/stage/${this.stageId}/fixture/${fixtureId}`,
+            `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`,
             fixture
         );
     }
@@ -152,11 +161,11 @@ class SettingsApp extends Globals {
                 if (!macros) {
                     macros = [];
                 }
-                let macroExists = macros.find(macro => macro.macro.name == macroName);
+                let macroExists = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
                 if (macroExists) {
                     return alert('Macro name already exists');
                 }
-                macros.push({ "macro": { name: macroName, fixtures: macroFixtures } });
+                macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
                 window.location.reload();
             });
@@ -166,18 +175,20 @@ class SettingsApp extends Globals {
         var tData = [];
         for (let group of activeFixtureGroups) {
             let i = 0;
-            for (let fixtureId of group.fixtureId) {
-                let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
-                tData.push({
-                    id: fixture.id,
-                    name: fixture.name,
-                    active: fixture.enabled,
-                    fixtureGroup: this.groups.find(ele => ele.id == fixture.fixtureGroupId).name,
-                    fixtureGroupId: fixture.fixtureGroupId,
-                    fixturePosition: i,
-                    index: fixture.index
-                });
-                i++;
+            if (group.fixtureId) {
+                for (let fixtureId of group.fixtureId) {
+                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    tData.push({
+                        id: fixture.id,
+                        name: fixture.name,
+                        active: fixture.enabled,
+                        fixtureGroup: this.groups.find(ele => ele.id == fixture.fixtureGroupId).name,
+                        fixtureGroupId: fixture.fixtureGroupId,
+                        fixturePosition: i,
+                        index: fixture.index
+                    });
+                    i++;
+                }
             }
         }
         tData = tData.sort((a, b) => {

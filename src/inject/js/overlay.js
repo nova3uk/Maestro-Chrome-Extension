@@ -2,6 +2,11 @@ var maestro = maestro || {};
 class OverlayApp extends Globals {
     constructor(scriptSource, loggingOn = false) {
         super()
+        if (scriptSource) {
+            var src = new URL(scriptSource);
+            this.ExtensionId = src.host;
+            this.Origin = src.origin;
+        }
         this.scriptSource = scriptSource;
         this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();

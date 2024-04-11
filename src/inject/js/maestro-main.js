@@ -3,6 +3,8 @@ var maestro = maestro || {};
 class App extends Globals {
     constructor(scriptSource, loggingOn = false) {
         super();
+        this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
+
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
@@ -22,6 +24,11 @@ class App extends Globals {
             if (this.logging)
                 console.log("Color picker loaded.")
         };
+        if (scriptSource.indexOf("blinder=true") !== -1) {
+            this.strobeAt100Percent = true;
+            if (this.logging)
+                console.log("Blinder toggle active.")
+        };
     }
 
     testSetPositions = function () {
@@ -35,7 +42,7 @@ class App extends Globals {
 
         this.prepareFetch(
             this.httpMethods.PUT,
-            `api/v1/output/stage/71e61e5a-6257-4bc6-8176-d78aa45060d0/fixture/528bd747-bf10-478c-b6fe-6dfca9e6944c/attribute/${attribute}`,
+            `api/${this.apiVersion}/output/stage/71e61e5a-6257-4bc6-8176-d78aa45060d0/fixture/528bd747-bf10-478c-b6fe-6dfca9e6944c/attribute/${attribute}`,
             newRange
         );
     }
@@ -48,7 +55,7 @@ class App extends Globals {
     };
     getStage = async () => {
         this.clearStage();
-        const stage = await this.getUrl("/api/v1/output/stage");
+        const stage = await this.getUrl(`/api/${this.apiVersion}/output/stage`);
         this.stageId = stage.activeStageId;
         this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
 
@@ -70,7 +77,7 @@ class App extends Globals {
         );
     };
     getSystemInfo = async () => {
-        const info = await this.getUrl("/api/v1/system_info");
+        const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
         return info;
     }
     setColorAll = async (onOrOff, color = [...this.allColors]) => {
@@ -139,7 +146,7 @@ class App extends Globals {
         }
     };
     updateAttributeRange = async (fixtureId, attributeId, lowValue, highValue) => {
-        let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
+        let url = `/api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
 
         let options = {
             method: 'PUT',
@@ -164,7 +171,7 @@ class App extends Globals {
         }
     };
     updateAttribute = async (fixtureId, attributeId, value) => {
-        let url = `/api/v1/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
+        let url = `/api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
 
         let options = {
             method: 'PUT',
@@ -191,12 +198,21 @@ class App extends Globals {
     };
 
     manualOverride = async (mode, onOrOff) => {
-        let url = 'api/v1/global/manual_override';
+        let url = `api/${this.apiVersion}/global/manual_override`;
 
+        var dimmer = 0;
+        if (this.strobeAt100Percent) {
+            dimmer = 1;
+        } else {
+            let brightness = await this.getBrightness();
+            dimmer = brightness.value;
+        }
+        debugger
         let options = {
             method: onOrOff == true ? 'PUT' : 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                "highValue": dimmer,
                 "mode": mode.toUpperCase()
             })
         };

@@ -1,9 +1,11 @@
 var maestro = maestro || {};
 class Globals {
     // Public variables
+    apiVersion = "v1";
     logging = false;
     overlay = false;
     colorPicker = false;
+    strobeAt100Percent = false;
     latchedOn = false;
     overlayApp = {};
     btnTimer;
@@ -96,7 +98,16 @@ class Globals {
                 console.error("Cannot connect to the API, is Maestro running?", e);
         }
     };
-
+    openNewTab = function (page) {
+        let url = chrome.runtime.getURL(page);
+        chrome.tabs.query({ url: url }, function (tabs) {
+            if (tabs.length > 0) {
+                chrome.tabs.update(tabs[0].id, { active: true });
+            } else {
+                chrome.tabs.create({ url: url });
+            }
+        });
+    };
     setAttributeRange = function (range) {
         return {
             attribute: {
@@ -126,12 +137,15 @@ class Globals {
         }
         return response.json();
     }
-    getFixture = async (fixtureId) => {
-        return await this.getUrl(`${this.maestroUrl}api/v1/output/stage/${this.stageId}/fixture/${fixtureId}`);
+    getBrightness = async (fixtureId) => {
+        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
     };
-    getStage = async (force = false) => {
+    getFixture = async (fixtureId) => {
+        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
+    };
+    getStages = async (force = false) => {
         if (!this.stage || force) {
-            const stage = await this.getUrl(`${this.maestroUrl}api/v1/output/stage`);
+            const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
             this.stageId = stage.activeStageId;
             this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
             this.stage = stage;
@@ -142,7 +156,7 @@ class Globals {
         return this.stage;
     };
     getActiveStage = async () => {
-        const stage = await this.getUrl(`${this.maestroUrl}api/v1/output/stage/${this.stageId}`);
+        const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}`);
         this.activeStage = stage;
         this.activeStageFixtureGroups = stage.fixtureGroup
         return this.activeStage;

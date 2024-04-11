@@ -16,6 +16,7 @@ const getFromStore = async (key) => {
         var logging = await getFromStore("loggingToggle");
         var footer = await getFromStore("footerToggle");
         var color = await getFromStore("colorToggle");
+        var blinder = await getFromStore("blinderToggle");
 
         if (enabled) {
             let g = document.createElement("script");
@@ -23,7 +24,7 @@ const getFromStore = async (key) => {
             (document.head || document.documentElement).appendChild(g);
             g.onload = function () {
                 let s = document.createElement("script");
-                s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?logging=${logging}&footer=${footer}&color=${color}`);
+                s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?logging=${logging}&footer=${footer}&color=${color}&blinder=${blinder}`);
                 (document.head || document.documentElement).appendChild(s);
             };
         }
