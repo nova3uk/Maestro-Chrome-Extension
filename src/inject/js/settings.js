@@ -192,13 +192,18 @@ class SettingsApp extends Globals {
             if (group.fixtureId) {
                 for (let fixtureId of group.fixtureId) {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    let [fixtureName, dmxValues] = fixture.name.split("_");
+                    let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
+
                     tData.push({
                         id: fixture.id,
                         name: fixture.name,
-                        active: fixture.enabled,
                         fixtureGroup: this.groups.find(ele => ele.id == fixture.fixtureGroupId).name,
-                        fixtureGroupId: fixture.fixtureGroupId,
                         fixturePosition: i,
+                        active: fixture.enabled,
+                        shutter: normalValue,
+                        strobe: strobeValue,
+                        fixtureGroupId: fixture.fixtureGroupId,
                         index: fixture.index
                     });
                     i++;
@@ -213,34 +218,41 @@ class SettingsApp extends Globals {
             onClickRow: function (row) {
                 document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
             },
-            columns: [{
-                field: 'name',
-                title: 'Fixture Name'
-            }, {
-                field: 'fixtureGroup',
-                title: 'Fixture Group'
-            }, {
-                field: 'fixturePosition',
-                title: 'Arrangement'
-            }, {
-                field: 'active',
-                title: 'Enabled'
-            }, {
-                field: 'fixtureGroupId',
-                title: ''
-            }],
             data: tData,
-            columns: [{}, {}, {}, {},
-            {
-                field: 'operate',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return '<input type="checkbox" name="fixture_cbx" value="' + row.id + '" id="cb_' + row.id + '" class="checkbox">';
-                }
-            }],
+            columns: [
+                {}, {}, {}, {},
+                {
+                    field: 'shutter',
+                    title: 'Shutter Open',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        //return '<input type="number" min="0" max="255" value="' + row.shutter + '">';
+                        return "<span>" + (row.shutter || "") + "</span>"
+                    }
+                },
+                {
+                    field: 'strobe',
+                    title: 'Strobe',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        //return '<input type="number" min="0" max="255" value="' + row.strobe + '">';
+                        return "<span>" + (row.strobe || "") + "</span>";
+                    }
+                },
+                {
+                    field: 'active',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return '<input type="checkbox" name="fixture_cbx" value="' + row.id + '" id="cb_' + row.id + '" class="checkbox">';
+                    }
+                }],
             rowAttributes: function (row, index) {
                 return {
                     'data-id': row.id,
@@ -264,9 +276,7 @@ class SettingsApp extends Globals {
                     }
 
                 }
-            },
-            sortName: 'active',
-            sortOrder: 'desc'
+            }
         });
     }
     macroTable = function (macros) {
