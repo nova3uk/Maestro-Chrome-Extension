@@ -207,7 +207,6 @@ class App extends Globals {
             let brightness = await this.getBrightness();
             dimmer = brightness.value;
         }
-        debugger
         let options = {
             method: onOrOff == true ? 'PUT' : 'DELETE',
             headers: { 'Content-Type': 'application/json' },
