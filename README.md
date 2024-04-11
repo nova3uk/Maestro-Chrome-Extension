@@ -3,11 +3,13 @@ See https://www.maestrodmx.com/ for more information.
 
 This Chrome Extension is currently only for the purpose of temporarily adding functionaity not yet available in the official software, by means of manipulation of the web interface. It is of course only available on versions of Chrome which can run Extensions, therefore desktop only not mobile.
 
-Currently it supports 2 main functions:
+Currently it supports 3 main functions:
 
 1. Adding the possibility to Strobe fixtures which depend on a Shutter, or a Strobe channel - fixtures using normal RGB values will already work. In general this usually means moving head fixtures or similar with a color wheel.
 2. Adding a Footer bar with Latching Manual Overrides (Blackout, Blinder, Strobe, Fog and Effect) which is visible on any page, not only the Show Page. These buttons are Latching (they stay on until turned off, no more finger holding)
+3. Macros. Adding the possibility to store a fixtures DMX settings in a macro, and recalling it later. For example to set movers to a specific colour and location.
 
+   
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
 Setup Instructions.
