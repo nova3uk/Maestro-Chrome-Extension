@@ -24,6 +24,10 @@
 			letter-spacing: 0.00938em;
 		}
 
+		.main {
+			padding: 0 5px 10px 5px;
+		}
+
 		.logo {
 
 			margin: 10px;
@@ -33,6 +37,10 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+		}
+
+		.right-align {
+			text-align: right;
 		}
 
 		.footer-toggle {
@@ -100,51 +108,56 @@
 </head>
 
 <body>
-	<div class="centered-content">
-		<img class="logo" src="./maestro-logo-full.png" width="154" height="26">
-		<h1><i>Extension</i></h1>
+	<div class="main">
+		<div class="centered-content">
+			<img class="logo" src="./maestro-logo-full.png" width="154" height="26">
+			<h1><i>Extension</i></h1>
+		</div>
+
+		<div class="footer-toggle">
+			<label class="switch">
+				<input type="checkbox" id="enabledToggle">
+				<span class="slider round"></span>
+			</label>
+			<label for="enabledToggle">
+				<span>Extension Enabled</span>
+			</label>
+		</div>
+
+		<div class="footer-toggle">
+			<label class="switch">
+				<input type="checkbox" id="footerToggle">
+				<span class="slider round"></span>
+			</label>
+			<label for="footerToggle">
+				<span>Activate Footer</span>
+			</label>
+		</div>
+
+		<div class="footer-toggle">
+			<label class="switch">
+				<input type="checkbox" id="colorToggle">
+				<span class="slider round"></span>
+			</label>
+			<label for="footerToggle">
+				<span>Color Overrides<b><i>(Unstable!!)</i></b></span>
+			</label>
+		</div>
+
+		<div class="footer-toggle">
+			<label class="switch">
+				<input type="checkbox" id="loggingToggle">
+				<span class="slider round"></span>
+			</label>
+			<label for="loggingToggle">
+				<span>Console Logging</span>
+			</label>
+		</div>
+		</br>
+		<div class="right-align">
+			<button id="openSettings">Settings</button>
+		</div>
 	</div>
-
-	<div class="footer-toggle">
-		<label class="switch">
-			<input type="checkbox" id="enabledToggle">
-			<span class="slider round"></span>
-		</label>
-		<label for="enabledToggle">
-			<span>Extension Enabled</span>
-		</label>
-	</div>
-
-	<div class="footer-toggle">
-		<label class="switch">
-			<input type="checkbox" id="footerToggle">
-			<span class="slider round"></span>
-		</label>
-		<label for="footerToggle">
-			<span>Activate Footer</span>
-		</label>
-	</div>
-
-	<div class="footer-toggle">
-		<label class="switch">
-			<input type="checkbox" id="colorToggle">
-			<span class="slider round"></span>
-		</label>
-		<label for="footerToggle">
-			<span>Color Overrides<b><i>(Unstable!!)</i></b></span>
-		</label>
-	</div>	
-
-	<div class="footer-toggle">
-		<label class="switch">
-			<input type="checkbox" id="loggingToggle">
-			<span class="slider round"></span>
-		</label>
-		<label for="loggingToggle">
-			<span>Console Logging</span>
-		</label>
-	</div>
-
 	<script src="popup.js"></script>
 </body>
 

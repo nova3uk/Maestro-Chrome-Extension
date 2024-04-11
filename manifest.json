@@ -1,7 +1,7 @@
 {
   "name": "MaestroDMX Enhancer Extension",
   "description": "Add add-on features to enable more functionaity than is built into the current version.",
-  "version": "1.1",
+  "version": "1.2",
   "manifest_version": 3,
   "background": {
     "service_worker": "src/bg/bg-loader.js"
@@ -15,7 +15,7 @@
   "host_permissions": ["*://*/*"],
   "content_scripts": [
     {
-      "matches": ["*://maestro.mierzyn.com/*", "*://10.10.100.10/*"],
+      "matches": ["*://maestro.mierzyn.com/*"],
       "exclude_matches": [],
       "js": ["src/inject/js/inject.js"],
       "run_at": "document_end"
@@ -24,9 +24,17 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "src/inject/js/globals.js",
         "src/inject/js/maestro-main.js",
         "src/inject/js/overlay.js",
-        "src/inject/css/overlay.css"
+        "src/inject/css/overlay.css",
+        "src/external/bootstrap.bundle.min.js",
+        "src/external/bootstrap-icons.css",
+        "src/external/bootstrap.min.css",
+        "src/external/jquery.min.js",
+        "src/external/bootstrap-table.min.js",
+        "src/external/bootstrap-table.min.css",
+        "src/external/json-editor.js"
       ],
       "matches": ["*://*/*"]
     }

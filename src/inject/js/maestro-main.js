@@ -1,7 +1,8 @@
 var maestro = maestro || {};
 
-class App {
+class App extends Globals {
     constructor(scriptSource, loggingOn = false) {
+        super();
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
@@ -20,67 +21,24 @@ class App {
             this.colorPicker = true;
             if (this.logging)
                 console.log("Color picker loaded.")
-        }
+        };
     }
 
-    // Public variables
-    logging = false;
-    overlay = false;
-    colorPicker = false;
-    latchedOn = false;
-    overlayApp = {};
-    btnTimer;
-    strobeBtn;
-    strobeActive = false;
-    stageId = null;
-    stage = null;
-    fixtures = [];
-    shutterFixtures = [];
-    strobeFixtures = [];
-    eventManual;
-    pageObserver;
-    maxDmxVal = 1;
-    minDmxVal = 0;
-    allColors = [
-        "RED",
-        "GREEN",
-        "BLUE",
-        "COOL_WHITE",
-        "WARM_WHITE",
-        "CYAN",
-        "MAGENTA",
-        "YELLOW",
-        "AMBER",
-        "UV"
-    ];
-    commonColors = [
-        "RED",
-        "GREEN",
-        "BLUE",
-        "COOL_WHITE",
-        "AMBER",
-        "UV"
-    ];
-
-    getFilePath = (fileName) => `${this.Origin}/${fileName}`;
-
-    getUrl = async (url) => {
-        try {
-            const response = await fetch(url);
-            const responseJson = await response.json();
-            return responseJson;
-        } catch (e) {
-            if (this.logging)
-                console.error("Cannot connect to the API, is Maestro running?", e);
-        }
+    testSetPositions = function () {
+        this.testSetPosition(0, 138, 138);
+        this.testSetPosition(2, 42, 42);
     }
-    isNumeric = function (value) {
-        return !isNaN(parseFloat(value)) && isFinite(value);
-    };
-    getQueryStringParameter = function (querystring = window.Location.search, key) {
-        const urlParams = new URLSearchParams(querystring);
-        return urlParams.get(key);
-    };
+    testSetPosition = function (attribute, low = 0, high = 255) {
+        let rangeAttributeType = { ...this.getAttributeType('range'), lowValue: low, highValue: high };
+        let calculatedRange = this.calculateRange(rangeAttributeType);
+        let newRange = this.setAttributeRange(calculatedRange);
+
+        this.prepareFetch(
+            this.httpMethods.PUT,
+            `api/v1/output/stage/71e61e5a-6257-4bc6-8176-d78aa45060d0/fixture/528bd747-bf10-478c-b6fe-6dfca9e6944c/attribute/${attribute}`,
+            newRange
+        );
+    }
     clearStage = () => {
         this.strobeBtn = null;
         this.stageId = null;

@@ -22,7 +22,25 @@ let loadSettings = function () {
             checkbox.checked = result[checkbox.id] || false;
         });
     });
+
+    document.getElementById('openSettings').addEventListener('click', function () {
+        let url = chrome.runtime.getManifest().content_scripts[0].matches[0];
+        openNewTab('settings/settings.html?maestro_url=' + encodeURIComponent(url));
+
+    });
 };
+
+let openNewTab = function (page) {
+    let url = chrome.runtime.getURL(page);
+    chrome.tabs.query({ url: url }, function (tabs) {
+        if (tabs.length > 0) {
+            chrome.tabs.update(tabs[0].id, { active: true });
+        } else {
+            chrome.tabs.create({ url: url });
+        }
+    });
+};
+
 
 // Call loadSettings when the page loads
 window.addEventListener('DOMContentLoaded', loadSettings);
