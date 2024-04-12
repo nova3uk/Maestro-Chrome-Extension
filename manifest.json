@@ -11,8 +11,7 @@
     "default_icon": "favicon-maestro.png"
   },
   "default_locale": "en",
-  "permissions": ["storage", "tabs", "contextMenus", "webNavigation"],
-  "host_permissions": ["*://*/*"],
+  "permissions": ["storage", "tabs"],
   "content_scripts": [
     {
       "matches": ["*://maestro.local/*", "*://192.168.37.1/*"],
@@ -22,7 +21,7 @@
     }
   ],
   "externally_connectable": {
-    "matches": ["*://*/*"]
+    "matches": ["*://maestro.local/*", "*://192.168.37.1/*"]
   },
   "web_accessible_resources": [
     {
