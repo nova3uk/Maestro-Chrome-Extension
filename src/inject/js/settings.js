@@ -256,6 +256,9 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
+                        if (row.name.toUpperCase().includes("IGNORE")) {
+                            return "";
+                        }
                         return '<input type="checkbox" name="fixture_cbx" value="' + row.id + '" id="cb_' + row.id + '" class="checkbox">';
                     }
                 }],
@@ -268,19 +271,27 @@ class SettingsApp extends Globals {
                 }
             },
             rowStyle: function (row, index) {
-                if (row.active) {
+                if (row.name.toUpperCase().includes("IGNORE")) {
                     return {
                         css: {
-                            'background-color': '#66ffcc'
+                            'background-color': '#cccccc'
                         }
                     }
                 } else {
-                    return {
-                        css: {
-                            'background-color': '#ffcce0'
+                    if (row.active) {
+                        return {
+                            css: {
+                                'background-color': '#66ffcc'
+                            }
                         }
-                    }
+                    } else {
+                        return {
+                            css: {
+                                'background-color': '#ffcce0'
+                            }
+                        }
 
+                    }
                 }
             }
         });
