@@ -85,6 +85,8 @@ class SettingsApp extends Globals {
 
                         this.patchFixture(fixture.id, fixtureProfile);
 
+                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                        deleteButton.disabled = true;
                         const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
                         applyButton.disabled = true;
                         const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
@@ -108,6 +110,8 @@ class SettingsApp extends Globals {
                 }
                 const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
                 applyButton.disabled = false;
+                const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                deleteButton.disabled = false;
                 const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
                 clearButton.disabled = true;
             }
@@ -134,6 +138,8 @@ class SettingsApp extends Globals {
             for (let fixture of macro.macro.fixtures) {
                 this.retrieveFixtureProfile(macro.macro.name, fixture.id).then(fixtureProfile => {
                     if (fixtureProfile) {
+                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                        deleteButton.disabled = true;
                         const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
                         applyButton.disabled = true;
                         const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');

@@ -137,6 +137,10 @@ class Globals {
         }
         return response.json();
     }
+    getSystemInfo = async () => {
+        const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
+        return info;
+    }
     getBrightness = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
     };

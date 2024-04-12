@@ -76,12 +76,8 @@ class App extends Globals {
             )
         );
     };
-    getSystemInfo = async () => {
-        const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
-        return info;
-    }
     setColorAll = async (onOrOff, color = [...this.allColors]) => {
-        const delay = ms => new Promise(res => setTimeout(res, ms));
+        //const delay = ms => new Promise(res => setTimeout(res, ms));
         for (let fixture of this.fixtures) {
             for (let attr in fixture.attribute) {
                 if (this.allColors.includes(fixture.attribute[attr].type)) {
