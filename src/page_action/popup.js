@@ -25,7 +25,7 @@ let loadSettings = function () {
 
     document.getElementById('openSettings').addEventListener('click', function () {
         let url = chrome.runtime.getManifest().content_scripts[0].matches[0];
-        openNewTab('settings/settings.html?maestro_url=' + encodeURIComponent(url));
+        openNewTab('src/settings/settings.html?maestro_url=' + encodeURIComponent(url));
 
     });
 };

@@ -7,7 +7,7 @@
     "service_worker": "src/bg/bg-loader.js"
   },
   "action": {
-    "default_popup": "page_action/page_action.html",
+    "default_popup": "src/page_action/page_action.html",
     "default_icon": "favicon-maestro.png"
   },
   "default_locale": "en",
