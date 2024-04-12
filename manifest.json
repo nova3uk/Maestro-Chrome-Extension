@@ -21,6 +21,9 @@
       "run_at": "document_end"
     }
   ],
+  "externally_connectable": {
+    "matches": ["*://*/*"]
+  },
   "web_accessible_resources": [
     {
       "resources": [

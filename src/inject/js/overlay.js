@@ -36,7 +36,15 @@ class OverlayApp extends Globals {
             }
         });
         this.createCheckboxes()
+
+        //watch for changes in the local storage
+        //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 1000);
     }
+    checkForRunningMacros = async () => {
+        var keys = await this.retrieveAllKeys()
+        var macrosRunning = keys.filter(key => key.includes("fixtureProfile_"));
+        document.getElementById('maestroMacrosRunning').textContent = macrosRunning.length > 0 ? macrosRunning.length + ' macros running' : '';
+    };
     // Function to create an overlay
     createOverlay = function () {
         let overlay = document.createElement('div');
@@ -64,11 +72,12 @@ class OverlayApp extends Globals {
         return container;
     };
 
-    createText = function (text) {
+    createText = function (text, id) {
         let textElement = document.createElement('span');
         textElement.textContent = text;
         textElement.style.color = '#f4f5f5';
         textElement.style.marginLeft = '10px';
+        textElement.id = (id || '');
         return textElement;
     };
 
@@ -298,10 +307,10 @@ class OverlayApp extends Globals {
 
         let systemInfo = await maestro.App.getSystemInfo();
         if (systemInfo) {
-            let systemInfoContainer = this.createText(`v${systemInfo.version} -  `);
+            let systemInfoContainer = this.createText(`v${systemInfo.version} -  `, 'maestroSystemInfo');
             cornerText.appendChild(systemInfoContainer);
 
-            let clock = document.createElement('span');
+            let clock = this.createText('', 'maestroClock');
             cornerText.appendChild(clock);
 
             function updateClock() {
@@ -314,6 +323,9 @@ class OverlayApp extends Globals {
 
             setInterval(updateClock, 1000);
         }
+
+        let macros = this.createText('', 'maestroMacrosRunning');
+        cornerText.appendChild(macros);
     };
 }
 

@@ -42,24 +42,6 @@ class SettingsApp extends Globals {
             return macros;
         });
     };
-    storeFixtureProfile = async (macroName, fixture) => {
-        let currentSetting = await this.getFixture(fixture.id);
-        await this.saveLocalSetting("fixtureProfile_" + macroName + "_" + fixture.id, { "fixture": currentSetting });
-    };
-    retrieveFixtureProfile = async (macroName, fixtureId) => {
-        return await this.getLocalSetting("fixtureProfile_" + macroName + "_" + fixtureId);
-    };
-    retrieveAllKeys = async () => {
-        return new Promise((resolve, reject) => {
-            chrome.storage.local.get(null, function (items) {
-                resolve(Object.keys(items));
-            });
-        });
-    }
-    deleteFixtureProfile = async (macroName, fixtureId) => {
-        this.deleteLocalSetting("fixtureProfile_" + macroName + "_" + fixtureId);
-    };
-
     applyMacro = async function (macroName) {
         var keys = await this.retrieveAllKeys()
 
@@ -138,7 +120,7 @@ class SettingsApp extends Globals {
             for (let fixture of macro.macro.fixtures) {
                 this.retrieveFixtureProfile(macro.macro.name, fixture.id).then(fixtureProfile => {
                     if (fixtureProfile) {
-                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
                         deleteButton.disabled = true;
                         const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
                         applyButton.disabled = true;
