@@ -12,8 +12,9 @@ Currently it supports 3 main functions:
    
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
-Setup Instructions.
-![maestro_manifest](https://github.com/nova3uk/Maestro-Chrome-Extension/assets/4563061/44e8b073-0583-4f2a-948b-28a2c6c5ab5c)
+**Setup Instructions.**
+
+![maestro_manifest2](https://github.com/nova3uk/Maestro-Chrome-Extension/assets/4563061/503cb5ea-b4a0-4178-8439-56ea6ae52a6d)
 
 1. If you have setup a custom IP or url for the MaestroDMX then the manifest must be edited to modify content_scripts/matches (see above image) so that it has the url/ip of your maestro so that it will run on the maestro web control panel. The default network name is "maestro.local" or ip "192.168.37.1", which are already included in the manifest file for your convenience. If it is wrong it will not trigger the extension.
 2. The plugin is looking for fixtures with both a Color Wheel and a Shutter, or a dedicated STROBE channel. It is not going to find anything else.
@@ -34,6 +35,6 @@ Once it has built a list of the fixtures it needs to modify, it then searches fo
 
 If for any reason it gets "stuck" simply reload the page, wait a couple of seconds then click the button and release again it should clear everything and work as normal, although this has not happened in testing so far.
 
-Please Note: 
+**Please Note: **
 This plugin was developed in a couple of hours one evening, the code is neither clean nor perfect, but it does work well enough for my purposes - if you want to use it you do so at your own RISK, i offer no warranty of any kind whatsoever implied nor otherwise. Copilot was used to help speedup the build and check for problems.
 Any logos or tradenames referring to MaestroDMX are the property of MaestroDMX and I am in no way affiliated with MaestroDMX whatsoever.
