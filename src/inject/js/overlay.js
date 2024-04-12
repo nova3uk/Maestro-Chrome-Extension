@@ -12,6 +12,7 @@ class OverlayApp extends Globals {
         this.maestroUrl = this.parseMaestroUrl();
     };
     btnColors = {};
+    cornerText;
 
     start = async () => {
         this.btnColors.backgroundColor = "#308fe8";
@@ -35,15 +36,28 @@ class OverlayApp extends Globals {
                 maestro.App.setColorAll(true, selectedColor);
             }
         });
+
         this.createCheckboxes()
 
         //watch for changes in the local storage
-        //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 1000);
+        this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
     }
     checkForRunningMacros = async () => {
-        var keys = await this.retrieveAllKeys()
-        var macrosRunning = keys.filter(key => key.includes("fixtureProfile_"));
-        document.getElementById('maestroMacrosRunning').textContent = macrosRunning.length > 0 ? macrosRunning.length + ' macros running' : '';
+        // Make a simple request:
+        if (!document.getElementById('maestroMacrosRunning')) {
+            let macros = this.createText('', 'maestroMacrosRunning');
+            macros.style.color = 'red';
+            this.cornerText.appendChild(macros);
+        }
+        var msg = { checkRunningMacros: true };
+        await chrome.runtime.sendMessage(this.ExtensionId, msg,
+            function (response) {
+                if (response) {
+                    document.getElementById('maestroMacrosRunning').textContent = response.length > 0 ? response.length + ' macro' + (response.length > 1 ? 's' : '') + ' active!' : '';
+                } else {
+                    document.getElementById('maestroMacrosRunning').textContent = "";
+                }
+            });
     };
     // Function to create an overlay
     createOverlay = function () {
@@ -294,24 +308,24 @@ class OverlayApp extends Globals {
         });
     };
     loadCornerText = async function () {
-        let cornerText = document.createElement('div');
-        cornerText.style.position = 'fixed';
-        cornerText.style.bottom = '10px';
-        cornerText.style.left = '20px';
-        cornerText.style.color = '#f4f5f5';
-        cornerText.style.width = '200px';
-        cornerText.style.height = '30px';
-        cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
-        cornerText.style.zIndex = '100001';
-        document.body.appendChild(cornerText);
+        this.cornerText = document.createElement('div');
+        this.cornerText.style.position = 'fixed';
+        this.cornerText.style.bottom = '10px';
+        this.cornerText.style.left = '20px';
+        this.cornerText.style.color = '#f4f5f5';
+        this.cornerText.style.width = '300px';
+        this.cornerText.style.height = '30px';
+        this.cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        this.cornerText.style.zIndex = '100001';
+        document.body.appendChild(this.cornerText);
 
         let systemInfo = await maestro.App.getSystemInfo();
         if (systemInfo) {
             let systemInfoContainer = this.createText(`v${systemInfo.version} -  `, 'maestroSystemInfo');
-            cornerText.appendChild(systemInfoContainer);
+            this.cornerText.appendChild(systemInfoContainer);
 
             let clock = this.createText('', 'maestroClock');
-            cornerText.appendChild(clock);
+            this.cornerText.appendChild(clock);
 
             function updateClock() {
                 let now = new Date();
@@ -323,9 +337,6 @@ class OverlayApp extends Globals {
 
             setInterval(updateClock, 1000);
         }
-
-        let macros = this.createText('', 'maestroMacrosRunning');
-        cornerText.appendChild(macros);
     };
 }
 

@@ -24,7 +24,7 @@ const getFromStore = async (key) => {
             (document.head || document.documentElement).appendChild(g);
             g.onload = function () {
                 let s = document.createElement("script");
-                s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?logging=${logging}&footer=${footer}&color=${color}&blinder=${blinder}`);
+                s.src = chrome.runtime.getURL(`src/inject/js/maestro-main.js?extension_id=${chrome.runtime.id}&logging=${logging}&footer=${footer}&color=${color}&blinder=${blinder}`);
                 (document.head || document.documentElement).appendChild(s);
             };
         }

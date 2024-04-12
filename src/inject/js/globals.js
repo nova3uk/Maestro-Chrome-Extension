@@ -84,8 +84,8 @@ class Globals {
     isNumeric = function (value) {
         return !isNaN(parseFloat(value)) && isFinite(value);
     };
-    getQueryStringParameter(key) {
-        const urlParams = new URLSearchParams(window.location.search);
+    getQueryStringParameter(key, url = window.location.search) {
+        const urlParams = new URLSearchParams(url);
         return urlParams.get(key);
     };
     getUrl = async (url) => {
