@@ -15,7 +15,7 @@
   "host_permissions": ["*://*/*"],
   "content_scripts": [
     {
-      "matches": ["*://maestro.mierzyn.com/*"],
+      "matches": ["*://maestro.local/*", "*://192.168.137.1/*"],
       "exclude_matches": [],
       "js": ["src/inject/js/inject.js"],
       "run_at": "document_end"
