@@ -173,6 +173,33 @@ class SettingsApp extends Globals {
             });
         });
     };
+    changeStrobeParam = async (id) => {
+        let fixture = await this.getFixture(id);
+
+        let newStrobeValue = document.getElementById('strobe_val_' + id).value;
+        let newShutterValue = document.getElementById('shutter_val_' + id).value;
+
+        var updatedName = "";
+        let [fixtureName, dmxValues] = fixture.name.split("_");
+
+        if (!newStrobeValue && !newShutterValue) {
+            updatedName = `${fixtureName}`
+        } else {
+            updatedName = `${fixtureName}_${newShutterValue}:${newStrobeValue}`;
+            fixture.name = updatedName;
+        }
+
+        fixture.name = updatedName;
+
+        document.getElementById('name_' + id).innerText = updatedName;
+
+        let fixtureProfile = {
+            fixture: fixture
+        };
+
+        this.patchFixture(id, fixtureProfile);
+
+    };
     fixtureTable = function (activeStage, activeFixtureGroups) {
         var tData = [];
         for (let group of activeFixtureGroups) {
@@ -203,12 +230,25 @@ class SettingsApp extends Globals {
         });
 
         $('#fixtures').bootstrapTable({
-            onClickRow: function (row) {
+            onClickRow: function (row, field, $element) {
+                if ($element == "shutter" || $element == "strobe")
+                    return false;
+
                 document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
             },
             data: tData,
             columns: [
-                {}, {}, {}, {},
+                {
+                    field: 'name',
+                    title: 'Fixture Name',
+                    align: 'left',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return '<span id="name_' + row.id + '">' + value + '</span>';
+                    }
+                },
+                {}, {}, {},
                 {
                     field: 'shutter',
                     title: 'Shutter Open',
@@ -216,8 +256,10 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        //return '<input type="number" min="0" max="255" value="' + row.shutter + '">';
-                        return "<span>" + (row.shutter || "") + "</span>"
+                        if (row.name.toUpperCase().includes("IGNORE")) {
+                            return "";
+                        }
+                        return '<input type="number" name="shutter_val" data-id="' + row.id + '" id="shutter_val_' + row.id + '" min="0" max="255" value="' + (row.shutter || "") + '">';
                     }
                 },
                 {
@@ -227,8 +269,10 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        //return '<input type="number" min="0" max="255" value="' + row.strobe + '">';
-                        return "<span>" + (row.strobe || "") + "</span>";
+                        if (row.name.toUpperCase().includes("IGNORE")) {
+                            return "";
+                        }
+                        return '<input type="number" name="shutter_strobe" data-id="' + row.id + '" id="strobe_val_' + row.id + '" min="0" max="255" value="' + (row.strobe || "") + '">';
                     }
                 },
                 {
@@ -276,6 +320,12 @@ class SettingsApp extends Globals {
                     }
                 }
             }
+        });
+        $('input[name="shutter_val"]').on('change', function (btn) {
+            maestro.SettingsApp.changeStrobeParam(this.dataset.id);
+        });
+        $('input[name="shutter_strobe"]').on('change', function (btn) {
+            maestro.SettingsApp.changeStrobeParam(this.dataset.id);
         });
     }
     macroTable = function (macros) {
