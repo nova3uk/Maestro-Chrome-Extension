@@ -9,7 +9,9 @@ class OverlayApp extends Globals {
         }
         this.scriptSource = scriptSource;
         this.loggingOn = loggingOn;
-        this.maestroUrl = this.parseMaestroUrl();
+
+        this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
+        this.maestroHost = new URL(this.maestroUrl).host;
     };
     btnColors = {};
     cornerText;
@@ -40,7 +42,10 @@ class OverlayApp extends Globals {
         this.createCheckboxes()
 
         //watch for changes in the local storage
-        this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
+        //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
+
+        //websocket for notifications
+        setTimeout(function () { maestro.OverlayApp.startNotifications(); }, 3000);
     }
     checkForRunningMacros = async () => {
         // Make a simple request:
@@ -60,7 +65,7 @@ class OverlayApp extends Globals {
             });
     };
     // Function to create an overlay
-    createOverlay = function () {
+    createOverlay = () => {
         let overlay = document.createElement('div');
         overlay.style.display = 'flex';
         overlay.style.flexDirection = 'column';
@@ -77,7 +82,7 @@ class OverlayApp extends Globals {
     };
 
     // Function to create a container for the checkboxes and labels
-    createContainer = function (overlay, leftOrRight = 'right') {
+    createContainer = (overlay, leftOrRight = 'right') => {
         let container = document.createElement('div');
         container.style.display = 'flex';
         container.style.justifyContent = leftOrRight == "right" ? 'flex-end' : 'flex-start';
@@ -86,7 +91,8 @@ class OverlayApp extends Globals {
         return container;
     };
 
-    createText = function (text, id) {
+
+    createText = (text, id) => {
         let textElement = document.createElement('span');
         textElement.textContent = text;
         textElement.style.color = '#f4f5f5';
@@ -96,7 +102,7 @@ class OverlayApp extends Globals {
     };
 
     // Function to create a checkbox with a label and an event listener
-    createCheckbox = function (id, text, onChange) {
+    createCheckbox = (id, text, onChange) => {
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = id;
@@ -110,7 +116,7 @@ class OverlayApp extends Globals {
 
         let checkboxContainer = document.createElement('div');
         checkboxContainer.id = `div_${id}`;
-        checkboxContainer.style.display = 'flex';
+        //checkboxContainer.style.display = 'flex';
         checkboxContainer.style.justifyContent = 'center';
         checkboxContainer.style.alignItems = 'center';
         checkboxContainer.style.width = '150px';
@@ -146,7 +152,7 @@ class OverlayApp extends Globals {
 
         return checkboxContainer;
     };
-    getIcon = function (iconName) {
+    getIcon = (iconName) => {
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.style.stroke = 'currentColor';
         svg.style.fill = 'currentColor';
@@ -200,7 +206,7 @@ class OverlayApp extends Globals {
         }
     };
     //Create dropdown
-    createDropdown = function (id, onChange) {
+    createDropdown = (id, onChange) => {
         let select = document.createElement('select');
         select.id = id;
 
@@ -222,7 +228,7 @@ class OverlayApp extends Globals {
 
         return select;
     };
-    checkBoxClick = function (item, status, id) {
+    checkBoxClick = (item, status, id) => {
         if (status === true) {
             let div = document.getElementById(id);
             div.style.color = this.btnColors.font;
@@ -234,7 +240,9 @@ class OverlayApp extends Globals {
         }
         maestro.App.manualOverride(item, status);
     };
-    createCheckboxes = function () {
+    createCheckboxes = () => {
+        this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1140px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 981px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 822px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 663px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 504px) {#div_maestro_ext_effect {display: none !important;}}');
+
         // Create the checkboxes
         this.blackoutCheckbox = this.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {
             maestro.OverlayApp.checkBoxClick("BLACKOUT", checked, 'div_maestro_ext_blackout');
@@ -262,11 +270,11 @@ class OverlayApp extends Globals {
         this.container.appendChild(this.fogCheckbox);
         this.container.appendChild(this.effectCheckbox);
     };
-    clearCheckbox = function (btnId) {
+    clearCheckbox = (btnId) => {
         let checkbox = document.getElementById(btnId);
         checkbox.checked = false;
     };
-    clearCheckboxes = function (checkedBox) {
+    clearCheckboxes = (checkedBox) => {
         if (checkedBox !== "maestro_ext_strobe" && checkedBox.toLowerCase() !== "strobe") {
             maestro.App.latchedOn = false;
             maestro.App.setStrobe(false, false);
@@ -307,7 +315,7 @@ class OverlayApp extends Globals {
             observer.observe(document, { childList: true, subtree: true });
         });
     };
-    loadCornerText = async function () {
+    loadCornerText = async () => {
         this.cornerText = document.createElement('div');
         this.cornerText.style.position = 'fixed';
         this.cornerText.style.bottom = '10px';
@@ -315,7 +323,7 @@ class OverlayApp extends Globals {
         this.cornerText.style.color = '#f4f5f5';
         this.cornerText.style.width = '300px';
         this.cornerText.style.height = '30px';
-        this.cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        //this.cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
         this.cornerText.style.zIndex = '100001';
         document.body.appendChild(this.cornerText);
 
@@ -338,7 +346,60 @@ class OverlayApp extends Globals {
             setInterval(updateClock, 1000);
         }
     };
-}
+    startNotifications = async () => {
+        var ws = new WebSocket("ws://" + this.maestroHost + "/notifications");
+
+        ws.onopen = (event) => {
+            if (this.logging)
+                console.log("Opening Notifications WebSocket");
+        };
+        ws.onmessage = (event) => {
+            if (this.logging)
+                console.log("WebSocket message received:", event.data);
+
+            let data = JSON.parse(event.data);
+            if (data.type == "AUDIO_LEVEL_NOTIFICATION") {
+                this.audioLevelMeter(data.msg);
+            }
+        };
+    }
+    audioLevelMeter = async (msg) => {
+        let level = Math.floor(((msg.inputLevel + 37.5) / 37.5) * 100);
+
+        if (!document.getElementById('audioLevelWrapper')) {
+            let audioLevelWrapper = document.createElement('div');
+            audioLevelWrapper.id = 'audioLevelWrapper';
+            audioLevelWrapper.style.width = '120px';
+            audioLevelWrapper.style.height = '10px';
+            audioLevelWrapper.style.display = 'inline-block';
+            audioLevelWrapper.style.backgroundColor = '#37383a';
+            audioLevelWrapper.style.borderRadius = '6px';
+            audioLevelWrapper.style.marginLeft = '10px';
+
+            this.cornerText.appendChild(audioLevelWrapper);
+
+            let audioLevelMeter = document.createElement('div');
+            audioLevelMeter.id = 'audioLevelMeter';
+            audioLevelMeter.style.width = '0%';
+            audioLevelMeter.style.height = '100%';
+            audioLevelMeter.style.backgroundColor = 'green';
+            audioLevelMeter.style.borderRadius = '6px';
+            audioLevelMeter.style.transition = "width 600ms linear";
+            audioLevelWrapper.appendChild(audioLevelMeter);;
+        }
+
+        try {
+            let audioLevelMeter = document.getElementById('audioLevelMeter');
+            if (audioLevelMeter) {
+                audioLevelMeter.style.width = level + '%';
+                audioLevelMeter.style.backgroundColor = level < 30 ? 'red' : level < 50 ? 'blue' : level < 98 ? 'green' : 'orange';
+            }
+        } catch (e) {
+            if (this.logging)
+                console.error("Error updating audio level meter", e);
+        }
+    }
+};
 
 maestro.OverlayApp = new OverlayApp(document.currentScript.src);
 maestro.OverlayApp.start();

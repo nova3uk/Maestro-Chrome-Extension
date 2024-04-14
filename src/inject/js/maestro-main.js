@@ -4,6 +4,7 @@ class App extends Globals {
     constructor(scriptSource, loggingOn = false) {
         super();
         this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
+        this.maestroHost = new URL(this.maestroUrl).host;
 
         if (scriptSource) {
             var src = new URL(scriptSource);
@@ -30,7 +31,6 @@ class App extends Globals {
                 console.log("Blinder toggle active.")
         };
     }
-
     testSetPositions = function () {
         this.testSetPosition(0, 138, 138);
         this.testSetPosition(2, 42, 42);

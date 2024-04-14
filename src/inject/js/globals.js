@@ -263,5 +263,11 @@ class Globals {
             });
         });
     };
+    injectCSS = (css) => {
+        let el = document.createElement('style');
+        el.innerText = css;
+        document.head.appendChild(el);
+        return el;
+    };
 }
 maestro.Globals = new Globals(document.currentScript.src);
