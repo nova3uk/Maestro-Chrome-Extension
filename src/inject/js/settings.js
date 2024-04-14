@@ -74,7 +74,8 @@ class SettingsApp extends Globals {
                 clearButton.disabled = false;
             }
         }
-        await this.startCue({ value: this.currentCue.playIndex });
+        if (document.getElementById('restartCueOnChange').checked)
+            await this.startCue({ value: this.currentCue.playIndex });
     }
     revertMacro = async (macroName) => {
         this.currentCue = await this.getShowState();
@@ -95,7 +96,8 @@ class SettingsApp extends Globals {
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = true;
 
-            await this.startCue({ value: this.currentCue.playIndex });
+            if (document.getElementById('restartCueOnChange').checked)
+                await this.startCue({ value: this.currentCue.playIndex });
         }
     };
     deleteMacro = async (macroName) => {
