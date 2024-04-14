@@ -16,6 +16,7 @@ class Globals {
     fixtures = [];
     shutterFixtures = [];
     strobeFixtures = [];
+    currentCue = [];
     eventManual;
     pageObserver;
     maxDmxVal = 1;
@@ -124,7 +125,7 @@ class Globals {
         return { lowValue: range.lowValue / 255, highValue: range.highValue / 255 };
     }
 
-    prepareFetch = async function (method = this.httpMethods, url, params = {}) {
+    prepareFetch = async function (method = this.httpMethods, url, params = {}, returnJson = true) {
         let options = {
             method: method,
             headers: { 'Content-Type': 'application/json' },
@@ -135,8 +136,13 @@ class Globals {
         if (!response.ok) {
             throw new Error(`HTTP error ${response.status}`);
         }
-        return response.json();
+
+        try {
+            if (returnJson)
+                return response.json();
+        } catch (e) { }
     }
+
     getSystemInfo = async () => {
         const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
         return info;
@@ -144,6 +150,15 @@ class Globals {
     getBrightness = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
     };
+    getShows = async () => {
+        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
+    }
+    getShowState = async () => {
+        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
+    }
+    startCue = async (cue) => {
+        return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/start_cue`, cue, false);
+    }
     getFixture = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
     };
