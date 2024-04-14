@@ -351,12 +351,13 @@ class OverlayApp extends Globals {
 
         ws.onopen = (event) => {
             if (this.logging)
-                console.log("Opening Notifications WebSocket");
+                console.log("Opening Notifications WebSocket", event);
+        };
+        ws.onerror = (event) => {
+            if (this.logging)
+                console.log("Opening Notifications WebSocket", event);
         };
         ws.onmessage = (event) => {
-            if (this.logging)
-                console.log("WebSocket message received:", event.data);
-
             let data = JSON.parse(event.data);
             if (data.type == "AUDIO_LEVEL_NOTIFICATION") {
                 this.audioLevelMeter(data.msg);
