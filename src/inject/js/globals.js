@@ -146,19 +146,22 @@ class Globals {
     getSystemInfo = async () => {
         const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
         return info;
-    }
+    };
     getBrightness = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
     };
     getShows = async () => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
-    }
+    };
     getShowState = async () => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
-    }
+    };
     startCue = async (cue) => {
         return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/start_cue`, cue, false);
-    }
+    };
+    stopShow = async () => {
+        return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/stop`, {}, false);
+    };
     getFixture = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
     };
