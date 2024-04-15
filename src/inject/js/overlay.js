@@ -144,6 +144,7 @@ class OverlayApp extends Globals {
         }
         let label = document.createElement('label');
         label.textContent = text;
+        label.style.userSelect  = 'none';
         label.style.cursor = 'pointer';
 
         let svg = this.getIcon(text);
