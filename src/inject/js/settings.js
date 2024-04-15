@@ -6,6 +6,8 @@ class SettingsApp extends Globals {
         this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();
     }
+    currentFixture;
+
     start = async () => {
         await this.getStages();
         this.controlPageLink();
@@ -42,7 +44,7 @@ class SettingsApp extends Globals {
         }
 
         document.getElementById('backupFixtures').addEventListener('click', async () => {
-            if (confirm('Are you sure you want to backup all fixtures?')) {
+            if (confirm('Are you sure you want to backup all fixtures?\n\nThis will overwrite the current backup.')) {
                 await this.backupAllFixtures();
                 this.getBackupDate();
             }
@@ -438,33 +440,41 @@ class SettingsApp extends Globals {
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;
-
+            
             $('#panTiltFinder').modal('show');
             document.getElementById('panTiltFinder').dataset.id = id;
 
             document.getElementById('panRange').addEventListener('input', function () {
                 document.getElementById('panRangeVal').innerText = this.value;
+                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('panRange').addEventListener('change', function () {
                 document.getElementById('panRangeVal').innerText = this.value;
+                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('input', function () {
                 document.getElementById('tiltRangeVal').innerText = this.value;
+                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('change', function (id) {
                 document.getElementById('tiltRangeVal').innerText = this.value;
-            });
-            document.getElementById('panTiltApply').addEventListener('click', function () {
-                document.getElementById('panTiltApply').disabled = true;
-
                 maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
-
-                document.getElementById('panTiltApply').disabled = false;
             });
+            document.getElementById('panTiltReset').addEventListener('click', function () {
+                document.getElementById('panTiltReset').disabled = true;
+
+                maestro.SettingsApp.resetPanTilt(document.getElementById('panTiltFinder').dataset.id);
+
+                document.getElementById('panTiltReset').disabled = false;
+            });           
         });
     }
     setPanTilt = async (id) => {
-        let fixture = await this.getFixture(id);
+        if(!this.currentFixture)    
+            this.currentFixture = await this.getFixture(id);
+
+        let fixture = this.currentFixture;
+
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
 
@@ -476,6 +486,16 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
+    resetPanTilt = async (id) => {
+        let fixture = await this.getFixture(id);
+        let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
+        let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
+
+        let panRange = this.calculateRange({ lowValue: 0, highValue: 255 });
+        let titRange = this.calculateRange({ lowValue: 0, highValue: 255 });
+        await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
+        await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
+    }
     macroTable = (macros) => {
         var tData = [];
 
