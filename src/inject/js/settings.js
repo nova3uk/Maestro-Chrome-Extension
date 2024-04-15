@@ -57,25 +57,29 @@ class SettingsApp extends Globals {
                 return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
             }
         }
+
         for (let macro of macros) {
             for (let fixture of macro.macro.fixtures) {
-                await this.storeFixtureProfile(macroName, fixture)
-                let fixtureProfile = {
-                    fixture: fixture
-                };
+                let currentProfile = await this.getFixture(fixture.id);
 
-                await this.patchFixture(fixture.id, fixtureProfile);
+                //await this.patchFixture(fixture.id, fixtureProfile);
 
-                const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-                deleteButton.disabled = true;
-                const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-                applyButton.disabled = true;
-                const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-                clearButton.disabled = false;
+                let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
+                if (diff.length == 0) {
+                    return alert('Macro is the same as the currently running Profile, and would have no effect.')
+                }
+
+                //save original profile prior to modification
+                await this.storeFixtureProfile(macroName, currentProfile)
+                this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
             }
         }
-        if (document.getElementById('restartCueOnChange').checked)
-            await this.startCue({ value: this.currentCue.playIndex });
+        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+        deleteButton.disabled = true;
+        const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+        applyButton.disabled = true;
+        const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+        clearButton.disabled = false;
     }
     revertMacro = async (macroName) => {
         this.currentCue = await this.getShowState();
@@ -84,20 +88,24 @@ class SettingsApp extends Globals {
 
         if (macros) {
             var fixtures = macros[0].macro.fixtures;
+
             for (let fixture of fixtures) {
-                let fixtureProfile = await maestro.SettingsApp.retrieveFixtureProfile(macroName, fixture.id);
-                maestro.SettingsApp.patchFixture(fixture.id, fixtureProfile);
+                let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(macroName, fixture.id);
+
+                //get diff between original and current profile
+                let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
+
+                //revert changes
+                this.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture);
                 maestro.SettingsApp.deleteFixtureProfile(macroName, fixture.id);
             }
+
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
             applyButton.disabled = false;
             const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
             deleteButton.disabled = false;
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = true;
-
-            if (document.getElementById('restartCueOnChange').checked)
-                await this.startCue({ value: this.currentCue.playIndex });
         }
     };
     deleteMacro = async (macroName) => {
@@ -130,6 +138,44 @@ class SettingsApp extends Globals {
                     }
                 });
             }
+        }
+    };
+    processAttributeChanges = (diff, fixtureId, newProfile, oldProfile) => {
+        for (let attr of diff) {
+            let attrNew = newProfile.attribute[attr];
+            let attrOld = oldProfile.attribute[attr];
+            let attrDiff = this.getObjectDiff(attrNew, attrOld);
+
+            for (let prop of attrDiff) {
+                let update = {
+                    attribute: {
+                        [prop]: attrNew[prop]
+                    }
+                };
+
+                //we do not need the response, so not awaiting this function
+                this.putAttribute(fixtureId, attr, update);
+            }
+        };
+    }
+    putAttribute = async (fixtureId, attributeId, attribute) => {
+        let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
+
+        let options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attribute)
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            return response.json();
+        } catch (error) {
+            if (this.logging)
+                console.error('Fatal error updating fixture data:', error);
         }
     };
     patchFixture = async (fixtureId, fixture) => {

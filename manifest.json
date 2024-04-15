@@ -1,7 +1,7 @@
 {
   "name": "MaestroDMX Enhancer Extension",
   "description": "Add add-on features to enable more functionaity than is built into the current version.",
-  "version": "1.2",
+  "version": "1.3.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "src/bg/bg-loader.js"
@@ -36,7 +36,8 @@
         "src/external/jquery.min.js",
         "src/external/bootstrap-table.min.js",
         "src/external/bootstrap-table.min.css",
-        "src/external/json-editor.js"
+        "src/external/json-editor.js",
+        "src/external/loadash.min.js"
       ],
       "matches": ["*://*/*"]
     }

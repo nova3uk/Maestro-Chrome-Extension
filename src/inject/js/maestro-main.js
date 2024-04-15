@@ -31,21 +31,6 @@ class App extends Globals {
                 console.log("Blinder toggle active.")
         };
     }
-    testSetPositions = function () {
-        this.testSetPosition(0, 138, 138);
-        this.testSetPosition(2, 42, 42);
-    }
-    testSetPosition = function (attribute, low = 0, high = 255) {
-        let rangeAttributeType = { ...this.getAttributeType('range'), lowValue: low, highValue: high };
-        let calculatedRange = this.calculateRange(rangeAttributeType);
-        let newRange = this.setAttributeRange(calculatedRange);
-
-        this.prepareFetch(
-            this.httpMethods.PUT,
-            `api/${this.apiVersion}/output/stage/71e61e5a-6257-4bc6-8176-d78aa45060d0/fixture/528bd747-bf10-478c-b6fe-6dfca9e6944c/attribute/${attribute}`,
-            newRange
-        );
-    }
     clearStage = () => {
         this.strobeBtn = null;
         this.stageId = null;
