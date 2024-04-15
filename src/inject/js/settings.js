@@ -19,11 +19,59 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.macroTable(macros);
             maestro.SettingsApp.checkRunningMacros(macros)
         });
+        this.getBackupDate();
+    }
+    getBackupDate = async (stageId = this.stageId) => {
+        let backupDate = await this.getLocalSetting("fixture_backup").then(backupData => {
+            if (backupData && backupData.stageId == stageId) {
+                return backupData.date;
+            }
+        });
+        if (backupDate) {
+            backupDate = this.formatDate(new Date(JSON.parse(backupDate)));
+            backupDate = `${backupDate} - <a href="#" id="restoreBackup">Restore</a>`;
+            document.getElementById('backupDate').innerHTML = backupDate;
+
+            document.getElementById('restoreBackup').addEventListener('click', async () => {
+                if (confirm('Are you sure you want to restore this backup?\n\nALL CURRENT FIXTURE SETTINGS IN THIS STAGE WILL BE OVERWRITTEN!!!\n\nIf a Show Cue is currently running, it will be stopped by resoring this backup.')) {
+                    await this.restoreAllFixtures();
+                }
+            });
+        } else {
+            document.getElementById('backupDate').innerText = "Never";
+        }
+
+        document.getElementById('backupFixtures').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to backup all fixtures?')) {
+                await this.backupAllFixtures();
+                this.getBackupDate();
+            }
+        });
     }
     backupAllFixtures = async () => {
         let fixtures = await this.getActiveStage();
-        await this.saveLocalSetting("fixtures", fixtures);
-    }
+        let backupData = {
+            stageId: this.stageId,
+            date: JSON.stringify(new Date().getTime()),
+            fixtures: fixtures,
+        }
+        await this.saveLocalSetting("fixture_backup", backupData);
+    };
+    restoreAllFixtures = async (stageId = this.stageId) => {
+        let backup = await this.getLocalSetting("fixture_backup").then(backupData => {
+            if (backupData && backupData.stageId == stageId) {
+                return backupData;
+            }
+        });
+        for (let fixture of backup.fixtures.fixture) {
+            let data = {
+                fixture: fixture
+            };
+            await this.patchFixture(fixture.id, data);
+        }
+
+        return alert('All fixtures have been restored to the backup state');
+    };
     controlPageLink = function () {
         var link = document.getElementById('controlPageLink')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
