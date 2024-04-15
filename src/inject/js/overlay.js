@@ -382,9 +382,11 @@ class OverlayApp extends Globals {
         };
     }
     audioLevelMeter = async (msg) => {
-        let soundLevel = Math.floor(((msg.inputLevel + 37.5) / 37.5) * 100);
+        let soundLevel = Math.floor(((msg.inputLevel + 37) / 37) * 100);
         let activityLevel = Math.floor((msg.activityLevel * 100));
         let container = document.getElementById('audioLevelContainer');
+        if (soundLevel < 5) soundLevel = 0;
+        if (activityLevel < 5) activityLevel = 0;
 
         if (!document.getElementById('audioLevelMeter')) {
             let audioLevelWrapper = document.createElement('div');
