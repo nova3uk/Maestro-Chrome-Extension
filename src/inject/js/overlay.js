@@ -48,8 +48,7 @@ class OverlayApp extends Globals {
         //watch for changes in the local storage
         //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
 
-        //websocket for notifications
-        setTimeout(function () { maestro.OverlayApp.startNotifications(); }, 3000);
+        maestro.OverlayApp.startNotifications();
     }
     checkForRunningMacros = async () => {
         // Make a simple request:
@@ -320,23 +319,34 @@ class OverlayApp extends Globals {
         });
     };
     loadCornerText = async () => {
-        this.cornerText = document.createElement('div');
-        this.cornerText.style.position = 'fixed';
-        this.cornerText.style.bottom = '10px';
-        this.cornerText.style.left = '20px';
-        this.cornerText.style.color = '#f4f5f5';
-        this.cornerText.style.width = '300px';
-        this.cornerText.style.height = '30px';
-        this.cornerText.style.zIndex = '100001';
-        document.body.appendChild(this.cornerText);
+        try {
+            this.cornerText = document.createElement('div');
+            this.cornerText.style.position = 'fixed';
+            this.cornerText.style.bottom = '10px';
+            this.cornerText.style.left = '20px';
+            this.cornerText.style.color = '#f4f5f5';
+            this.cornerText.style.width = '300px';
+            this.cornerText.style.height = '30px';
+            this.cornerText.style.zIndex = '100001';
+            document.body.appendChild(this.cornerText);
 
-        let systemInfo = await maestro.App.getSystemInfo();
-        if (systemInfo) {
+            let systemInfo = await maestro.App.getSystemInfo();
             let systemInfoContainer = this.createText(`v${systemInfo.version} -  `, 'maestroSystemInfo');
             this.cornerText.appendChild(systemInfoContainer);
 
             let clock = this.createText('', 'maestroClock');
             this.cornerText.appendChild(clock);
+
+            let audioLevelWrapper = document.createElement('div');
+            audioLevelWrapper.id = 'audioLevelWrapper';
+            audioLevelWrapper.style.width = '120px';
+            audioLevelWrapper.style.height = '10px';
+            audioLevelWrapper.style.display = 'inline-block';
+            audioLevelWrapper.style.backgroundColor = '#37383a';
+            audioLevelWrapper.style.borderRadius = '6px';
+            audioLevelWrapper.style.marginLeft = '10px';
+
+            this.cornerText.appendChild(audioLevelWrapper);
 
             function updateClock() {
                 let now = new Date();
@@ -345,8 +355,11 @@ class OverlayApp extends Globals {
                 let seconds = now.getSeconds().toString().padStart(2, '0');
                 clock.textContent = `${hours}:${minutes}:${seconds}`;
             }
-
+            updateClock();
             setInterval(updateClock, 1000);
+        } catch (e) {
+            if (this.logging)
+                console.error("Error loading corner text", e);
         }
     };
     startNotifications = async () => {
@@ -370,18 +383,7 @@ class OverlayApp extends Globals {
     audioLevelMeter = async (msg) => {
         let level = Math.floor(((msg.inputLevel + 37.5) / 37.5) * 100);
 
-        if (!document.getElementById('audioLevelWrapper')) {
-            let audioLevelWrapper = document.createElement('div');
-            audioLevelWrapper.id = 'audioLevelWrapper';
-            audioLevelWrapper.style.width = '120px';
-            audioLevelWrapper.style.height = '10px';
-            audioLevelWrapper.style.display = 'inline-block';
-            audioLevelWrapper.style.backgroundColor = '#37383a';
-            audioLevelWrapper.style.borderRadius = '6px';
-            audioLevelWrapper.style.marginLeft = '10px';
-
-            this.cornerText.appendChild(audioLevelWrapper);
-
+        if (!document.getElementById('audioLevelMeter')) {
             let audioLevelMeter = document.createElement('div');
             audioLevelMeter.id = 'audioLevelMeter';
             audioLevelMeter.style.width = '0%';
