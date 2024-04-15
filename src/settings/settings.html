@@ -35,9 +35,17 @@
                     security.</p>
                 <p class="text-danger font-weight-bold">
                     Due to the way Maestro works internally, if you apply a macro and change a fixtures settings,
-                    it will cause the currently playing Cue to stop and reset. This is a limitation of the Maestro.
-                    You can try to check the box "Restart Cue on Macro" to try to avoid this, but it may cause the
-                    Maestro to crash, so use with caution. We are researching better solution for this problem.
+                    which are manipulated by the Cue,
+                    it will cause the currently playing Cue to stop and reset, and likely overwrite your macro on
+                    resume.<br><br>
+                    <i>This is a limitation of the Maestro. It is best to use macros which affect non supported
+                        channels,
+                        or when no cue is running for static
+                        scenes.
+                        <br>
+                        You can try to check the box "Restart Cue on Macro" to try to avoid this, but it may cause the
+                        Maestro to crash, so use with caution.
+                    </i>
                 </p>
             </div>
         </div>
