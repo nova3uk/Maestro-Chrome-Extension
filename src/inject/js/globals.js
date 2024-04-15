@@ -76,6 +76,7 @@ class Globals {
         fixtures: []
     }
 
+
     getAttributeType = (type) => this.attributeTypes[type];
     getAttributeTypes = () => this.attributeTypes;
     getHttpMethods = () => this.httpMethods;

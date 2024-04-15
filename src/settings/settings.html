@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maestro Extension - Setings</title>
-    <link href="../external/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../external/bootstrap.min.css">
     <link rel="stylesheet" href="../external/bootstrap-icons.css">
     <link rel="stylesheet" href="../external/bootstrap-table.min.css">
 </head>
@@ -19,11 +19,15 @@
             <div class="h6">
                 <p>To make a Macro:</p>
                 <ol>
+                    <li>Before you start modifying, click the "Backup Now" button below to take a snapshot backup of all
+                        fixtures in the current stage.</li>
                     <li>Go to the <a id="controlPageLink">Control Page</a> Page on the Stages tab.</li>
                     <li>Set all the toggles the way you want them, for each fixture you want to include in the Macro.
                     </li>
                     <li>Come back to this page and select the fixtures you want to include in your Macro.</li>
                     <li>Click "Add Macro" to create it.</li>
+                    <li>Once you have created the macros you can at any time click Restore below to restore all the
+                        fixtures back to their normal state before you began.</li>
                 </ol>
                 <p>To use the Macro:</p>
                 <ol>
@@ -31,8 +35,7 @@
                     <li>Clear the Macro to revert all toggles to the previous state.</li>
                 </ol>
                 <p class="text-danger font-weight-bold">Remember to back up your Stage and Fixtures before testing this
-                    feature for
-                    security.
+                    feature for your own security.
                 </p>
             </div>
         </div>
@@ -89,13 +92,63 @@
                 </tr>
             </thead>
         </table>
-
         <div class="float-end my-2">
             <button id="addMacro" class="btn btn-primary">Add Macro</button>
         </div>
 
-        <div class="my-5">
+        <!-- <div class="my-5" style="max-width: 500px;">
+            <table class="table">
+                <tr>
+                    <td>Pan:</td>
+                    <td><input type="range" class="form-range" min="0" max="255" steps="1" id="panRange" value="0"></td>
+                    <td><span id="panRangeVal"></span></td>
+                </tr>
+                <tr>
+                    <td>Tilt:</td>
+                    <td><input type="range" class="form-range" min="0" max="255" steps="1" id="tiltRange" value="0">
+                    </td>
+                    <td><span id="tiltRangeVal"></span></td>
+                </tr>
+            </table>
+        </div> -->
+
+
+        <!-- Modal Pan/Tilt Finder -->
+        <div id="panTiltFinder" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Pan/Tilt - Position Finder</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="my-5" style="max-width: 500px;">
+                            <table class="table">
+                                <tr>
+                                    <td width="50">Pan:</td>
+                                    <td><input type="range" class="form-range" min="0" max="255" steps="1" id="panRange"
+                                            value="0"></td>
+                                    <td width="30"><span id="panRangeVal">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td width="50">Tilt:</td>
+                                    <td><input type="range" class="form-range" min="0" max="255" steps="1"
+                                            id="tiltRange" value="0">
+                                    </td>
+                                    <td width="30"><span id="tiltRangeVal">0</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="panTiltApply">Apply</button>
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
+
     </div>
     <script src="../external/jquery.min.js"></script>
     <script src="../external/bootstrap.bundle.min.js"></script>

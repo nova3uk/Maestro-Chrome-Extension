@@ -304,6 +304,7 @@ class SettingsApp extends Globals {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                     let [fixtureName, dmxValues] = fixture.name.split("_");
                     let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
+                    let panOrTilt = fixture.attribute.some(ele => ele.type === 'PAN' || ele.type === 'TILT');
 
                     tData.push({
                         id: fixture.id,
@@ -314,7 +315,8 @@ class SettingsApp extends Globals {
                         shutter: normalValue,
                         strobe: strobeValue,
                         fixtureGroupId: fixture.fixtureGroupId,
-                        index: fixture.index
+                        index: fixture.index,
+                        pantilt: panOrTilt
                     });
                     i++;
                 }
@@ -326,13 +328,25 @@ class SettingsApp extends Globals {
 
         $('#fixtures').bootstrapTable({
             onClickRow: function (row, field, $element) {
-                if ($element == "shutter" || $element == "strobe")
+                if ($element == "shutter" || $element == "strobe" || $element == "pantilt")
                     return false;
 
                 document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
             },
             data: tData,
             columns: [
+                {
+                    field: 'pantilt',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.pantilt) {
+                            return '<span role="button" class="panOrTilt cursor-pointer" data-id="' + row.id + '"><img src="pan_tilt.svg"></span>';
+                        }
+                    }
+                },
                 {
                     field: 'name',
                     title: 'Fixture Name',
@@ -422,7 +436,46 @@ class SettingsApp extends Globals {
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
         });
+        $('.panOrTilt').on('click', function (btn) {
+            let id = this.dataset.id;
+
+            $('#panTiltFinder').modal('show');
+            document.getElementById('panTiltFinder').dataset.id = id;
+
+            document.getElementById('panRange').addEventListener('input', function () {
+                document.getElementById('panRangeVal').innerText = this.value;
+            });
+            document.getElementById('panRange').addEventListener('change', function () {
+                document.getElementById('panRangeVal').innerText = this.value;
+            });
+            document.getElementById('tiltRange').addEventListener('input', function () {
+                document.getElementById('tiltRangeVal').innerText = this.value;
+            });
+            document.getElementById('tiltRange').addEventListener('change', function (id) {
+                document.getElementById('tiltRangeVal').innerText = this.value;
+            });
+            document.getElementById('panTiltApply').addEventListener('click', function () {
+                document.getElementById('panTiltApply').disabled = true;
+
+                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
+
+                document.getElementById('panTiltApply').disabled = false;
+            });
+        });
     }
+    setPanTilt = async (id) => {
+        let fixture = await this.getFixture(id);
+        let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
+        let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
+
+        let panValue = document.getElementById('panRange').value;
+        let tiltValue = document.getElementById('tiltRange').value;
+
+        let panRange = this.calculateRange({ lowValue: panValue, highValue: panValue });
+        let titRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
+        await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
+        await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
+    };
     macroTable = (macros) => {
         var tData = [];
 
