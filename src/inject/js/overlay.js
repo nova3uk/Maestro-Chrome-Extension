@@ -47,8 +47,6 @@ class OverlayApp extends Globals {
 
         //watch for changes in the local storage
         //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
-
-        maestro.OverlayApp.startNotifications();
     }
     checkForRunningMacros = async () => {
         // Make a simple request:
@@ -328,6 +326,9 @@ class OverlayApp extends Globals {
             this.cornerText.style.width = '300px';
             this.cornerText.style.height = '30px';
             this.cornerText.style.zIndex = '100001';
+            this.cornerText.style.justifyContent = 'center';
+            this.cornerText.style.display = 'flex';
+
             document.body.appendChild(this.cornerText);
 
             let systemInfo = await maestro.App.getSystemInfo();
@@ -337,16 +338,16 @@ class OverlayApp extends Globals {
             let clock = this.createText('', 'maestroClock');
             this.cornerText.appendChild(clock);
 
-            let audioLevelWrapper = document.createElement('div');
-            audioLevelWrapper.id = 'audioLevelWrapper';
-            audioLevelWrapper.style.width = '120px';
-            audioLevelWrapper.style.height = '10px';
-            audioLevelWrapper.style.display = 'inline-block';
-            audioLevelWrapper.style.backgroundColor = '#37383a';
-            audioLevelWrapper.style.borderRadius = '6px';
-            audioLevelWrapper.style.marginLeft = '10px';
+            let audioLevelContainer = document.createElement('div');
+            audioLevelContainer.id = 'audioLevelContainer';
+            audioLevelContainer.style.width = '120px';
+            audioLevelContainer.style.height = '22px';
+            audioLevelContainer.style.display = 'inline-block';
+            audioLevelContainer.style.marginLeft = '10px';
 
-            this.cornerText.appendChild(audioLevelWrapper);
+            this.cornerText.appendChild(audioLevelContainer);
+
+            maestro.OverlayApp.startNotifications();
 
             function updateClock() {
                 let now = new Date();
@@ -381,24 +382,57 @@ class OverlayApp extends Globals {
         };
     }
     audioLevelMeter = async (msg) => {
-        let level = Math.floor(((msg.inputLevel + 37.5) / 37.5) * 100);
+        let soundLevel = Math.floor(((msg.inputLevel + 37.5) / 37.5) * 100);
+        let activityLevel = Math.floor((msg.activityLevel * 100));
+        let container = document.getElementById('audioLevelContainer');
 
         if (!document.getElementById('audioLevelMeter')) {
+            let audioLevelWrapper = document.createElement('div');
+            audioLevelWrapper.id = 'audioLevelWrapper';
+            audioLevelWrapper.style.width = '120px';
+            audioLevelWrapper.style.height = '10px';
+            audioLevelWrapper.style.backgroundColor = '#37383a';
+            audioLevelWrapper.style.borderRadius = '6px';
+            container.appendChild(audioLevelWrapper);
+
             let audioLevelMeter = document.createElement('div');
             audioLevelMeter.id = 'audioLevelMeter';
             audioLevelMeter.style.width = '0%';
-            audioLevelMeter.style.height = '100%';
+            audioLevelMeter.style.height = '10px';
             audioLevelMeter.style.backgroundColor = 'green';
             audioLevelMeter.style.borderRadius = '6px';
             audioLevelMeter.style.transition = "width 600ms linear";
             audioLevelWrapper.appendChild(audioLevelMeter);;
         }
+        if (!document.getElementById('activityLevelMeter')) {
+            let activityLevelWrapper = document.createElement('div');
+            activityLevelWrapper.id = 'activityLevelWrapper';
+            activityLevelWrapper.style.width = '120px';
+            activityLevelWrapper.style.height = '10px';
+            activityLevelWrapper.style.marginTop = '2px';
+            activityLevelWrapper.style.backgroundColor = '#37383a';
+            activityLevelWrapper.style.borderRadius = '6px';
+            container.appendChild(activityLevelWrapper);
+
+            let activityLevelMeter = document.createElement('div');
+            activityLevelMeter.id = 'activityLevelMeter';
+            activityLevelMeter.style.backgroundColor = this.audioLevelColors.low;
+            activityLevelMeter.style.width = '0%';
+            activityLevelMeter.style.height = '10px';
+            activityLevelMeter.style.borderRadius = '6px';
+            activityLevelMeter.style.transition = "width 600ms linear";
+            activityLevelWrapper.appendChild(activityLevelMeter);;
+        }
 
         try {
             let audioLevelMeter = document.getElementById('audioLevelMeter');
             if (audioLevelMeter) {
-                audioLevelMeter.style.width = level + '%';
-                audioLevelMeter.style.backgroundColor = level < 61 ? this.audioLevelColors.low : level < 96 ? this.audioLevelColors.normal : this.audioLevelColors.high;
+                audioLevelMeter.style.width = soundLevel + '%';
+                audioLevelMeter.style.backgroundColor = soundLevel < 61 ? this.audioLevelColors.low : soundLevel < 96 ? this.audioLevelColors.normal : this.audioLevelColors.high;
+            }
+            let activityLevelMeter = document.getElementById('activityLevelMeter');
+            if (activityLevelMeter) {
+                activityLevelMeter.style.width = activityLevel + '%';
             }
         } catch (e) {
             if (this.logging)
