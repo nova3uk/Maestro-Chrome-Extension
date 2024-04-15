@@ -17,10 +17,14 @@ class OverlayApp extends Globals {
     cornerText;
 
     start = async () => {
-        this.btnColors.backgroundColor = "#308fe8";
-        this.btnColors.hover = "#0f1827";
-        this.btnColors.active = "#0f1827";
-        this.btnColors.font = "#b21aac";
+        this.btnColors = {
+            backgroundColor: "#308fe8",
+            hover: "#0f1827",
+            active: "#0f1827",
+            font: "#b21aac"
+        };
+        this.audioLevelColors = { low: "#308fe8", normal: "#4baf4f", high: "#fed835" };
+
 
         // Create the overlay and container for right items
         this.overlay = this.createOverlay();
@@ -323,7 +327,6 @@ class OverlayApp extends Globals {
         this.cornerText.style.color = '#f4f5f5';
         this.cornerText.style.width = '300px';
         this.cornerText.style.height = '30px';
-        //this.cornerText.style.backgroundColor = 'rgba(0,0,0,0.8)';
         this.cornerText.style.zIndex = '100001';
         document.body.appendChild(this.cornerText);
 
@@ -393,7 +396,7 @@ class OverlayApp extends Globals {
             let audioLevelMeter = document.getElementById('audioLevelMeter');
             if (audioLevelMeter) {
                 audioLevelMeter.style.width = level + '%';
-                audioLevelMeter.style.backgroundColor = level < 30 ? 'red' : level < 50 ? 'blue' : level < 98 ? 'green' : 'orange';
+                audioLevelMeter.style.backgroundColor = level < 61 ? this.audioLevelColors.low : level < 96 ? this.audioLevelColors.normal : this.audioLevelColors.high;
             }
         } catch (e) {
             if (this.logging)
