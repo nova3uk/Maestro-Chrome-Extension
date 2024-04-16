@@ -117,7 +117,7 @@ class SettingsApp extends Globals {
 
         if (macros) {
             const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
-            const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key.endsWith(id)));
+            const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
             if (runningMacroIds.length > 0) {
                 return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
@@ -136,7 +136,7 @@ class SettingsApp extends Globals {
                 }
 
                 //save original profile prior to modification
-                await this.storeFixtureProfile(macroName, currentProfile)
+                await this.storeFixtureProfile(currentProfile)
                 this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
             }
         }
@@ -156,14 +156,14 @@ class SettingsApp extends Globals {
             var fixtures = macros[0].macro.fixtures;
 
             for (let fixture of fixtures) {
-                let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(macroName, fixture.id);
+                let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
 
                 //get diff between original and current profile
                 let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
 
                 //revert changes
                 this.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture);
-                maestro.SettingsApp.deleteFixtureProfile(macroName, fixture.id);
+                maestro.SettingsApp.deleteFixtureProfile(fixture.id);
             }
 
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
@@ -193,16 +193,17 @@ class SettingsApp extends Globals {
 
         for (let macro of macros) {
             for (let fixture of macro.macro.fixtures) {
-                this.retrieveFixtureProfile(macro.macro.name, fixture.id).then(fixtureProfile => {
-                    if (fixtureProfile) {
-                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
-                        deleteButton.disabled = true;
-                        const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
-                        applyButton.disabled = true;
-                        const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');
-                        clearButton.disabled = false;
-                    }
-                });
+                let fixtureProfile = await this.retrieveFixtureProfile(fixture.id);
+                
+                if (fixtureProfile) {
+                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
+                    deleteButton.disabled = true;
+                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
+                    applyButton.disabled = true;
+                    const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');
+                    clearButton.disabled = false;
+                }
+                
             }
         }
     };
