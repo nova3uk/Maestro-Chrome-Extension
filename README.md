@@ -6,7 +6,7 @@ This Chrome Extension is currently only for the purpose of temporarily adding fu
 Currently it supports 3 main functions:
 
 1. Adding the possibility to Strobe fixtures which depend on a Shutter, or a Strobe channel - fixtures using normal RGB values will already work. In general this usually means moving head fixtures or similar with a color wheel.
-2. Adding a Footer bar with Latching Manual Overrides (Blackout, Blinder, Strobe, Fog and Effect) which is visible on any page, not only the Show Page. These buttons are Latching (they stay on until turned off, no more finger holding)
+2. Adding a Footer bar with Latching Manual Overrides (Blackout, Blinder, Strobe, Fog and Effect) which is visible on any page, not only the Show Page. These buttons are Latching (they stay on until turned off, no more finger holding). The footer bar also has some info, such as the version of the plugin, the current time and also mini Sound Input level, and Activity Level monitors.
 3. Macros. Adding the possibility to store a fixtures DMX settings in a macro, and recalling it later. For example to set movers to a specific colour and location.
 
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
