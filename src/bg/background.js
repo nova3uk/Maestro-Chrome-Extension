@@ -25,6 +25,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.storage.sync.set({ colorToggle: false });
         chrome.storage.sync.set({ footerToggle: true });
         chrome.storage.sync.set({ blinderToggle: false });
+
+        let internalUrl = chrome.runtime.getURL("src/settings/settings.html?maestro_url=*%3A%2F%2Fmaestro.local%2F*");
+        chrome.tabs.create({ url: internalUrl }, function (tab) { });
+
     } else if (details.reason == "update") {
         var thisVersion = chrome.runtime.getManifest().version;
         console.log(
