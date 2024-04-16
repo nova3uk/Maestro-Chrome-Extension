@@ -14,7 +14,11 @@
   "permissions": ["storage", "tabs"],
   "content_scripts": [
     {
-      "matches": ["*://maestro.local/*", "*://192.168.37.1/*"],
+      "matches": [
+        "*://maestro.local/*",
+        "*://192.168.37.1/*",
+        "*://10.0.0.200/*"
+      ],
       "exclude_matches": [],
       "js": ["src/inject/js/inject.js"],
       "run_at": "document_end"
