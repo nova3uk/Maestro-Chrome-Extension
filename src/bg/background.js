@@ -11,9 +11,32 @@ chrome.runtime.onMessage.addListener(function (
 });
 chrome.runtime.onMessageExternal.addListener(
     function (request, sender, sendResponse) {
-        if (request.checkRunningMacros) {
+        if(request.getStrobeFixtures){
             this.retrieveAllKeys().then(keys => {
-                return sendResponse(keys.filter(key => key.includes("fixtureProfile_")));
+                let response = [];
+                for(let key in keys){
+                    if(key.includes("strobe_")){
+                        let item = {};
+                        item[key] = keys[key];
+
+                        response.push(item);
+                    }
+                }
+                return sendResponse(response);
+            });
+        }
+        if(request.getIgnoreFixtures){
+            this.retrieveAllKeys().then(keys => {
+                let response = [];
+                for(let key in keys){
+                    if(key.includes("fixture_ignore_")){
+                        let item = {};
+                        item[key] = keys[key];
+
+                        response.push(item);
+                    }
+                }
+                return sendResponse(response);
             });
         }
     });
@@ -39,7 +62,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 retrieveAllKeys = async () => {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(null, function (items) {
-            resolve(Object.keys(items));
+            resolve(items);
         });
     });
-}
+};

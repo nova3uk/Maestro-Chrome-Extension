@@ -31,6 +31,7 @@ class App extends Globals {
                 console.log("Blinder toggle active.")
         };
     }
+    strobeParams;
     clearStage = () => {
         this.strobeBtn = null;
         this.stageId = null;
@@ -96,14 +97,25 @@ class App extends Globals {
         for (let { fixtures, attributeType } of allFixtures) {
             try {
                 for (let fixture of fixtures) {
-                    try {
-                        let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
-                        let normalValue = shutterParams ? shutterParams.shutter : "";
-                        let strobeValue = shutterParams ? shutterParams.strobe : "";
-                        let ignoreParam = await this.getLocalSetting("fixture_ignore_" + fixture.id);
-                        let ignore = ignoreParam ? ignoreParam.ignore : false;
+                    try { 
+                        let normalValue = 0;
+                        let strobeValue = 0;
+                        let ignore = false;
 
-                        if (ignore) continue;
+                        for(let i=0; i<this.ignoreFixtures.length; i++){
+                            if(this.ignoreFixtures[i]["ignore_fixture_" + fixture.id] != null){
+                                ignore = true;
+                                break;
+                            }
+                        }
+                        for(let i=0; i<this.strobeParams.length; i++){
+                            if(this.strobeParams[i]["strobe_" + fixture.id] != null){
+                                normalValue = this.strobeParams[i]["strobe_" + fixture.id].shutter;
+                                strobeValue = this.strobeParams[i]["strobe_" + fixture.id].strobe;
+                                break;
+                            }
+                        }
+
 
                         if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
                             throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
@@ -270,8 +282,32 @@ class App extends Globals {
         s.src = this.getFilePath("src/inject/js/overlay.js");
         (document.head || document.documentElement).appendChild(s);
     };
+    getStrobeParams = async () => {
+        // get strobe fixtures from backend
+        chrome.runtime.sendMessage(this.ExtensionId, {getStrobeFixtures : true},
+            function(response) {
+                if (response){
+                    maestro.App.strobeParams = response;
+                    if (this.logging)
+                        console.log("Strobe fixtures loaded.");
+                }
+            });
+    }
+    getIgnoreFixtures = async () => {
+        // get strobe fixtures from backend
+        chrome.runtime.sendMessage(this.ExtensionId, {getIgnoreFixtures : true},
+            function(response) {
+                if (response){
+                    maestro.App.ignoreFixtures = response;
+                    if (this.logging)
+                        console.log("Ignore fixtures loaded.");
+                }
+            });
+    }
     startUp = async () => {
         try {
+            this.getStrobeParams();
+            this.getIgnoreFixtures();
             this.getStage();
             this.bindStrobeButton();
             this.reloadMonitor();
