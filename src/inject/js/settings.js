@@ -7,9 +7,11 @@ class SettingsApp extends Globals {
         this.maestroUrl = this.parseMaestroUrl();
     }
     currentFixture;
-
+    activeStageId;
     start = async () => {
         await this.getStages();
+        this.activeStageId = this.stageId;
+
         this.controlPageLink();
 
         this.stageTable(this.stage);
@@ -22,7 +24,21 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.checkRunningMacros(macros)
         });
         this.getBackupDate();
+        setInterval(() => {
+            this.watchForStageChange();
+        }, 5000);
     }
+    watchForStageChange = async () => {
+        const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
+        if (this.activeStageId != loadedStage.activeStageId) {
+            document.getElementById('panTiltFinder').style.display = "none";
+            $('#modalStageReloaded').modal({ backdrop: 'static', keyboard: false });
+            $('#modalStageReloaded').modal('show');
+            document.getElementById('btnReloadPage').addEventListener('click', function () {
+                window.location.reload();
+            });
+        }
+    };
     getBackupDate = async (stageId = this.stageId) => {
         let backupDate = await this.getLocalSetting("fixture_backup").then(backupData => {
             if (backupData && backupData.stageId == stageId) {
@@ -345,7 +361,7 @@ class SettingsApp extends Globals {
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         if (row.pantilt) {
-                            return '<span role="button" class="panOrTilt cursor-pointer" data-id="' + row.id + '"><img src="pan_tilt.svg"></span>';
+                            return '<span role="button" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
                         }
                     }
                 },
@@ -432,6 +448,12 @@ class SettingsApp extends Globals {
                 }
             }
         });
+        $('#fixtures thead th').each(function (tr) {
+            if (tr == 0) {
+                let s = $('<span role="button" class="panOrTilt cursor-pointer" data-id="panOrTiltAll" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt for All Movers"><img src="pan_tilt.svg">');
+                $(this).find(".th-inner").append(s)
+            }
+        })
         $('input[name="shutter_val"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
         });
@@ -440,40 +462,73 @@ class SettingsApp extends Globals {
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;
-            
+            let fixtureNames = "";
+            let fixtureIds = [];
+
+            if (id == "panOrTiltAll") {
+                let fixtures = maestro.SettingsApp.fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
+
+                for (let f of fixtures) {
+                    fixtureNames += `<span>${f.name}</span><br>`;
+                    fixtureIds.push(f.id);
+                }
+                document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
+                document.getElementById('fixtureName').innerHTML = fixtureNames;
+            } else {
+                fixtureIds.push(id);
+                let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+
+                document.getElementById('panTiltFinder').dataset.id = JSON.stringify(id);
+                document.getElementById('fixtureName').innerText = fixture.name;
+            }
+
             $('#panTiltFinder').modal('show');
-            document.getElementById('panTiltFinder').dataset.id = id;
 
             document.getElementById('panRange').addEventListener('input', function () {
                 document.getElementById('panRangeVal').innerText = this.value;
-                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
-            });
-            document.getElementById('panRange').addEventListener('change', function () {
-                document.getElementById('panRangeVal').innerText = this.value;
-                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
+                maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('input', function () {
                 document.getElementById('tiltRangeVal').innerText = this.value;
-                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
-            });
-            document.getElementById('tiltRange').addEventListener('change', function (id) {
-                document.getElementById('tiltRangeVal').innerText = this.value;
-                maestro.SettingsApp.setPanTilt(document.getElementById('panTiltFinder').dataset.id);
+                maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('panTiltReset').addEventListener('click', function () {
-                document.getElementById('panTiltReset').disabled = true;
-
-                maestro.SettingsApp.resetPanTilt(document.getElementById('panTiltFinder').dataset.id);
-
-                document.getElementById('panTiltReset').disabled = false;
-            });           
+                document.getElementById('panRange').value = 0;
+                document.getElementById('tiltRange').value = 0;
+                document.getElementById('panRangeVal').innerText = "";
+                document.getElementById('tiltRangeVal').innerText = "";
+                maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            });
         });
     }
+    resetPanTiltHandler = async (id) => {
+        let ids = JSON.parse(id);
+        if (Array.isArray(ids)) {
+            return this.resetPanTiltAll(ids);
+        } else {
+            return this.resetPanTilt(ids);
+        }
+    }
+    panTiltHandler = async (id) => {
+        let ids = JSON.parse(id);
+        if (Array.isArray(ids)) {
+            return this.panTiltAll(ids);
+        } else {
+            return this.setPanTilt(ids);
+        }
+    };
+    resetPanTiltAll = async (ids) => {
+        for (let id of ids) {
+            await this.resetPanTilt(id);
+        }
+    }
+    panTiltAll = async (ids) => {
+        for (let id of ids) {
+            await this.setPanTilt(id);
+        }
+    };
     setPanTilt = async (id) => {
-        if(!this.currentFixture)    
-            this.currentFixture = await this.getFixture(id);
-
-        let fixture = this.currentFixture;
+        let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
 
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
@@ -487,7 +542,7 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
     resetPanTilt = async (id) => {
-        let fixture = await this.getFixture(id);
+        let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
 
@@ -495,7 +550,7 @@ class SettingsApp extends Globals {
         let titRange = this.calculateRange({ lowValue: 0, highValue: 255 });
         await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
-    }
+    };
     macroTable = (macros) => {
         var tData = [];
 
@@ -568,7 +623,7 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.deleteMacro(macro);
             }
         });
-    }
+    };
     stageTable = (stages) => {
         var tData = [];
         let activeStage = stages.activeStageId;
@@ -620,7 +675,7 @@ class SettingsApp extends Globals {
             sortOrder: 'desc'
         });
 
-    }
+    };
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src);
 maestro.SettingsApp.start();

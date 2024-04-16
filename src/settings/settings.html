@@ -49,7 +49,7 @@
         <h2 class="mt-3">Macros</h2>
 
         <table id="macros" class="table my-2">
-            <thead>
+            <thead class="table-light">
                 <tr>
                     <th data-field="name">Macro Name</th>
                     <th data-field="length">Number of Fixtures</th>
@@ -69,7 +69,7 @@
         <h2 class="mt-3">Stages</h2>
 
         <table id="stages" class="table my-1">
-            <thead>
+            <thead class="table-light">
                 <tr>
                     <th data-field="name" data-sortable="true">Stage Name</th>
                     <th data-field="fixtures" data-sortable="true">Fixture</th>
@@ -81,8 +81,9 @@
         <h2 class="mt-3">Fixtures</h2>
 
         <table id="fixtures" class="table my-1">
-            <thead>
+            <thead class="table-light">
                 <tr>
+                    <th data-field="pantilt"></th>
                     <th data-field="name">Fixture Name</th>
                     <th data-field="fixtureGroup">Fixture Group</th>
                     <th data-field="fixturePosition">Arrangement</th>
@@ -96,23 +97,6 @@
             <button id="addMacro" class="btn btn-primary">Add Macro</button>
         </div>
 
-        <!-- <div class="my-5" style="max-width: 500px;">
-            <table class="table">
-                <tr>
-                    <td>Pan:</td>
-                    <td><input type="range" class="form-range" min="0" max="255" steps="1" id="panRange" value="0"></td>
-                    <td><span id="panRangeVal"></span></td>
-                </tr>
-                <tr>
-                    <td>Tilt:</td>
-                    <td><input type="range" class="form-range" min="0" max="255" steps="1" id="tiltRange" value="0">
-                    </td>
-                    <td><span id="tiltRangeVal"></span></td>
-                </tr>
-            </table>
-        </div> -->
-
-
         <!-- Modal Pan/Tilt Finder -->
         <div id="panTiltFinder" class="modal fade" role="dialog">
             <div class="modal-dialog">
@@ -124,9 +108,9 @@
                     <div class="modal-body">
                         <p>
                             These settigns are LIVE EFFECTS saved to the fixture automatically.
-                            To revert click "Reset".
+                            To revert to 0-255 click "Reset".
                         </p>
-                        <div class="my-5" style="max-width: 500px;">
+                        <div class="my-3" style="max-width: 500px;">
                             <table class="table">
                                 <tr>
                                     <td width="50">Pan:</td>
@@ -143,16 +127,38 @@
                                 </tr>
                             </table>
                         </div>
+                        <div class="my-2">
+                            <p id="fixtureName" class="h5 text-center"></p>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="panTiltReset">Reset</button>
-                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" id="panTiltReset">Reset</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
 
             </div>
         </div>
+        <!-- Modal Stage Reloaded -->
+        <div id="modalStageReloaded" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Stage Changed</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="h5 text-danger">
+                            You must reload the page to see the changes.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnReloadPage">Reload Now</button>
+                    </div>
+                </div>
 
+            </div>
+        </div>
     </div>
     <script src="../external/jquery.min.js"></script>
     <script src="../external/bootstrap.bundle.min.js"></script>
