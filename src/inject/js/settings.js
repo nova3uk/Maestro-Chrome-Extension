@@ -8,6 +8,8 @@ class SettingsApp extends Globals {
     }
     currentFixture;
     activeStageId;
+    ignoredFixtures = [];
+
     start = async () => {
         await this.getStages();
         this.activeStageId = this.stageId;
@@ -311,6 +313,9 @@ class SettingsApp extends Globals {
                     let ignoreParam = await this.getLocalSetting("fixture_ignore_" + fixture.id);
                     let ignore = ignoreParam ? ignoreParam.ignore : false;
 
+                    if (ignore == true)
+                        maestro.SettingsApp.ignoredFixtures.push({ id: fixture.id });
+
                     tData.push({
                         id: fixture.id,
                         name: fixture.name,
@@ -479,8 +484,12 @@ class SettingsApp extends Globals {
                 let fixtures = maestro.SettingsApp.getAllMovers();
 
                 for (let f of fixtures) {
-                    fixtureNames += `<span>${f.name}</span><br>`;
-                    fixtureIds.push(f.id);
+                    if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
+                        fixtureNames += `<span class="text-danger">(ignored)${f.name}</span><br>`;
+                    } else {
+                        fixtureNames += `<span>${f.name}</span><br>`;
+                        fixtureIds.push(f.id);
+                    }
                 }
                 document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
                 document.getElementById('fixtureName').innerHTML = fixtureNames;
@@ -539,6 +548,8 @@ class SettingsApp extends Globals {
     };
     setPanTilt = async (id) => {
         let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+        let ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
+        if (ignoreFixtures) return;
 
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
