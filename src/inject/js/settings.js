@@ -304,6 +304,8 @@ class SettingsApp extends Globals {
                     let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
                     let normalValue = shutterParams ? shutterParams.shutter : "";
                     let strobeValue = shutterParams ? shutterParams.strobe : "";
+                    let ignoreParam = await this.getLocalSetting("fixture_ignore_" + fixture.id);
+                    let ignore = ignoreParam ? ignoreParam.ignore : false;
 
                     tData.push({
                         id: fixture.id,
@@ -316,7 +318,8 @@ class SettingsApp extends Globals {
                         fixtureGroupId: fixture.fixtureGroupId,
                         index: fixture.index,
                         pantilt: panOrTilt,
-                        hasShutterOrStrobe: hasShutterOrStrobe
+                        hasShutterOrStrobe: hasShutterOrStrobe,
+                        ignore: ignore
                     });
                     i++;
                 }
@@ -328,7 +331,7 @@ class SettingsApp extends Globals {
 
         $('#fixtures').bootstrapTable({
             onClickRow: function (row, field, $element) {
-                if ($element == "shutter" || $element == "strobe" || $element == "pantilt")
+                if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore")
                     return false;
 
                 document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
@@ -365,7 +368,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.name.toUpperCase().includes("IGNORE"))
+                        if (row.ignore)
                             return "";
                         if (!row.hasShutterOrStrobe)
                             return;
@@ -379,7 +382,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.name.toUpperCase().includes("IGNORE"))
+                        if (row.ignore)
                             return "";
                         if (!row.hasShutterOrStrobe)
                             return;
@@ -388,16 +391,26 @@ class SettingsApp extends Globals {
                     }
                 },
                 {
-                    field: 'active',
-                    title: '',
+                    field: 'ignore',
+                    title: 'Ignore',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.name.toUpperCase().includes("IGNORE")) {
+                        return `<input type="checkbox" name="fixture_ignore" value="${row.id}" data-id="${row.id}" class="checkbox"${row.ignore == true ? " checked" : ""}>`;
+                    }
+                },
+                {
+                    field: 'active',
+                    title: 'Select',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.ignore) {
                             return "";
                         }
-                        return '<input type="checkbox" name="fixture_cbx" value="' + row.id + '" id="cb_' + row.id + '" class="checkbox">';
+                        return `<input type="checkbox" name="fixture_cbx" value="${row.id}" id="cb_${row.id}" class="checkbox"}>`;
                     }
                 }],
             rowAttributes: function (row, index) {
@@ -439,6 +452,13 @@ class SettingsApp extends Globals {
                 $(this).find(".th-inner").append(s)
             }
         })
+        $('.checkbox[name="fixture_ignore"]').on('change', function () {
+            if ($(this).is(':checked')) {
+                maestro.SettingsApp.saveLocalSetting("fixture_ignore_" + $(this).data('id'), { ignore: true })
+            } else {
+                maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
+            }
+        });
         $('input[name="shutter_val"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
         });

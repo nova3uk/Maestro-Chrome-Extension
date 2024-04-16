@@ -1,4 +1,4 @@
-MaestroDMX is an autonomous lighting designer-in-a-box that listens to music and makes decisions like a professional lighting designer. 
+MaestroDMX is an autonomous lighting designer-in-a-box that listens to music and makes decisions like a professional lighting designer.
 See https://www.maestrodmx.com/ for more information.
 
 This Chrome Extension is currently only for the purpose of temporarily adding functionaity not yet available in the official software, by means of manipulation of the web interface. It is of course only available on versions of Chrome which can run Extensions, therefore desktop only not mobile.
@@ -9,19 +9,18 @@ Currently it supports 3 main functions:
 2. Adding a Footer bar with Latching Manual Overrides (Blackout, Blinder, Strobe, Fog and Effect) which is visible on any page, not only the Show Page. These buttons are Latching (they stay on until turned off, no more finger holding)
 3. Macros. Adding the possibility to store a fixtures DMX settings in a macro, and recalling it later. For example to set movers to a specific colour and location.
 
-   
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
 **Setup Instructions.**
 
 ![maestro_manifest2](https://github.com/nova3uk/Maestro-Chrome-Extension/assets/4563061/503cb5ea-b4a0-4178-8439-56ea6ae52a6d)
 
-1. If you have setup a custom IP or url for the MaestroDMX then the manifest must be edited to modify content_scripts/matches (see above image) so that it has the url/ip of your maestro so that it will run on the maestro web control panel. The default network name is "maestro.local" or ip "192.168.37.1", which are already included in the manifest file for your convenience. If it is wrong it will not trigger the extension.
+1. The default network name is "maestro.local" or ip "192.168.37.1" or ip "10.0.0.200", which are already included in the manifest file for your convenience. If it is wrong it will not trigger the extension. If you use a custom ip, you can edit your hosts file to add a mapping for maestro.local to your custom ip and this will work. See for example https://eu.siteground.com/kb/hosts-file/
 2. The plugin is looking for fixtures with both a Color Wheel and a Shutter, or a dedicated STROBE channel. It is not going to find anything else.
 3. If you have a device with both a shutter and a color wheel, or a Strobe but it is not one you want to be controlled by the plugin, then modify its name to include the word "IGNORE", for example: "Chinese Laser IGNORE"
 4. The script needs to know what is the OPEN dmx value and what SHUTTER dmx value to switch. You can set the Open and Strobe values on the Settings page, accessible from the link in the Popup menu displayed when you click the Extension Icon in your Chrome Toolbar. For example, you can set the Shutter Open to 250 if that is the normal open dmx value for your fixture, and 150 is the Strobe active value. Usually you can adjust the strobe number higher or lower if you want it to be faster/slower strobing, everything depends on your specific fixtures requirements - check its dmx table in the manual.
-5. Installing the plugin. You need to download the whole folder and save it somewhere suitable on your computer, if you downloaded a zip file then it needs to be expanded first.
-6. In Chrome, go to Extension, Manage Extensions. Then you need to select the option to "Load unpacked", usually in the top left of the page, then select the folder you extracted in point 5.
+5. Installing the plugin in Developer Mode. You need to download the whole folder and save it somewhere suitable on your computer, if you downloaded a zip file then it needs to be expanded first.
+6. In Chrome, go to Extension, Manage Extensions. Make sure Developer Mode is enabled, then you need to select the option to "Load unpacked", usually in the top left of the page, then select the folder you extracted in point 5.
 
 Et voila - the plugin should be installed, configured and active. If it is not working, then the reason will be one of either you have not correctly put the web address of your maestro in the manifest, or you have not correctly renamed the fixtures to have only one underscore, and the correct dmx values, or worse that you are trying to effect fixtures without a colorwheel and shutter.
 
@@ -29,7 +28,7 @@ Settings:
 You can turn on or off the entire plugin, the Footer bar, or enable/disable console logging via the Popup menu, accessible by clicking the Plugin Icon in the chrome address bar(it may be hidden in your plugins list, if you have too many plugins loaded at once - you can Pin it to stay visible if you wish)
 
 How does it work?
-The plugin queries he api, in order to understand the id of the stage. It then calls the maestro API again to download the fixture list, and searches for fixtures with a shutter and a color wheel or a dedicated Strobe channel, which also contain the attributes required in point 4 above in the name. It also forcefully ignores any fixture with the word IGNORE in the name. 
+The plugin queries he api, in order to understand the id of the stage. It then calls the maestro API again to download the fixture list, and searches for fixtures with a shutter and a color wheel or a dedicated Strobe channel, which also contain the attributes required in point 4 above in the name. It also forcefully ignores any fixture with the word IGNORE in the name.
 
 Once it has built a list of the fixtures it needs to modify, it then searches for the Strobe button on the page, and adds a hook into its click and unclick events(mousdown, mouseup). Therefore it does not interfere with the usual functionality of the web interface, it meerly piggy backs on to it, so that when you click the Strobe button it sends an api call to the Maestro changing the dmx value of the strobe to the value in the parameter set in the name, when you let go it sends another message reverting the change back. The maestro reacts instantly to these changes and the effect is seemless. It only modifies those fixtures it should and always reverts the value when you stop.
 

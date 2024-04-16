@@ -100,8 +100,10 @@ class App extends Globals {
                         let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
                         let normalValue = shutterParams ? shutterParams.shutter : "";
                         let strobeValue = shutterParams ? shutterParams.strobe : "";
+                        let ignoreParam = await this.getLocalSetting("fixture_ignore_" + fixture.id);
+                        let ignore = ignoreParam ? ignoreParam.ignore : false;
 
-                        if (!dmxValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
+                        if (ignore) continue;
 
                         if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
                             throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
