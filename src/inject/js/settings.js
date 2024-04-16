@@ -287,42 +287,23 @@ class SettingsApp extends Globals {
         });
     };
     changeStrobeParam = async (id) => {
-        let fixture = await this.getFixture(id);
-
         let newStrobeValue = document.getElementById('strobe_val_' + id).value;
         let newShutterValue = document.getElementById('shutter_val_' + id).value;
 
-        var updatedName = "";
-        let [fixtureName, dmxValues] = fixture.name.split("_");
-
-        if (!newStrobeValue && !newShutterValue) {
-            updatedName = `${fixtureName}`
-        } else {
-            updatedName = `${fixtureName}_${newShutterValue}:${newStrobeValue}`;
-            fixture.name = updatedName;
-        }
-
-        fixture.name = updatedName;
-
-        document.getElementById('name_' + id).innerText = updatedName;
-
-        let fixtureProfile = {
-            fixture: fixture
-        };
-
-        this.patchFixture(id, fixtureProfile);
-
+        this.saveLocalSetting("strobe_" + id, { strobe: newStrobeValue, shutter: newShutterValue });
     };
-    fixtureTable = (activeStage, activeFixtureGroups) => {
+    fixtureTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
         for (let group of activeFixtureGroups) {
             let i = 0;
             if (group.fixtureId) {
                 for (let fixtureId of group.fixtureId) {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
-                    let [fixtureName, dmxValues] = fixture.name.split("_");
-                    let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
                     let panOrTilt = fixture.attribute.some(ele => ele.type === 'PAN' || ele.type === 'TILT');
+                    let hasShutterOrStrobe = fixture.attribute.some(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
+                    let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
+                    let normalValue = shutterParams ? shutterParams.shutter : "";
+                    let strobeValue = shutterParams ? shutterParams.strobe : "";
 
                     tData.push({
                         id: fixture.id,
@@ -334,7 +315,8 @@ class SettingsApp extends Globals {
                         strobe: strobeValue,
                         fixtureGroupId: fixture.fixtureGroupId,
                         index: fixture.index,
-                        pantilt: panOrTilt
+                        pantilt: panOrTilt,
+                        hasShutterOrStrobe: hasShutterOrStrobe
                     });
                     i++;
                 }
@@ -383,9 +365,10 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.name.toUpperCase().includes("IGNORE")) {
+                        if (row.name.toUpperCase().includes("IGNORE"))
                             return "";
-                        }
+                        if (!row.hasShutterOrStrobe)
+                            return;
                         return '<input type="number" name="shutter_val" data-id="' + row.id + '" id="shutter_val_' + row.id + '" min="0" max="255" value="' + (row.shutter || "") + '">';
                     }
                 },
@@ -396,9 +379,11 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.name.toUpperCase().includes("IGNORE")) {
+                        if (row.name.toUpperCase().includes("IGNORE"))
                             return "";
-                        }
+                        if (!row.hasShutterOrStrobe)
+                            return;
+
                         return '<input type="number" name="shutter_strobe" data-id="' + row.id + '" id="strobe_val_' + row.id + '" min="0" max="255" value="' + (row.strobe || "") + '">';
                     }
                 },
@@ -466,7 +451,7 @@ class SettingsApp extends Globals {
             let fixtureIds = [];
 
             if (id == "panOrTiltAll") {
-                let fixtures = maestro.SettingsApp.fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
+                let fixtures = maestro.SettingsApp.getAllMovers();
 
                 for (let f of fixtures) {
                     fixtureNames += `<span>${f.name}</span><br>`;
@@ -551,6 +536,9 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
+    getAllMovers = () => {
+        return maestro.SettingsApp.fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
+    }
     macroTable = (macros) => {
         var tData = [];
 

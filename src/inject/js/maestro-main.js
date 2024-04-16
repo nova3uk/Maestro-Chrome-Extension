@@ -97,8 +97,9 @@ class App extends Globals {
             try {
                 for (let fixture of fixtures) {
                     try {
-                        let [fixtureName, dmxValues] = fixture.name.split("_");
-                        let [normalValue, strobeValue] = dmxValues ? dmxValues.split(":") : [];
+                        let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
+                        let normalValue = shutterParams ? shutterParams.shutter : "";
+                        let strobeValue = shutterParams ? shutterParams.strobe : "";
 
                         if (!dmxValues || fixtureName.toUpperCase().includes("IGNORE")) continue;
 
