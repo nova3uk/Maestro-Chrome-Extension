@@ -369,7 +369,16 @@ class SettingsApp extends Globals {
                         return '<span id="name_' + row.id + '">' + value + '</span>';
                     }
                 },
-                {}, {}, {},
+                {}, {}, {
+                    field: 'active',
+                    title: 'Active',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return row.active == true ? 'Yes' : 'No';
+                    }
+                },
                 {
                     field: 'shutter',
                     title: 'Shutter Open',
@@ -431,7 +440,7 @@ class SettingsApp extends Globals {
                 }
             },
             rowStyle: function (row, index) {
-                if (row.name.toUpperCase().includes("IGNORE")) {
+                if (row.ignore == true) {
                     return {
                         css: {
                             'background-color': '#cccccc'
