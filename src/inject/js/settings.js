@@ -354,7 +354,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.pantilt) {
+                        if (row.pantilt && !row.ignore) {
                             return '<span role="button" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
                         }
                     }
