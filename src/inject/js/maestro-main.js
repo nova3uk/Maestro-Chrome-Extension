@@ -103,11 +103,13 @@ class App extends Globals {
                         let ignore = false;
 
                         for(let i=0; i<this.ignoreFixtures.length; i++){
-                            if(this.ignoreFixtures[i]["ignore_fixture_" + fixture.id] != null){
+                            if(this.ignoreFixtures[i]["fixture_ignore_" + fixture.id] != null){
                                 ignore = true;
                                 break;
                             }
                         }
+                        if(ignore) continue;
+                        
                         for(let i=0; i<this.strobeParams.length; i++){
                             if(this.strobeParams[i]["strobe_" + fixture.id] != null){
                                 normalValue = this.strobeParams[i]["strobe_" + fixture.id].shutter;

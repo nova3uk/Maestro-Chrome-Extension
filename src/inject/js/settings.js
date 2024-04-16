@@ -286,7 +286,7 @@ class SettingsApp extends Globals {
                 }
                 macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
-                window.location.reload();
+                document.location.reload();
             });
         });
     };
@@ -462,6 +462,7 @@ class SettingsApp extends Globals {
             } else {
                 maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
             }
+            document.location.reload();
         });
         $('input[name="shutter_val"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
