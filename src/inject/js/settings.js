@@ -136,7 +136,7 @@ class SettingsApp extends Globals {
                 }
 
                 //save original profile prior to modification
-                await this.storeFixtureProfile(currentProfile)
+                await this.storeFixtureProfile(macroName, currentProfile)
                 this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
             }
         }
@@ -193,17 +193,20 @@ class SettingsApp extends Globals {
 
         for (let macro of macros) {
             for (let fixture of macro.macro.fixtures) {
+
                 let fixtureProfile = await this.retrieveFixtureProfile(fixture.id);
-                
+
                 if (fixtureProfile) {
-                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
-                    deleteButton.disabled = true;
-                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
-                    applyButton.disabled = true;
-                    const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');
-                    clearButton.disabled = false;
+                    if (fixtureProfile.macroName == macro.macro.name) {
+                        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
+                        deleteButton.disabled = true;
+                        const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
+                        applyButton.disabled = true;
+                        const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');
+                        clearButton.disabled = false;
+                    }
                 }
-                
+
             }
         }
     };

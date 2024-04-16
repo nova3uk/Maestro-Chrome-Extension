@@ -188,9 +188,9 @@ class Globals {
         this.activeStageFixtureGroups = stage.fixtureGroup
         return this.activeStage;
     }
-    storeFixtureProfile = async (fixture) => {
+    storeFixtureProfile = async (macroName, fixture) => {
         let currentSetting = await this.getFixture(fixture.id);
-        await this.saveLocalSetting("macro_active_"  + fixture.id, { "fixture": currentSetting });
+        await this.saveLocalSetting("macro_active_" + fixture.id, { "macroName": macroName, "fixture": currentSetting });
     };
     retrieveFixtureProfile = async (fixtureId) => {
         return await this.getLocalSetting("macro_active_" + fixtureId);
@@ -203,7 +203,7 @@ class Globals {
         });
     }
     deleteFixtureProfile = async (fixtureId) => {
-        this.deleteLocalSetting("macro_active_" +  fixtureId);
+        this.deleteLocalSetting("macro_active_" + fixtureId);
     };
     injectOverlay = function () {
         var s = document.createElement("script");
