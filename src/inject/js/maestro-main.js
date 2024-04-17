@@ -69,14 +69,13 @@ class App extends Globals {
                 if (this.allColors.includes(fixture.attribute[attr].type)) {
                     if (onOrOff == 1) {
                         if (fixture.attribute[attr].type == color) {
-                            await this.updateAttributeRange(fixture.id, attr, this.maxDmxVal, this.maxDmxVal);
+                            this.updateAttributeRange(fixture.id, attr, this.maxDmxVal, this.maxDmxVal);
                         } else {
-                            await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.minDmxVal);
+                            this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.minDmxVal);
                         }
                     } else {
-                        await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.maxDmxVal);
+                        this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.maxDmxVal);
                     }
-                    //await delay(50);
                 }
             }
         }
