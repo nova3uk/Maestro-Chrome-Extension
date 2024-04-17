@@ -11,24 +11,31 @@ class SettingsApp extends Globals {
     ignoredFixtures = [];
 
     start = async () => {
-        await this.getStages();
-        this.activeStageId = this.stageId;
+        try {
+            await this.getStages();
+            this.activeStageId = this.stageId;
 
-        this.controlPageLink();
+            this.controlPageLink();
 
-        this.stageTable(this.stage);
+            this.stageTable(this.stage);
 
-        this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
+            this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
 
-        this.bindMacroBtn();
-        await this.loadMacros(function (macros) {
-            maestro.SettingsApp.macroTable(macros);
-            maestro.SettingsApp.checkRunningMacros(macros)
-        });
-        this.getBackupDate();
-        setInterval(() => {
-            this.watchForStageChange();
-        }, 5000);
+            this.bindMacroBtn();
+            await this.loadMacros(function (macros) {
+                maestro.SettingsApp.macroTable(macros);
+                maestro.SettingsApp.checkRunningMacros(macros)
+            });
+            this.getBackupDate();
+            setInterval(() => {
+                this.watchForStageChange();
+            }, 5000);
+        } catch (error) {
+            $('#modalDown').modal({ backdrop: 'static', keyboard: false });
+            $('#modalDown').modal('show');
+            if (this.logging)
+                console.error('Fatal error:', error);
+        }
     }
     watchForStageChange = async () => {
         const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
@@ -36,6 +43,7 @@ class SettingsApp extends Globals {
             document.getElementById('panTiltFinder').style.display = "none";
             $('#modalStageReloaded').modal({ backdrop: 'static', keyboard: false });
             $('#modalStageReloaded').modal('show');
+
             document.getElementById('btnReloadPage').addEventListener('click', function () {
                 window.location.reload();
             });
