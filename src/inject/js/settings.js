@@ -123,32 +123,21 @@ class SettingsApp extends Globals {
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result;
                     var parse = JSON.parse(content);
-                    let foreignStageMacros = false;
-                    let foreignFixtures = [];
 
                     if (parse.macros) {
-                        for (let macro of parse.macros) {
-                            if (macro.macro.stageId !== maestro.SettingsApp.stageId) {
-                                foreignStageMacros = true;
-                                if (!confirm('This backup contains macros from a different stage.\n\nIf you continue, these macros will be reassigned to the currently active stage.')) {
-                                    return;
-                                } else {
-                                    for (let macro of parse.macros) {
-                                        macro.macro.stageId = maestro.SettingsApp.stageId;
-                                    }
-                                    break;
-                                }
+                        const foreignStageMacros = parse.macros.some(macro => macro.macro.stageId !== maestro.SettingsApp.stageId);
+                        if (foreignStageMacros) {
+                            const confirmMessage = 'This backup contains macros from a different stage.\n\nIf you continue, these macros will be reassigned to the currently active stage.';
+                            if (!confirm(confirmMessage)) {
+                                return;
+                            } else {
+                                parse.macros.forEach(macro => {
+                                    macro.macro.stageId = maestro.SettingsApp.stageId;
+                                });
                             }
                         }
                         let currentFixtureIds = maestro.SettingsApp.fixtures.map(fixture => fixture.id);
-                        for (let macro of parse.macros) {
-                            for (let fixture of macro.macro.fixtures) {
-                                if (!currentFixtureIds.includes(fixture.id)) {
-                                    if (foreignFixtures.indexOf(fixture.id) == -1)
-                                        foreignFixtures.push(fixture.id);
-                                }
-                            }
-                        }
+                        let foreignFixtures = [...new Set(parse.macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id)).filter(fixtureId => !currentFixtureIds.includes(fixtureId)))];
 
                         if (foreignFixtures.length > 0) {
                             return alert('This backup contains fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
