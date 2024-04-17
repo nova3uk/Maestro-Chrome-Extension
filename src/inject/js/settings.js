@@ -428,7 +428,7 @@ class SettingsApp extends Globals {
                             return "";
                         if (!row.hasShutterOrStrobe)
                             return;
-                        return '<input type="number" name="shutter_val" data-id="' + row.id + '" id="shutter_val_' + row.id + '" min="0" max="255" value="' + (row.shutter || "") + '">';
+                        return '<input type="number" style="width:70px;" name="shutter_val" data-id="' + row.id + '" id="shutter_val_' + row.id + '" min="0" max="255" value="' + (row.shutter || "") + '">';
                     }
                 },
                 {
@@ -443,7 +443,7 @@ class SettingsApp extends Globals {
                         if (!row.hasShutterOrStrobe)
                             return;
 
-                        return '<input type="number" name="shutter_strobe" data-id="' + row.id + '" id="strobe_val_' + row.id + '" min="0" max="255" value="' + (row.strobe || "") + '">';
+                        return '<input type="number" style="width:70px;" name="shutter_strobe" data-id="' + row.id + '" id="strobe_val_' + row.id + '" min="0" max="255" value="' + (row.strobe || "") + '">';
                     }
                 },
                 {
@@ -551,18 +551,24 @@ class SettingsApp extends Globals {
             $('#panTiltFinder').modal('show');
 
             document.getElementById('panRange').addEventListener('input', function () {
-                document.getElementById('panRangeVal').innerText = this.value;
+                document.getElementById('panRangeVal').value = this.value;
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('input', function () {
-                document.getElementById('tiltRangeVal').innerText = this.value;
+                document.getElementById('tiltRangeVal').value = this.value;
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            });
+            document.getElementById('tiltRangeVal').addEventListener('change', function (ele) {
+                document.getElementById('tiltRange').value = this.value;
+            });
+            document.getElementById('panRangeVal').addEventListener('change', function (ele) {
+                document.getElementById('panRange').value = this.value;
             });
             document.getElementById('panTiltReset').addEventListener('click', function () {
                 document.getElementById('panRange').value = 0;
                 document.getElementById('tiltRange').value = 0;
-                document.getElementById('panRangeVal').innerText = "";
-                document.getElementById('tiltRangeVal').innerText = "";
+                document.getElementById('panRangeVal').value = "";
+                document.getElementById('tiltRangeVal').value = "";
                 maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
         });
