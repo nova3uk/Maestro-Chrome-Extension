@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function (
     );
 });
 chrome.runtime.onMessageExternal.addListener(
-    function (request, sender, sendResponse) {
+    async function (request, sender, sendResponse) {
         if (request.getStrobeFixtures) {
             this.retrieveAllKeys().then(keys => {
                 let response = [];
@@ -39,6 +39,25 @@ chrome.runtime.onMessageExternal.addListener(
                 return sendResponse(response);
             });
         }
+        if (request.getAutoFogParams) {
+            let autoFogEnabled = await this.getSetting("autoFogToggle");
+            let autoFogOnActivityPeak = await this.getLocalSetting("autoFogOnActivityPeak");
+            let autoFogOnActivityPeakPercent = await this.getLocalSetting("autoFogOnActivityPeakPercent");
+            let autoFogOnActivityPeakDuration = await this.getLocalSetting("autoFogOnActivityPeakDuration");
+            let autoFogOnTimer = await this.getLocalSetting("autoFogOnTimer");
+            let fogTimer = await this.getLocalSetting("fogTimer");
+            let fogTimerDuration = await this.getLocalSetting("fogTimerDuration");
+            let response = {};
+            response.autoFogEnabled = autoFogEnabled;
+            response.autoFogOnActivityPeak = autoFogOnActivityPeak;
+            response.autoFogOnActivityPeakPercent = autoFogOnActivityPeakPercent;
+            response.autoFogOnActivityPeakDuration = autoFogOnActivityPeakDuration;
+            response.autoFogOnTimer = autoFogOnTimer;
+            response.fogTimer = fogTimer;
+            response.fogTimerDuration = fogTimerDuration;
+
+            return sendResponse(response);
+        }
         if (request.openSettingsWindow) {
             let url = chrome.runtime.getURL(`src/settings/settings.html?maestro_url=${encodeURIComponent(request.openSettingsWindow)}`);
             chrome.tabs.query({ url: url }, function (tabs) {
@@ -58,6 +77,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.storage.sync.set({ colorToggle: false });
         chrome.storage.sync.set({ footerToggle: true });
         chrome.storage.sync.set({ blinderToggle: false });
+        chrome.storage.sync.set({ blinderToggle: false });
 
         let internalUrl = chrome.runtime.getURL("src/settings/settings.html?maestro_url=*%3A%2F%2Fmaestro.local%2F*");
         chrome.tabs.create({ url: internalUrl }, function (tab) { });
@@ -73,6 +93,28 @@ retrieveAllKeys = async () => {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(null, function (items) {
             resolve(items);
+        });
+    });
+};
+getLocalSetting = async (key) => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get([key], function (result) {
+            if (result[key] === undefined) {
+                resolve(null);
+            } else {
+                resolve(result[key]);
+            }
+        });
+    });
+};
+getSetting = async (key) => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get([key], function (result) {
+            if (result[key] === undefined) {
+                resolve(null);
+            } else {
+                resolve(result[key]);
+            }
         });
     });
 };

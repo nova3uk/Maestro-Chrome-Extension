@@ -21,6 +21,8 @@ class Globals {
     pageObserver;
     maxDmxVal = 1;
     minDmxVal = 0;
+    audioLevel = 0;
+    activityLevel = 0;
     allColors = [
         "RED",
         "GREEN",
@@ -70,18 +72,46 @@ class Globals {
         PUT: 'PUT',
         DELETE: 'DELETE',
         PATCH: 'PATCH'
-    }
+    };
     macro = {
         name: "",
         fixtures: []
-    }
+    };
+    // Variable to be monitored
+    activityLevelRoot = 0;
+    arrActivityLevelCallbacks = []
 
+
+
+    // Handler for the proxy
+    activityLevelHdlr = {
+        set(target, property, value) {
+            for (let i = 0; i < maestro.Globals.arrActivityLevelCallbacks.length; i++) {
+                if (typeof maestro.Globals.arrActivityLevelCallbacks[i] === 'function')
+                    maestro.Globals.arrActivityLevelCallbacks[i](value);
+            }
+
+            target[property] = value;
+            return true;
+        }
+    };
+
+    // Create a proxy for the variable
+    activityLevel = new Proxy({ value: this.activityLevelRoot }, this.activityLevelHdlr);
 
     getAttributeType = (type) => this.attributeTypes[type];
     getAttributeTypes = () => this.attributeTypes;
     getHttpMethods = () => this.httpMethods;
 
-
+    debounce = (callback, wait = 1000) => {
+        let timeoutId = null;
+        return (...args) => {
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => {
+                callback(...args);
+            }, wait);
+        };
+    };
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     isNumeric = function (value) {
         return !isNaN(parseFloat(value)) && isFinite(value);

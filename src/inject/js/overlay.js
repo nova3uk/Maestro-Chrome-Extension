@@ -397,6 +397,9 @@ class OverlayApp extends Globals {
         let soundLevel = Math.floor(((msg.inputLevel + 37) / 37) * 100);
         let activityLevel = Math.floor((msg.activityLevel * 100));
         let container = document.getElementById('audioLevelContainer');
+        this.soundLevel = soundLevel;
+        this.activityLevel.value = activityLevel;
+
         if (soundLevel < 5) soundLevel = 0;
         if (activityLevel < 5) activityLevel = 0;
 

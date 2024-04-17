@@ -27,6 +27,7 @@ class SettingsApp extends Globals {
         this.bindMacroBtn();
         this.bindBackupBtn();
         this.bindRestoreBtn();
+        this.bindAutoFog();
 
         await this.loadMacros(function (macros) {
             maestro.SettingsApp.macroTable(macros);
@@ -175,6 +176,70 @@ class SettingsApp extends Globals {
 
         return alert('All fixtures have been restored to the backup state');
     };
+    bindAutoFog = async () => {
+        var fogOn = await this.getSetting("autoFogToggle");
+
+        document.getElementById('autoFogEnabled').checked = await this.getSetting("autoFogToggle");
+        document.getElementById('autoFogOnActivityPeak').checked = await this.getLocalSetting("autoFogOnActivityPeak");
+        document.getElementById('autoFogOnActivityPeakPercent').value = await this.getLocalSetting("autoFogOnActivityPeakPercent");
+        document.getElementById('autoFogOnActivityPeakDuration').value = await this.getLocalSetting("autoFogOnActivityPeakDuration");
+        document.getElementById('autoFogOnTimer').checked = await this.getLocalSetting("autoFogOnTimer");
+        document.getElementById('fogTimer').value = await this.getLocalSetting("fogTimer");
+        document.getElementById('fogTimerDuration').value = await this.getLocalSetting("fogTimerDuration");
+
+        if (!fogOn) {
+            document.getElementById('autoFogOnActivityPeak').disabled = !fogOn;
+            document.getElementById('autoFogOnTimer').disabled = !fogOn;
+            document.getElementById('fogTimer').disabled = !fogOn;
+            document.getElementById('fogTimerDuration').disabled = !fogOn;
+            document.getElementById('autoFogOnActivityPeakPercent').disabled = !fogOn;
+            document.getElementById('autoFogOnActivityPeakDuration').disabled = !fogOn;
+        }
+        document.getElementById('autoFogEnabled').addEventListener('change', async () => {
+            let autoFogEnabled = document.getElementById('autoFogEnabled').checked;
+            await this.saveSetting("autoFogToggle", autoFogEnabled);
+
+            document.getElementById('autoFogOnActivityPeak').disabled = !autoFogEnabled;
+            document.getElementById('autoFogOnTimer').disabled = !autoFogEnabled;
+            document.getElementById('fogTimer').disabled = !autoFogEnabled;
+            document.getElementById('fogTimerDuration').disabled = !autoFogEnabled;
+            document.getElementById('autoFogOnActivityPeakPercent').disabled = !autoFogEnabled;
+            document.getElementById('autoFogOnActivityPeakDuration').disabled = !autoFogEnabled;
+
+        });
+        document.getElementById('autoFogOnActivityPeak').addEventListener('change', async () => {
+            let autoFogOnActivityPeak = document.getElementById('autoFogOnActivityPeak').checked;
+
+            document.getElementById('autoFogOnActivityPeakPercent').disabled = !autoFogOnActivityPeak;
+            document.getElementById('autoFogOnActivityPeakDuration').disabled = !autoFogOnActivityPeak;
+
+            await this.saveLocalSetting("autoFogOnActivityPeak", autoFogOnActivityPeak);
+        });
+        document.getElementById('autoFogOnTimer').addEventListener('change', async () => {
+            let autoFogOnTimer = document.getElementById('autoFogOnTimer').checked;
+
+            document.getElementById('fogTimer').disabled = !autoFogOnTimer;
+            document.getElementById('fogTimerDuration').disabled = !autoFogOnTimer;
+
+            await this.saveLocalSetting("autoFogOnTimer", autoFogOnTimer);
+        });
+        document.getElementById('fogTimer').addEventListener('change', async () => {
+            let fogTimer = document.getElementById('fogTimer').value;
+            await this.saveLocalSetting("fogTimer", fogTimer);
+        });
+        document.getElementById('fogTimerDuration').addEventListener('change', async () => {
+            let fogTimerDuration = document.getElementById('fogTimerDuration').value;
+            await this.saveLocalSetting("fogTimerDuration", fogTimerDuration);
+        });
+        document.getElementById('autoFogOnActivityPeakPercent').addEventListener('change', async () => {
+            let autoFogOnActivityPeakPercent = document.getElementById('autoFogOnActivityPeakPercent').value;
+            await this.saveLocalSetting("autoFogOnActivityPeakPercent", autoFogOnActivityPeakPercent);
+        });
+        document.getElementById('autoFogOnActivityPeakDuration').addEventListener('change', async () => {
+            let autoFogOnActivityPeakDuration = document.getElementById('autoFogOnActivityPeakDuration').value;
+            await this.saveLocalSetting("autoFogOnActivityPeakDuration", autoFogOnActivityPeakDuration);
+        });
+    }
     controlPageLink = function () {
         var link = document.getElementById('controlPageLink')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
