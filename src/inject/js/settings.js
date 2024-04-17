@@ -11,32 +11,48 @@ class SettingsApp extends Globals {
     ignoredFixtures = [];
 
     start = async () => {
-        try {
-            await this.getStages();
-            this.activeStageId = this.stageId;
-
-            this.controlPageLink();
-
-            this.stageTable(this.stage);
-
-            this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
-
-            this.bindMacroBtn();
-            await this.loadMacros(function (macros) {
-                maestro.SettingsApp.macroTable(macros);
-                maestro.SettingsApp.checkRunningMacros(macros)
-            });
-            this.getBackupDate();
-            setInterval(() => {
-                this.watchForStageChange();
-            }, 5000);
-        } catch (error) {
-            $('#modalDown').modal({ backdrop: 'static', keyboard: false });
-            $('#modalDown').modal('show');
-            if (this.logging)
-                console.error('Fatal error:', error);
+        if (!await this.watchOffline()) {
+            return;
         }
+
+        await this.getStages();
+        this.activeStageId = this.stageId;
+
+        this.controlPageLink();
+
+        this.stageTable(this.stage);
+
+        this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
+
+        this.bindMacroBtn();
+        await this.loadMacros(function (macros) {
+            maestro.SettingsApp.macroTable(macros);
+            maestro.SettingsApp.checkRunningMacros(macros)
+        });
+        this.getBackupDate();
+        setInterval(() => {
+            this.watchForStageChange();
+        }, 5000);
+        setInterval(() => {
+            this.watchOffline();
+        }, 5000);
+
     }
+    watchOffline = async () => {
+        try {
+            let state = await this.getShowState();
+            $('#modalDown').modal('hide');
+            return true;
+        } catch (e) {
+            if ($('#modalDown').hasClass('show')) {
+                return false
+            };
+            setTimeout(() => {
+                $('#modalDown').modal('show');
+            }, 500);
+            return false;
+        }
+    };
     watchForStageChange = async () => {
         const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
         if (this.activeStageId != loadedStage.activeStageId) {

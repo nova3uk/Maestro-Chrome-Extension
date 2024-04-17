@@ -98,6 +98,8 @@ class Globals {
         } catch (e) {
             if (this.logging)
                 console.error("Cannot connect to the API, is Maestro running?", e);
+
+            throw e;
         }
     };
     formatDate = (d) => {
@@ -149,17 +151,34 @@ class Globals {
     }
 
     getSystemInfo = async () => {
-        const info = await this.getUrl(`/api/${this.apiVersion}/system_info`);
-        return info;
+        try {
+            return await this.getUrl(`/api/${this.apiVersion}/system_info`);
+        } catch (e) {
+            if (this.logging) {
+                console.error("Cannot connect to the API, is Maestro running?", e);
+            }
+            throw e;
+        }
     };
     getBrightness = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
     };
     getShows = async () => {
-        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
+        try {
+            return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
+        } catch (e) {
+            if (this.logging) {
+                console.error("Cannot connect to the API, is Maestro running?", e);
+            }
+            throw e;
+        }
     };
     getShowState = async () => {
-        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
+        try {
+            return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
+        } catch (e) {
+            throw e;
+        }
     };
     startCue = async (cue) => {
         return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/start_cue`, cue, false);

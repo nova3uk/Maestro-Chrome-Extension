@@ -97,21 +97,21 @@ class App extends Globals {
         for (let { fixtures, attributeType } of allFixtures) {
             try {
                 for (let fixture of fixtures) {
-                    try { 
+                    try {
                         let normalValue = 0;
                         let strobeValue = 0;
                         let ignore = false;
 
-                        for(let i=0; i<this.ignoreFixtures.length; i++){
-                            if(this.ignoreFixtures[i]["fixture_ignore_" + fixture.id] != null){
+                        for (let i = 0; i < this.ignoreFixtures.length; i++) {
+                            if (this.ignoreFixtures[i]["fixture_ignore_" + fixture.id] != null) {
                                 ignore = true;
                                 break;
                             }
                         }
-                        if(ignore) continue;
-                        
-                        for(let i=0; i<this.strobeParams.length; i++){
-                            if(this.strobeParams[i]["strobe_" + fixture.id] != null){
+                        if (ignore) continue;
+
+                        for (let i = 0; i < this.strobeParams.length; i++) {
+                            if (this.strobeParams[i]["strobe_" + fixture.id] != null) {
                                 normalValue = this.strobeParams[i]["strobe_" + fixture.id].shutter;
                                 strobeValue = this.strobeParams[i]["strobe_" + fixture.id].strobe;
                                 break;
@@ -286,9 +286,9 @@ class App extends Globals {
     };
     getStrobeParams = async () => {
         // get strobe fixtures from backend
-        chrome.runtime.sendMessage(this.ExtensionId, {getStrobeFixtures : true},
-            function(response) {
-                if (response){
+        chrome.runtime.sendMessage(this.ExtensionId, { getStrobeFixtures: true },
+            function (response) {
+                if (response) {
                     maestro.App.strobeParams = response;
                     if (this.logging)
                         console.log("Strobe fixtures loaded.");
@@ -297,9 +297,9 @@ class App extends Globals {
     }
     getIgnoreFixtures = async () => {
         // get strobe fixtures from backend
-        chrome.runtime.sendMessage(this.ExtensionId, {getIgnoreFixtures : true},
-            function(response) {
-                if (response){
+        chrome.runtime.sendMessage(this.ExtensionId, { getIgnoreFixtures: true },
+            function (response) {
+                if (response) {
                     maestro.App.ignoreFixtures = response;
                     if (this.logging)
                         console.log("Ignore fixtures loaded.");
