@@ -72,12 +72,21 @@ chrome.runtime.onMessageExternal.addListener(
 //onUpdate or Install
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
+        //sync settings
         chrome.storage.sync.set({ enabledToggle: true });
         chrome.storage.sync.set({ loggingToggle: false });
         chrome.storage.sync.set({ colorToggle: false });
         chrome.storage.sync.set({ footerToggle: true });
         chrome.storage.sync.set({ blinderToggle: false });
         chrome.storage.sync.set({ autoFogToggle: false });
+
+        //local settings
+        chrome.storage.local.set({ autoFogOnActivityPeak: false });
+        chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
+        chrome.storage.local.set({ autoFogOnActivityPeakDuration: 5 });
+        chrome.storage.local.set({ autoFogOnTimer: false });
+        chrome.storage.local.set({ fogTimer: 10 });
+        chrome.storage.local.set({ fogTimerDuration: 5 });
 
         let internalUrl = chrome.runtime.getURL("src/settings/settings.html?maestro_url=*%3A%2F%2Fmaestro.local%2F*");
         chrome.tabs.create({ url: internalUrl }, function (tab) { });
