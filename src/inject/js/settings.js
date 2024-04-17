@@ -142,14 +142,7 @@ class SettingsApp extends Globals {
                         if (foreignFixtures.length > 0) {
                             return alert('This backup contains fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
                         }
-
-                        console.log(currentFixtureIds);
-
                     }
-                    // try {
-                    //     delete parse["fixture_backup"];
-                    // } catch (e) { }
-
                     chrome.storage.local.clear(function () {
                         chrome.storage.local.set(parse);
                         if (!alert('Config restored successfully.')) { window.location.reload(); }
@@ -798,6 +791,5 @@ class SettingsApp extends Globals {
 
     };
 };
-
 maestro.SettingsApp = new SettingsApp(document.currentScript.src);
 maestro.SettingsApp.start();
