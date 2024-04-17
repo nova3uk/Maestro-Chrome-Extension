@@ -11,7 +11,7 @@
     "default_icon": "favicon-maestro.png"
   },
   "default_locale": "en",
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "downloads"],
   "content_scripts": [
     {
       "matches": [

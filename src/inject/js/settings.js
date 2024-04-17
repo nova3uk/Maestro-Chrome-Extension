@@ -25,6 +25,8 @@ class SettingsApp extends Globals {
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
 
         this.bindMacroBtn();
+        this.bindBackupBtn();
+
         await this.loadMacros(function (macros) {
             maestro.SettingsApp.macroTable(macros);
             maestro.SettingsApp.checkRunningMacros(macros)
@@ -92,6 +94,18 @@ class SettingsApp extends Globals {
             }
         });
     }
+    bindBackupBtn = async () => {
+        document.getElementById('downloadConfig').addEventListener('click', async () => {
+            chrome.storage.local.get(null, function (items) {
+                var result = JSON.stringify(items);
+                var url = 'data:application/json;base64,' + btoa(result);
+                chrome.downloads.download({
+                    url: url,
+                    filename: `backup_stage_${maestro.SettingsApp.stageId}.json`
+                });
+            });
+        });
+    };
     backupAllFixtures = async () => {
         let fixtures = await this.getActiveStage();
         let backupData = {
