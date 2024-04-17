@@ -97,7 +97,7 @@ class SettingsApp extends Globals {
     bindBackupBtn = async () => {
         document.getElementById('downloadConfig').addEventListener('click', async () => {
             chrome.storage.local.get(null, function (items) {
-                var result = JSON.stringify(items);
+                var result = maestro.SettingsApp.prettyJSON(items);
                 var url = 'data:application/json;base64,' + btoa(result);
                 chrome.downloads.download({
                     url: url,

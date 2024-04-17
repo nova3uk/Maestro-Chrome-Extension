@@ -290,6 +290,9 @@ class Globals {
             });
         });
     };
+    prettyJSON = (data) => {
+        return JSON.stringify(data, null, '\t');
+    }
     injectCSS = (css) => {
         let el = document.createElement('style');
         el.innerText = css;
