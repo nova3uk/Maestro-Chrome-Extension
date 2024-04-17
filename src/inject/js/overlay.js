@@ -101,7 +101,13 @@ class OverlayApp extends Globals {
         textElement.id = (id || '');
         return textElement;
     };
-
+    createHtml = (html, id) => {
+        let textElement = document.createElement('span');
+        textElement.innerHTML = html;
+        textElement.style.color = '#f4f5f5';
+        textElement.id = (id || '');
+        return textElement;
+    };
     // Function to create a checkbox with a label and an event listener
     createCheckbox = (id, text, onChange) => {
         let checkbox = document.createElement('input');
@@ -144,7 +150,7 @@ class OverlayApp extends Globals {
         }
         let label = document.createElement('label');
         label.textContent = text;
-        label.style.userSelect  = 'none';
+        label.style.userSelect = 'none';
         label.style.cursor = 'pointer';
 
         let svg = this.getIcon(text);
@@ -322,15 +328,20 @@ class OverlayApp extends Globals {
             this.cornerText = document.createElement('div');
             this.cornerText.style.position = 'fixed';
             this.cornerText.style.bottom = '10px';
-            this.cornerText.style.left = '20px';
+            this.cornerText.style.left = '10px';
             this.cornerText.style.color = '#f4f5f5';
             this.cornerText.style.width = '300px';
             this.cornerText.style.height = '30px';
             this.cornerText.style.zIndex = '100001';
-            this.cornerText.style.justifyContent = 'center';
             this.cornerText.style.display = 'flex';
 
             document.body.appendChild(this.cornerText);
+
+            let settingsIconContainer = this.createHtml(`<span id="openSettingsBtn" role="button" style="cursor:pointer;"><img src="${this.Origin}/src/img/settings.svg" width="30" height="30"></span>`, 'maestroSettingsIcon');
+            settingsIconContainer.onclick = function () {
+                maestro.OverlayApp.openSettingsWindow();
+            }
+            this.cornerText.appendChild(settingsIconContainer);
 
             let systemInfo = await maestro.App.getSystemInfo();
             let systemInfoContainer = this.createText(`v${systemInfo.version} -  `, 'maestroSystemInfo');

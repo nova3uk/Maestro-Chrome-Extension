@@ -11,11 +11,11 @@ chrome.runtime.onMessage.addListener(function (
 });
 chrome.runtime.onMessageExternal.addListener(
     function (request, sender, sendResponse) {
-        if(request.getStrobeFixtures){
+        if (request.getStrobeFixtures) {
             this.retrieveAllKeys().then(keys => {
                 let response = [];
-                for(let key in keys){
-                    if(key.includes("strobe_")){
+                for (let key in keys) {
+                    if (key.includes("strobe_")) {
                         let item = {};
                         item[key] = keys[key];
 
@@ -25,11 +25,11 @@ chrome.runtime.onMessageExternal.addListener(
                 return sendResponse(response);
             });
         }
-        if(request.getIgnoreFixtures){
+        if (request.getIgnoreFixtures) {
             this.retrieveAllKeys().then(keys => {
                 let response = [];
-                for(let key in keys){
-                    if(key.includes("fixture_ignore_")){
+                for (let key in keys) {
+                    if (key.includes("fixture_ignore_")) {
                         let item = {};
                         item[key] = keys[key];
 
@@ -37,6 +37,16 @@ chrome.runtime.onMessageExternal.addListener(
                     }
                 }
                 return sendResponse(response);
+            });
+        }
+        if (request.openSettingsWindow) {
+            let url = chrome.runtime.getURL(`src/settings/settings.html?maestro_url=${encodeURIComponent(request.openSettingsWindow)}`);
+            chrome.tabs.query({ url: url }, function (tabs) {
+                if (tabs && tabs.length > 0) {
+                    chrome.tabs.update(tabs[0].id, { active: true });
+                } else {
+                    chrome.tabs.create({ url: url });
+                }
             });
         }
     });

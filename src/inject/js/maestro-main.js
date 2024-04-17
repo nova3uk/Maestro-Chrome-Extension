@@ -306,6 +306,7 @@ class App extends Globals {
                 }
             });
     }
+
     startUp = async () => {
         try {
             this.getStrobeParams();

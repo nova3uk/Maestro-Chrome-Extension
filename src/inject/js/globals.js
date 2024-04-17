@@ -296,5 +296,14 @@ class Globals {
         document.head.appendChild(el);
         return el;
     };
+    openSettingsWindow = async () => {
+        chrome.runtime.sendMessage(this.ExtensionId, { openSettingsWindow: this.maestroUrl },
+            function (response) {
+                if (response) {
+                    if (this.logging)
+                        console.log("Settings window opened.");
+                }
+            });
+    }
 }
 maestro.Globals = new Globals(document.currentScript.src);
