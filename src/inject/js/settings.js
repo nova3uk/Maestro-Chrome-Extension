@@ -26,6 +26,7 @@ class SettingsApp extends Globals {
 
         this.bindMacroBtn();
         this.bindBackupBtn();
+        this.bindRestoreBtn();
 
         await this.loadMacros(function (macros) {
             maestro.SettingsApp.macroTable(macros);
@@ -101,11 +102,39 @@ class SettingsApp extends Globals {
                 var url = 'data:application/json;base64,' + btoa(result);
                 chrome.downloads.download({
                     url: url,
-                    filename: `backup_stage_${maestro.SettingsApp.stageId}.json`
+                    filename: `backup_stage_${Date.now()}_${maestro.SettingsApp.activeStage.name.replace(/[^a-z0-9]/gi, '_')}.json`
                 });
             });
         });
     };
+    bindRestoreBtn = async () => {
+        document.getElementById('restoreConfig').addEventListener('click', async () => {
+            var input = document.createElement('input');
+            input.id = 'fileInput';
+            input.type = 'file';
+            input.accept = ".json"
+            input.click();
+            input.onchange = e => {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+
+                reader.readAsText(file);
+
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result;
+                    var parse = JSON.parse(content);
+                    // try {
+                    //     delete parse["fixture_backup"];
+                    // } catch (e) { }
+
+                    chrome.storage.local.clear(function () {
+                        chrome.storage.local.set(parse);
+                        if (!alert('Config restored successfully.')) { window.location.reload(); }
+                    });
+                }
+            };
+        });
+    }
     backupAllFixtures = async () => {
         let fixtures = await this.getActiveStage();
         let backupData = {
@@ -378,7 +407,7 @@ class SettingsApp extends Globals {
 
         $('#fixtures').bootstrapTable({
             onClickRow: function (row, field, $element) {
-                if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore")
+                if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore" || $element == "colorWheel")
                     return false;
 
                 document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
@@ -521,6 +550,10 @@ class SettingsApp extends Globals {
         });
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
+        });
+        $('select[name="colorWheel"]').on('change', function (select) {
+            debugger
+            maestro.SettingsApp.changeColorWheel(this.dataset.id, this.value);
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;

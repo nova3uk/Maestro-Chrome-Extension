@@ -12,7 +12,7 @@
 
 <body>
     <div class="container">
-        <h1 class="my-2">Maestro Extension - Macro Builder</h1>
+        <h1 class="my-2">Maestro Extension - Setup</h1>
 
         <div class="my-2 bg-light p-2 rounded" width="100%">
 
@@ -42,7 +42,8 @@
         <div class="float-end my-2">
             <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
             <button class="btn btn-warning" id="backupFixtures">Backup Now</button>
-            <button class="btn btn-warning" id="downloadConfig">Download Config</button>
+            <button class="btn btn-info" id="downloadConfig">Download Config</button>
+            <button class="btn btn-info" id="restoreConfig">Restore Config</button>
         </div>
 
         <div class="my-5"></div>
@@ -72,16 +73,15 @@
             <div>
                 <p class="h5">Enable Strobe Triggering</p>
                 <p style="text-align: justify;">
-                    For fixtures which do not respond to the MaestroDMX Strobe function, you can configure a Shutter
-                    Open
-                    value, and a Strobe value below.
-                    <br>
-                    The Shuter Open value should be the normal Open value for the Shutter or Strobe channel of the
-                    fixture. The Strobe value should be the Strobe value for the fixture.
-                    <br>You can adjust the Strobe
-                    value based
-                    on your fixtures DMX values specified in the manual for your fixtrue, to make the strobe faster or
-                    slower.
+
+                    For fixtures that do not respond to the MaestroDMX Strobe function, you can set specific parameters:
+                    the Shutter Open value, representing the normal open state for the Shutter or Strobe channel of the
+                    fixture, and a Strobe value. The Strobe value should correspond to the strobe function of the
+                    fixture. You can fine-tune the Strobe value according to the DMX values specified in the fixture's
+                    manual, enabling adjustment for strobe speed.
+                <div class="my-1"></div>
+                Fixtures configured with both Shutter and Strobe values can be triggered using the Strobe button,
+                provided the extension identifies a compatible Shutter or Strobe channel within the fixture profile.
 
                 </p>
             </div>
