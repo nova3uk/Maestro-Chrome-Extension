@@ -343,7 +343,6 @@ class SettingsApp extends Globals {
             }
             const values = Array.from(checkboxes).map(checkbox => checkbox.value);
 
-            //make sure we have updated profiles
             await this.getActiveStage();
 
             let macroFixtures = maestro.SettingsApp.activeStage.fixture.filter(fixture => values.includes(fixture.id.toString()));
