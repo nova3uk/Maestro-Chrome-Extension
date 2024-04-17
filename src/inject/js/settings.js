@@ -123,6 +123,40 @@ class SettingsApp extends Globals {
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result;
                     var parse = JSON.parse(content);
+                    let foreignStageMacros = false;
+                    let foreignFixtures = [];
+
+                    if (parse.macros) {
+                        for (let macro of parse.macros) {
+                            if (macro.macro.stageId !== maestro.SettingsApp.stageId) {
+                                foreignStageMacros = true;
+                                if (!confirm('This backup contains macros from a different stage.\n\nIf you continue, these macros will be reassigned to the currently active stage.')) {
+                                    return;
+                                } else {
+                                    for (let macro of parse.macros) {
+                                        macro.macro.stageId = maestro.SettingsApp.stageId;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        let currentFixtureIds = maestro.SettingsApp.fixtures.map(fixture => fixture.id);
+                        for (let macro of parse.macros) {
+                            for (let fixture of macro.macro.fixtures) {
+                                if (!currentFixtureIds.includes(fixture.id)) {
+                                    if (foreignFixtures.indexOf(fixture.id) == -1)
+                                        foreignFixtures.push(fixture.id);
+                                }
+                            }
+                        }
+
+                        if (foreignFixtures.length > 0) {
+                            return alert('This backup contains fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
+                        }
+
+                        console.log(currentFixtureIds);
+
+                    }
                     // try {
                     //     delete parse["fixture_backup"];
                     // } catch (e) { }
@@ -550,10 +584,6 @@ class SettingsApp extends Globals {
         });
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
-        });
-        $('select[name="colorWheel"]').on('change', function (select) {
-            debugger
-            maestro.SettingsApp.changeColorWheel(this.dataset.id, this.value);
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;
