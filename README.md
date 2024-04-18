@@ -2,6 +2,7 @@ MaestroDMX is an autonomous lighting designer-in-a-box that listens to music and
 See https://www.maestrodmx.com/ for more information.
 
 You can install the ready Chrome Extension from the Chrome Web Store
+
 https://chromewebstore.google.com/detail/maestrodmx-enhancer-exten/ekhcjlogeglabdkdaohikndckadbhaia
 
 This Chrome Extension is currently only for the purpose of temporarily adding functionaity not yet available in the official software, by means of manipulation of the web interface. It is of course only available on versions of Chrome which can run Extensions, therefore desktop only not mobile.
