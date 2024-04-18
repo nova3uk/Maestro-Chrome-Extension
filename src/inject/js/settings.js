@@ -712,18 +712,18 @@ class SettingsApp extends Globals {
             $('#panTiltFinder').modal('show');
 
             document.getElementById('panRange').addEventListener('input', function () {
-                document.getElementById('panRangeVal').value = this.safeMinMax(this.value, 0, 255);
+                document.getElementById('panRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('input', function () {
-                document.getElementById('tiltRangeVal').value = this.safeMinMax(this.value, 0, 255);;
+                document.getElementById('tiltRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);;
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('tiltRange').value = this.safeMinMax(this.value, 0, 255);
+                document.getElementById('tiltRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             });
             document.getElementById('panRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('panRange').value = this.safeMinMax(this.value, 0, 255);
+                document.getElementById('panRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             });
             document.getElementById('panTiltReset').addEventListener('click', function () {
                 document.getElementById('panRange').value = 0;
