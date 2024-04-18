@@ -70,8 +70,14 @@
                     <h6>
                         Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
                         store it locally.<br>
-                        You can download the Config which *includes* the Fixture Backup and all settings in this page.
+                        You can download the Config which *includes* the Fixture Backup and all settings in this
+                        page.<br>
                         Restore can be used to upload the earlier downloaded Config file.<br>
+                        If you restore a config which contains a Fixture Backup, it will overwrite the current stage's
+                        fixture settings!<br>
+                        If you're not sure, go to Stages and Download Stage from the Maestro which will give you a
+                        backup
+                        of the current stage before you import a config and overwrite the fixtures.
                     </h6>
                     <i>Please note. You can import a file from a different stage, but it will fail if the fixtures
                         do not match.</i>
@@ -96,7 +102,7 @@
                 </h2>
                 <div id="collapseTwo" class="accordion-collapse collapse m-5" data-bs-parent="#headerAccordion">
                     <h5>Autofog can be also switched on/off from the Icon Menu in the Chrome toolbar.</h5>
-                    <i>These switches are live edits, and will take effect immediatly</i><br>
+                    <i>These switches are live edits, and will take effect immediately</i><br>
                     <i>
                         Activity trigger depends on the Audio Activity Level hitting the minimum peak you specify.<br>
                         The Duration is how long the Fog button will be pressed.<br>
@@ -165,7 +171,7 @@
                 <div id="collapseFour" class="accordion-collapse collapse m-5" data-bs-parent="#headerAccordion">
                     <div class="my-3">
                         <h5>The Strobe and Effect can be triggered based on audio Activity Level.</h5>
-                        <i>These switches are live edits, and will take effect immediatly</i><br>
+                        <i>These switches are live edits, and will take effect immediately</i><br>
                         <i>
                             Activity trigger depends on the Audio Activity Level hitting the minimum peak you
                             specify.<br>
@@ -247,19 +253,17 @@
             <div>
                 <p class="h5">Enable Strobe Triggering</p>
                 <p style="text-align: justify;">
-
-                    For fixtures that do not respond to the MaestroDMX Strobe function, you can set specific
-                    parameters:
-                    the Shutter Open value, representing the normal open state for the Shutter or Strobe channel of
-                    the
-                    fixture, and a Strobe value. The Strobe value should correspond to the strobe function of the
-                    fixture. You can fine-tune the Strobe value according to the DMX values specified in the
-                    fixture's
-                    manual, enabling adjustment for strobe speed.
+                <p></p>
+                For fixtures that do not respond to the MaestroDMX Strobe function, you can set specific parameters:
+                the Shutter Open value, representing the normal open state for the Shutter or Strobe channel of the
+                fixture, and a Strobe value. The Strobe value should correspond to the strobe function of the fixture.
+                You can fine-tune the Strobe value according to the DMX values specified in the fixture's manual,
+                enabling adjustment for strobe speed.
+                </p>
                 <div class="my-1"></div>
-                Fixtures configured with both Shutter and Strobe values can be triggered using the Strobe button,
-                provided the extension identifies a compatible Shutter or Strobe channel within the fixture profile.
-
+                <p>
+                    Fixtures configured with both Shutter and Strobe values can be triggered using the Strobe button,
+                    provided the extension identifies a compatible Shutter or Strobe channel within the fixture profile.
                 </p>
             </div>
         </div>
@@ -307,8 +311,8 @@
                     </div>
                     <div class="modal-body">
                         <p>
-                            These settigns are LIVE EFFECTS saved to the fixture automatically.
-                            To revert to 0-255 click "Reset".
+                            These settings are LIVE EFFECTS saved to the fixture automatically.
+                            To revert to 0-255, click "Reset".
                         </p>
                         <div class="my-3" style="max-width: 500px;">
                             <table class="table">

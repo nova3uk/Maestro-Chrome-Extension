@@ -104,8 +104,11 @@ class App extends Globals {
         if (this.strobeActive == false && onOrOff == false) return;
         if (this.latchedOn == true && onOrOff == false) return;
 
-        this.strobeActive = onOrOff;
+        //no fixtures to strobe
+        if (this.strobeParams.length == 0)
+            return;
 
+        this.strobeActive = onOrOff;
         this.latchedOn = latched;
 
         const allFixtures = [
@@ -129,14 +132,18 @@ class App extends Globals {
                         }
                         if (ignore) continue;
 
+                        let paramsFound = false
                         for (let i = 0; i < this.strobeParams.length; i++) {
                             if (this.strobeParams[i]["strobe_" + fixture.id] != null) {
                                 normalValue = this.strobeParams[i]["strobe_" + fixture.id].shutter;
                                 strobeValue = this.strobeParams[i]["strobe_" + fixture.id].strobe;
+                                paramsFound = true;
                                 break;
                             }
                         }
 
+                        //no params set for this fixture, skip
+                        if (!paramsFound) continue;
 
                         if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
                             throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
