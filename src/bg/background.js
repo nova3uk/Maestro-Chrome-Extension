@@ -39,22 +39,45 @@ chrome.runtime.onMessageExternal.addListener(
                 return sendResponse(response);
             });
         }
-        if (request.getAutoFogParams) {
+        if (request.getAutoProgramParams) {
             let autoFogEnabled = await this.getSetting("autoFogToggle");
             let autoFogOnActivityPeak = await this.getLocalSetting("autoFogOnActivityPeak");
             let autoFogOnActivityPeakPercent = await this.getLocalSetting("autoFogOnActivityPeakPercent");
             let autoFogOnActivityPeakDuration = await this.getLocalSetting("autoFogOnActivityPeakDuration");
+            let autoFogOnActivityPeakInterval = await this.getLocalSetting("autoFogOnActivityPeakInterval");
             let autoFogOnTimer = await this.getLocalSetting("autoFogOnTimer");
             let fogTimer = await this.getLocalSetting("fogTimer");
             let fogTimerDuration = await this.getLocalSetting("fogTimerDuration");
+
+            let autoEffectsEnabled = await this.getLocalSetting("autoEffectsEnabled");
+            let autoEffectsOnActivityPeakPercent = await this.getLocalSetting("autoEffectsOnActivityPeakPercent");
+            let autoEffectsOnActivityPeakDuration = await this.getLocalSetting("autoEffectsOnActivityPeakDuration");
+            let autoEffectsOnActivityPeakInterval = await this.getLocalSetting("autoEffectsOnActivityPeakInterval");
+            let autoStrobeEnabled = await this.getLocalSetting("autoStrobeEnabled");
+            let autoStrobeOnActivityPeakPercent = await this.getLocalSetting("autoStrobeOnActivityPeakPercent");
+            let autoStrobeOnActivityPeakDuration = await this.getLocalSetting("autoStrobeOnActivityPeakDuration");
+            let autoStrobeOnActivityPeakInterval = await this.getLocalSetting("autoStrobeOnActivityPeakInterval");
+
+
+
             let response = {};
             response.autoFogEnabled = autoFogEnabled;
             response.autoFogOnActivityPeak = autoFogOnActivityPeak;
             response.autoFogOnActivityPeakPercent = autoFogOnActivityPeakPercent;
             response.autoFogOnActivityPeakDuration = autoFogOnActivityPeakDuration;
+            response.autoFogOnActivityPeakInterval = autoFogOnActivityPeakInterval;
             response.autoFogOnTimer = autoFogOnTimer;
             response.fogTimer = fogTimer;
             response.fogTimerDuration = fogTimerDuration;
+            response.autoEffectsEnabled = autoEffectsEnabled;
+            response.autoEffectsOnActivityPeakPercent = autoEffectsOnActivityPeakPercent;
+            response.autoEffectsOnActivityPeakDuration = autoEffectsOnActivityPeakDuration;
+            response.autoEffectsOnActivityPeakInterval = autoEffectsOnActivityPeakInterval;
+            response.autoStrobeEnabled = autoStrobeEnabled;
+            response.autoStrobeOnActivityPeakPercent = autoStrobeOnActivityPeakPercent;
+            response.autoStrobeOnActivityPeakDuration = autoStrobeOnActivityPeakDuration;
+            response.autoStrobeOnActivityPeakInterval = autoStrobeOnActivityPeakInterval;
+
 
             return sendResponse(response);
         }
@@ -84,15 +107,50 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.storage.local.set({ autoFogOnActivityPeak: false });
         chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
         chrome.storage.local.set({ autoFogOnActivityPeakDuration: 5 });
+        chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
         chrome.storage.local.set({ autoFogOnTimer: false });
         chrome.storage.local.set({ fogTimer: 10 });
         chrome.storage.local.set({ fogTimerDuration: 5 });
+
+        chrome.storage.local.set({ autoEffectsEnabled: false });
+        chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
+        chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
+        chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
+
+        chrome.storage.local.set({ autoStrobeEnabled: false });
+        chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
+        chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
+        chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
 
         let internalUrl = chrome.runtime.getURL("src/settings/settings.html?maestro_url=*%3A%2F%2Fmaestro.local%2F*");
         chrome.tabs.create({ url: internalUrl }, function (tab) { });
 
     } else if (details.reason == "update") {
         var thisVersion = chrome.runtime.getManifest().version;
+        switch (thisVersion) {
+            case "1.3.2":
+                chrome.storage.sync.set({ autoFogToggle: false });
+
+                //local settings
+                chrome.storage.local.set({ autoFogOnActivityPeak: false });
+                chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
+                chrome.storage.local.set({ autoFogOnActivityPeakDuration: 5 });
+                chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
+                chrome.storage.local.set({ autoFogOnTimer: false });
+                chrome.storage.local.set({ fogTimer: 10 });
+                chrome.storage.local.set({ fogTimerDuration: 5 });
+
+                chrome.storage.local.set({ autoEffectsEnabled: false });
+                chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
+                chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
+                chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
+
+                chrome.storage.local.set({ autoStrobeEnabled: false });
+                chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
+                chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
+                chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
+                break;
+        }
         console.log(
             "Updated from " + details.previousVersion + " to " + thisVersion + "!"
         );

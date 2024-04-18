@@ -28,17 +28,20 @@
                 <div id="collapseOne" class="accordion-collapse collapse p-2" data-bs-parent="#headerAccordion">
 
                     <ol>
-                        <li>Before you start modifying, click the "Backup Now" button below to take a snapshot backup of
+                        <li>Before you start modifying, click the "Backup Now" button below to take a snapshot
+                            backup of
                             all
                             fixtures in the current stage.</li>
-                        <li>Go to the <a id="controlPageLink" target="_blank">Control Page</a> Page on the Stages tab.
+                        <li>Go to the <a id="controlPageLink" target="_blank">Control Page</a> Page on the Stages
+                            tab.
                         </li>
                         <li>Set all the toggles the way you want them, for each fixture you want to include in the
                             Macro.
                         </li>
                         <li>Come back to this page and select the fixtures you want to include in your Macro.</li>
                         <li>Click "Add Macro" to create it.</li>
-                        <li>Once you have created the macros you can at any time click Restore below to restore all the
+                        <li>Once you have created the macros you can at any time click Restore below to restore all
+                            the
                             fixtures back to their normal state before you began.</li>
                     </ol>
                     <p>To use the Macro:</p>
@@ -46,13 +49,41 @@
                         <li>Use it to set the toggles to the stored state.</li>
                         <li>Clear the Macro to revert all toggles to the previous state.</li>
                     </ol>
-                    <p class="text-danger font-weight-bold">Remember to back up your Stage and Fixtures before testing
+                    <p class="text-danger font-weight-bold">Remember to back up your Stage and Fixtures before
+                        testing
                         this
                         feature for your own security.
                     </p>
                 </div>
             </div>
-
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        <p class="h5">
+                            <img src="gear.svg" alt="Info" width="20" height="20">
+                            Backup & Restore
+                        </p>
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse m-5" data-bs-parent="#headerAccordion">
+                    <h6>
+                        Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
+                        store it locally.<br>
+                        You can download the Config which *includes* the Fixture Backup and all settings in this page.
+                        Restore can be used to upload the earlier downloaded Config file.<br>
+                    </h6>
+                    <i>Please note. You can import a file from a different stage, but it will fail if the fixtures
+                        do not match.</i>
+                    <br><br>
+                    <div class="my-3">
+                        <button class="btn btn-warning" id="backupFixtures">Backup Now</button>
+                        <button class="btn btn-info" id="downloadConfig">Download Config</button>
+                        <button class="btn btn-info" id="restoreConfig">Restore Config</button>
+                        <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
+                    </div>
+                </div>
+            </div>
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -65,7 +96,14 @@
                 </h2>
                 <div id="collapseTwo" class="accordion-collapse collapse m-5" data-bs-parent="#headerAccordion">
                     <h5>Autofog can be also switched on/off from the Icon Menu in the Chrome toolbar.</h5>
-                    <i>These switches are live edits, and will take effect immediatly</i>
+                    <i>These switches are live edits, and will take effect immediatly</i><br>
+                    <i>
+                        Activity trigger depends on the Audio Activity Level hitting the minimum peak you specify.<br>
+                        The Duration is how long the Fog button will be pressed.<br>
+                        The Interval is the minimum time between each execution of the Autofog.<br>
+                        Some music may have a lot of activity and it would trigger too many fog blasts, this interval
+                        helps you avoid this.
+                    </i>
                     <br><br>
                     <div class="row">
                         <div class="form-check form-switch col-auto">
@@ -84,12 +122,14 @@
                         <div class="col-auto">
                             Fog Trigger(% Activity) <input type="number" min="80" max="99" style="width:70px;"
                                 class="form-control" id="autoFogOnActivityPeakPercent">
-
                         </div>
                         <div class="col-auto">
                             Fog Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
                                 class="form-control" id="autoFogOnActivityPeakDuration">
-
+                        </div>
+                        <div class="col-auto">
+                            Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoFogOnActivityPeakInterval">
                         </div>
                     </div>
                     <div class="row">
@@ -100,7 +140,7 @@
                     </div>
                     <div class="row my-3">
                         <div class="col-auto">
-                            Fog Timer(In Minutes) <input type="number" min="0" max="15" style="width:70px;"
+                            Fog Timer(In Minutes) <input type="number" min="1" max="15" style="width:70px;"
                                 class="form-control" id="fogTimer">
 
                         </div>
@@ -112,13 +152,72 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="float-end my-3">
-            <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
-            <button class="btn btn-warning" id="backupFixtures">Backup Now</button>
-            <button class="btn btn-info" id="downloadConfig">Download Config</button>
-            <button class="btn btn-info" id="restoreConfig">Restore Config</button>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <p class="h5">
+                            <img src="gear.svg" alt="Info" width="20" height="20">
+                            AutoStrobe & AutoEffect Setup
+                        </p>
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse m-5" data-bs-parent="#headerAccordion">
+                    <div class="my-3">
+                        <h5>The Strobe and Effect can be triggered based on audio Activity Level.</h5>
+                        <i>These switches are live edits, and will take effect immediatly</i><br>
+                        <i>
+                            Activity trigger depends on the Audio Activity Level hitting the minimum peak you
+                            specify.<br>
+                            The Duration is how long the Strobe/Effect button will be pressed.<br>
+                            The Interval is the minimum time between each execution of the Strobe/Effect.<br>
+                            Some music may have a lot of activity and it would trigger too many events, the interval
+                            helps you avoid this.
+                        </i>
+                        <br><br>
+                        <div class="row">
+                            <div class="form-check form-switch col-auto">
+                                <input class="form-check-input" type="checkbox" id="autoStrobeEnabled">
+                                <label class="form-check-label" for="autoStrobeEnabled">Auto Strobe</label>
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-auto">
+                                Strobe Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
+                                    class="form-control" id="autoStrobeOnActivityPeakPercent">
+                            </div>
+                            <div class="col-auto">
+                                Strobe Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                    class="form-control" id="autoStrobeOnActivityPeakDuration">
+                            </div>
+                            <div class="col-auto">
+                                Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                    class="form-control" id="autoStrobeOnActivityPeakInterval">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-check form-switch col-auto">
+                                <input class="form-check-input" type="checkbox" id="autoEffectsEnabled">
+                                <label class="form-check-label" for="autoEffectsEnabled">Auto Effect</label>
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-auto">
+                                Effect Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
+                                    class="form-control" id="autoEffectsOnActivityPeakPercent">
+                            </div>
+                            <div class="col-auto">
+                                Effect Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                    class="form-control" id="autoEffectsOnActivityPeakDuration">
+                            </div>
+                            <div class="col-auto">
+                                Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                    class="form-control" id="autoEffectsOnActivityPeakInterval">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="my-5"></div>

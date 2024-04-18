@@ -103,6 +103,18 @@ class Globals {
     getAttributeTypes = () => this.attributeTypes;
     getHttpMethods = () => this.httpMethods;
 
+    safeMinMax = (obj, minNumber, maxNumber) => {
+        if (typeof obj === 'number' && !isNaN(obj)) {
+            if (obj < minNumber)
+                return minNumber;
+            if (obj > maxNumber)
+                return maxNumber;
+
+            return obj;
+        } else {
+            return minNumber;
+        }
+    };
     debounce = (callback, wait = 1000) => {
         let timeoutId = null;
         return (...args) => {
