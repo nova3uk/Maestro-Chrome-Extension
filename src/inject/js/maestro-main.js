@@ -35,7 +35,8 @@ class App extends Globals {
             if (this.logging)
                 console.log("AutoFog toggle active.")
         };
-    };
+    }
+
     strobeParams;
     getAutoParams;
     startUp = async () => {
@@ -222,21 +223,47 @@ class App extends Globals {
     };
     manualOverride = async (mode, onOrOff) => {
         let url = `api/${this.apiVersion}/global/manual_override`;
+        let method = onOrOff == true ? 'PUT' : 'DELETE';
+        let dimmer = 0;
+        let data;
 
-        var dimmer = 0;
-        if (this.strobeAt100Percent) {
-            dimmer = 1;
-        } else {
-            let brightness = await this.getBrightness();
-            dimmer = brightness.value;
-        }
+        switch (maestro.Globals.systemInfo.version) {
+            case "1.2.0":
+                if (this.strobeAt100Percent) {
+                    dimmer = 1;
+                } else {
+                    let brightness = await this.getBrightness();
+                    dimmer = brightness.value;
+                }
+
+                data = {
+                    "highValue": dimmer,
+                    "mode": mode.toUpperCase()
+                };
+
+                break;
+            case "1.3.0":
+                url = `api/${this.apiVersion}/triggers/state`;
+                method = "PATCH";
+
+                switch (mode) {
+                    case "FOG_ON":
+                        data = { fogActive: onOrOff }
+                        break;
+                    case "EFFECT_ON":
+                        data = { effectActive: onOrOff }
+                        break;
+                    case "WHITEOUT":
+                        mode = "BLINDER"
+                    default:
+                        data = { lightMode: onOrOff ? mode : "NORMAL" }
+                };
+        };
+
         let options = {
-            method: onOrOff == true ? 'PUT' : 'DELETE',
+            method: method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "highValue": dimmer,
-                "mode": mode.toUpperCase()
-            })
+            body: JSON.stringify(data)
         };
 
         try {
@@ -303,11 +330,6 @@ class App extends Globals {
     clearTimer = () => {
         clearTimeout(this.btnTimer);
     };
-    injectOverlay = function () {
-        var s = document.createElement("script");
-        s.src = this.getFilePath("src/inject/js/overlay.js");
-        (document.head || document.documentElement).appendChild(s);
-    };
     getStrobeParams = async () => {
         // get strobe fixtures from backend
         chrome.runtime.sendMessage(this.ExtensionId, { getStrobeFixtures: true },
@@ -360,8 +382,8 @@ class App extends Globals {
         if (window.maestroOnReloadMonitor) return;
 
         window.onload = function () {
-            if (isPageReloaded()) {
-                this.startUp();
+            if (maestro.App.isPageReloaded()) {
+                maestro.App.startUp();
             }
         };
         window.maestroOnReloadMonitor = true;

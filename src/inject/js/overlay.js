@@ -236,14 +236,18 @@ class OverlayApp extends Globals {
         return select;
     };
     checkBoxClick = (item, status, id) => {
+        let checkbox = document.querySelector(`#${id} > input[type='checkbox']`);
+        checkbox.checked = status;
+
         if (status === true) {
             let div = document.getElementById(id);
             div.style.color = this.btnColors.font;
-            div.style.backgroundColor = maestro.OverlayApp.btnColors.active;
+            div.style.backgroundColor = this.btnColors.active;
         } else {
             let div = document.getElementById(id);
+            div.checked = false;
             div.style.color = '';
-            div.style.backgroundColor = maestro.OverlayApp.btnColors.backgroundColor;
+            div.style.backgroundColor = this.btnColors.backgroundColor;
         }
         maestro.App.manualOverride(item, status);
     };
@@ -342,8 +346,8 @@ class OverlayApp extends Globals {
             }
             this.cornerText.appendChild(settingsIconContainer);
 
-            let systemInfo = await maestro.App.getSystemInfo();
-            let systemInfoContainer = this.createText(`v${systemInfo.version} -  `, 'maestroSystemInfo');
+
+            let systemInfoContainer = this.createText(`v${maestro.Globals.systemInfo.version} -  `, 'maestroSystemInfo');
             this.cornerText.appendChild(systemInfoContainer);
 
             let clock = this.createText('', 'maestroClock');

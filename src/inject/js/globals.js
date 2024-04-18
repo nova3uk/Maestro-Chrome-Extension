@@ -1,8 +1,27 @@
 var maestro = maestro || {};
 class Globals {
+    constructor(scriptSource) {
+        this.init(scriptSource);
+    }
+
+    init = async (scriptSource = null, logging = false) => {
+        if (scriptSource) {
+            if (scriptSource.indexOf("main=true") !== -1) {
+                var src = new URL(scriptSource);
+                this.ExtensionId = src.host;
+                this.Origin = src.origin;
+                this.Search = src.search;
+                this.systemInfo = await this.getSystemInfo();
+
+                this.injectMain(this.Search);
+            };
+        }
+    }
+
     // Public variables
+    systemInfo;
     apiVersion = "v1";
-    logging = false;
+    logging;
     overlay = false;
     colorPicker = false;
     strobeAt100Percent = false;
@@ -81,7 +100,18 @@ class Globals {
     activityLevelRoot = 0;
     arrActivityLevelCallbacks = []
 
+    getFilePath = (fileName) => `${this.Origin}/${fileName}`;
 
+    injectMain = function (params) {
+        var s = document.createElement("script");
+        s.src = this.getFilePath("src/inject/js/maestro-main.js" + params);
+        (document.head || document.documentElement).appendChild(s);
+    };
+    injectOverlay = function () {
+        var s = document.createElement("script");
+        s.src = this.getFilePath("src/inject/js/overlay.js");
+        (document.head || document.documentElement).appendChild(s);
+    };
 
     // Handler for the proxy
     activityLevelHdlr = {
@@ -255,8 +285,14 @@ class Globals {
         return this.activeStage;
     }
     storeFixtureProfile = async (macroName, fixture) => {
-        let currentSetting = await this.getFixture(fixture.id);
-        await this.saveLocalSetting("macro_active_" + fixture.id, { "macroName": macroName, "fixture": currentSetting });
+        try {
+            let currentSetting = await this.getFixture(fixture.id);
+            await this.saveLocalSetting("macro_active_" + fixture.id, { "macroName": macroName, "fixture": currentSetting });
+            return currentSetting;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     };
     retrieveFixtureProfile = async (fixtureId) => {
         return await this.getLocalSetting("macro_active_" + fixtureId);
@@ -354,6 +390,7 @@ class Globals {
                         console.log("Settings window opened.");
                 }
             });
-    }
+    };
 }
 maestro.Globals = new Globals(document.currentScript.src);
+// maestro.Globals.init(document.currentScript.src);   

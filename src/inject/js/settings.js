@@ -11,6 +11,8 @@ class SettingsApp extends Globals {
     ignoredFixtures = [];
 
     start = async () => {
+        this.logging = await this.getSetting("loggingToggle");
+
         if (!await this.watchOffline()) {
             return;
         }
@@ -158,7 +160,12 @@ class SettingsApp extends Globals {
 
                 };
             });
-        } catch (e) { return alert('Error processing Config File\n\n' + e); }
+        } catch (e) {
+            if (this.logging)
+                console.error('Error binding restoreConfig:', e);
+
+            return alert('Error processing Config File\n\n' + e);
+        }
     };
     backupAllFixtures = async () => {
         let fixtures = await this.getActiveStage();
@@ -319,40 +326,50 @@ class SettingsApp extends Globals {
         });
     };
     applyMacro = async (macroName) => {
-        var keys = await this.retrieveAllKeys()
-        this.currentCue = await this.getShowState();
+        try {
+            var keys = await this.retrieveAllKeys()
+            this.currentCue = await this.getShowState();
 
-        let macros = await this.loadMacros();
-        macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
+            let macros = await this.loadMacros();
+            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
 
-        if (macros) {
-            const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
-            const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
+            if (macros) {
+                const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
+                const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
-            if (runningMacroIds.length > 0) {
-                return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
-            }
-        }
-
-        for (let macro of macros) {
-            for (let fixture of macro.macro.fixtures) {
-                let currentProfile = await this.getFixture(fixture.id);
-                let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
-                if (diff.length == 0) {
-                    return alert('Macro is the same as the currently running Profile, and would have no effect.')
+                if (runningMacroIds.length > 0) {
+                    return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
                 }
-
-                //save original profile prior to modification
-                this.storeFixtureProfile(macroName, currentProfile)
-                this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
             }
+
+            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+            deleteButton.disabled = true;
+            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+            applyButton.disabled = true;
+            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+            clearButton.disabled = false;
+
+            for (let macro of macros) {
+                for (let fixture of macro.macro.fixtures) {
+                    let currentProfile = await this.getFixture(fixture.id);
+                    let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
+                    if (diff.length == 0) {
+                        return alert('Macro is the same as the currently running Profile, and would have no effect.')
+                    }
+
+                    //save original profile prior to modification
+                    if (await this.storeFixtureProfile(macroName, currentProfile)) {
+                        this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
+                    } else {
+                        if (this.logging)
+                            console.error('Error saving original profile for fixture ' + fixture.id);
+                    }
+                }
+            }
+        } catch (e) {
+            if (this.logging)
+                console.error('Error applying Macro:', e);
         }
-        const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-        deleteButton.disabled = true;
-        const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-        applyButton.disabled = true;
-        const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-        clearButton.disabled = false;
     }
     revertMacro = async (macroName) => {
         this.currentCue = await this.getShowState();
@@ -369,7 +386,7 @@ class SettingsApp extends Globals {
                 let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
 
                 //revert changes
-                this.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture);
+                if (await this.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture));
                 maestro.SettingsApp.deleteFixtureProfile(fixture.id);
             }
 
@@ -425,7 +442,6 @@ class SettingsApp extends Globals {
                     }
                 };
 
-                //we do not need the response, so not awaiting this function
                 await this.putAttribute(fixtureId, attr, update);
             }
         };
@@ -915,5 +931,5 @@ class SettingsApp extends Globals {
 
     };
 };
-maestro.SettingsApp = new SettingsApp(document.currentScript.src);
+maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
 maestro.SettingsApp.start();
