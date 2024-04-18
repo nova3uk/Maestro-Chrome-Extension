@@ -25,7 +25,6 @@ class OverlayApp extends Globals {
         };
         this.audioLevelColors = { low: "#308fe8", normal: "#4baf4f", high: "#fed835" };
 
-
         // Create the overlay and container for right items
         this.overlay = this.createOverlay();
         this.container = this.createContainer(this.overlay);

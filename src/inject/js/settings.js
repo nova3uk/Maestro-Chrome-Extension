@@ -19,11 +19,8 @@ class SettingsApp extends Globals {
         this.activeStageId = this.stageId;
 
         this.controlPageLink();
-
         this.stageTable(this.stage);
-
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
-
         this.bindMacroBtn();
         this.bindBackupBtn();
         this.bindRestoreBtn();
@@ -110,49 +107,59 @@ class SettingsApp extends Globals {
         });
     };
     bindRestoreBtn = async () => {
-        document.getElementById('restoreConfig').addEventListener('click', async () => {
-            var input = document.createElement('input');
-            input.id = 'fileInput';
-            input.type = 'file';
-            input.accept = ".json"
-            input.click();
-            input.onchange = e => {
-                var file = e.target.files[0];
-                var reader = new FileReader();
+        try {
+            document.getElementById('restoreConfig').addEventListener('click', async () => {
+                var input = document.createElement('input');
+                input.id = 'fileInput';
+                input.type = 'file';
+                input.accept = ".json"
+                input.click();
+                input.onchange = e => {
+                    var file = e.target.files[0];
+                    var reader = new FileReader();
 
-                reader.readAsText(file);
+                    reader.readAsText(file);
 
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result;
-                    var parse = JSON.parse(content);
+                    reader.onload = readerEvent => {
+                        var content = readerEvent.target.result;
+                        var parse = JSON.parse(content);
+                        if (parse.fixture_backup) {
+                            if (!confirm('This backup contains fixture data.\n\nIf you continue, all current fixture settings in this stage will be overwritten!\n\nTo continue, press OK.\n\nTo remove the Fixture Backup and continue with macros and settings only click cancel.')) {
+                                delete parse.fixture_backup
+                            }
+                        }
+                        if (parse.macros) {
+                            const foreignStageMacros = parse.macros.some(macro => macro.macro.stageId !== maestro.SettingsApp.stageId);
+                            if (foreignStageMacros) {
+                                const confirmMessage = 'This backup contains macros from a different stage.\n\nIf you continue, these macros will be reassigned to the currently active stage.';
+                                if (!confirm(confirmMessage)) {
+                                    return;
+                                } else {
+                                    parse.macros.forEach(macro => {
+                                        macro.macro.stageId = maestro.SettingsApp.stageId;
+                                    });
+                                }
+                            }
+                            let currentFixtureIds = maestro.SettingsApp.fixtures.map(fixture => fixture.id);
+                            let foreignFixtures = [...new Set(parse.macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id)).filter(fixtureId => !currentFixtureIds.includes(fixtureId)))];
 
-                    if (parse.macros) {
-                        const foreignStageMacros = parse.macros.some(macro => macro.macro.stageId !== maestro.SettingsApp.stageId);
-                        if (foreignStageMacros) {
-                            const confirmMessage = 'This backup contains macros from a different stage.\n\nIf you continue, these macros will be reassigned to the currently active stage.';
-                            if (!confirm(confirmMessage)) {
-                                return;
-                            } else {
-                                parse.macros.forEach(macro => {
-                                    macro.macro.stageId = maestro.SettingsApp.stageId;
+                            if (foreignFixtures.length > 0) {
+                                return alert('This backup contains macros for fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
+                            }
+
+                            if (confirm("Config file is ready to import.\n\nDo you want to continue and apply the new config?")) {
+                                chrome.storage.local.clear(function () {
+                                    chrome.storage.local.set(parse);
+                                    if (!alert('Config restored successfully.')) { window.location.reload(); }
                                 });
                             }
                         }
-                        let currentFixtureIds = maestro.SettingsApp.fixtures.map(fixture => fixture.id);
-                        let foreignFixtures = [...new Set(parse.macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id)).filter(fixtureId => !currentFixtureIds.includes(fixtureId)))];
-
-                        if (foreignFixtures.length > 0) {
-                            return alert('This backup contains fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
-                        }
                     }
-                    chrome.storage.local.clear(function () {
-                        chrome.storage.local.set(parse);
-                        if (!alert('Config restored successfully.')) { window.location.reload(); }
-                    });
-                }
-            };
-        });
-    }
+
+                };
+            });
+        } catch (e) { return alert('Error processing Config File\n\n' + e); }
+    };
     backupAllFixtures = async () => {
         let fixtures = await this.getActiveStage();
         let backupData = {

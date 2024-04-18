@@ -220,7 +220,6 @@ class App extends Globals {
                 console.error('Fatal error updating fixture data:', error);
         }
     };
-
     manualOverride = async (mode, onOrOff) => {
         let url = `api/${this.apiVersion}/global/manual_override`;
 
@@ -262,7 +261,6 @@ class App extends Globals {
                 console.error('Fatal error sending manual overide:', error);
         }
     };
-
 
     //the document is using dynamic css and labels, without ids.
     //so its required to search for the button by text
@@ -340,9 +338,9 @@ class App extends Globals {
                     if (response) {
                         maestro.App.getAutoParams = { ...maestro.App.getAutoParams, ...response };
 
-                        maestro.App.getAutoParams.activityPeakFogMinimumDelay = maestro.App.getAutoParams.autoFogOnActivityPeakInterval * 1000;
-                        maestro.App.getAutoParams.activityPeakStrobeMinimumDelay = maestro.App.getAutoParams.autoStrobeOnActivityPeakInterval * 1000;
-                        maestro.App.getAutoParams.activityPeakEffectsMinimumDelay = maestro.App.getAutoParams.autoEffectsOnActivityPeakInterval * 1000;
+                        maestro.App.getAutoParams.activityPeakFogMinimumDelay = maestro.App.getAutoParams.autoFogOnActivityPeakInterval * 60000;
+                        maestro.App.getAutoParams.activityPeakStrobeMinimumDelay = maestro.App.getAutoParams.autoStrobeOnActivityPeakInterval * 60000;
+                        maestro.App.getAutoParams.activityPeakEffectsMinimumDelay = maestro.App.getAutoParams.autoEffectsOnActivityPeakInterval * 60000;
 
                         if (maestro.App.getAutoParams.autoFogEnabled || maestro.App.getAutoParams.autoEffectsEnabled || maestro.App.getAutoParams.autoStrobeEnabled)
                             maestro.App.switchAutoPrograms();
