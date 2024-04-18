@@ -327,6 +327,7 @@ class SettingsApp extends Globals {
     };
     applyMacro = async (macroName) => {
         try {
+            var promiseArray = [];
             var keys = await this.retrieveAllKeys()
             this.currentCue = await this.getShowState();
 
@@ -342,13 +343,6 @@ class SettingsApp extends Globals {
                 }
             }
 
-            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-            deleteButton.disabled = true;
-            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-            applyButton.disabled = true;
-            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-            clearButton.disabled = false;
-
             for (let macro of macros) {
                 for (let fixture of macro.macro.fixtures) {
                     let currentProfile = await this.getFixture(fixture.id);
@@ -358,14 +352,27 @@ class SettingsApp extends Globals {
                     }
 
                     //save original profile prior to modification
-                    if (await this.storeFixtureProfile(macroName, currentProfile)) {
-                        this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
-                    } else {
-                        if (this.logging)
-                            console.error('Error saving original profile for fixture ' + fixture.id);
-                    }
+                    promiseArray.push(new Promise((resolve, reject) => {
+                        try {
+                            this.processAttributeChanges(diff, fixture.id, fixture, currentProfile).then(() => {
+                                resolve();
+                            });
+                        } catch (e) {
+                            reject(e)
+                        }
+                    }));
+
+                    await Promise.all(promiseArray).then(() => {
+                        this.storeFixtureProfile(macroName, currentProfile);
+                    });
                 }
             }
+            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+            deleteButton.disabled = true;
+            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+            applyButton.disabled = true;
+            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+            clearButton.disabled = false;
         } catch (e) {
             if (this.logging)
                 console.error('Error applying Macro:', e);
@@ -375,6 +382,7 @@ class SettingsApp extends Globals {
         this.currentCue = await this.getShowState();
         var macros = await this.loadMacros();
         macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
+        var promiseArray = [];
 
         if (macros) {
             var fixtures = macros[0].macro.fixtures;
@@ -385,9 +393,18 @@ class SettingsApp extends Globals {
                 //get diff between original and current profile
                 let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
 
-                //revert changes
-                if (await this.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture));
-                maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                promiseArray.push(new Promise((resolve, reject) => {
+                    try {
+                        maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
+                            resolve();
+                        });
+                    } catch (e) {
+                        reject(e)
+                    }
+                }))
+                await Promise.all(promiseArray).then(() => {
+                    maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                });
             }
 
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
@@ -430,22 +447,25 @@ class SettingsApp extends Globals {
         }
     }
     processAttributeChanges = async (diff, fixtureId, newProfile, oldProfile) => {
-        for (let attr of diff) {
-            let attrNew = newProfile.attribute[attr];
-            let attrOld = oldProfile.attribute[attr];
-            let attrDiff = this.getObjectDiff(attrNew, attrOld);
+        try {
+            for (let attr of diff) {
+                let attrNew = newProfile.attribute[attr];
+                let attrOld = oldProfile.attribute[attr];
+                let attrDiff = this.getObjectDiff(attrNew, attrOld);
 
-            for (let prop of attrDiff) {
-                let update = {
-                    attribute: {
-                        [prop]: attrNew[prop]
-                    }
-                };
-
-                await this.putAttribute(fixtureId, attr, update);
-            }
-        };
-    }
+                for (let prop of attrDiff) {
+                    let update = {
+                        attribute: {
+                            [prop]: attrNew[prop]
+                        }
+                    };
+                    await this.putAttribute(fixtureId, attr, update);
+                }
+            };
+        } catch (e) {
+            console.error('Error processing attribute changes:', e);
+        }
+    };
     putAttribute = async (fixtureId, attributeId, attribute) => {
         let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
 

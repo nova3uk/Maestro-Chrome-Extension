@@ -13,10 +13,12 @@ class Globals {
                 this.Search = src.search;
                 this.systemInfo = await this.getSystemInfo();
 
-                this.injectMain(this.Search);
+                this.loadScript(`${this.Origin}/src/inject/js/v/${this.systemInfo.version}/api.js`, this.Search).then(() => {
+                    this.loadScript(`${this.Origin}/src/inject/js/maestro-main.js`, this.Search);
+                });
             };
         }
-    }
+    };
 
     // Public variables
     systemInfo;
@@ -67,7 +69,7 @@ class Globals {
         tilt: "TILT",
         panFine: "PAN_FINE",
         tiltFine: "TILT_FINE",
-    }
+    };
     attributeTypes = {
         panSetting: {
             width: 0,
@@ -84,7 +86,7 @@ class Globals {
             lowValue: 0,
             highValue: 0
         }
-    }
+    };
     httpMethods = {
         GET: 'GET',
         POST: 'POST',
@@ -101,11 +103,19 @@ class Globals {
     arrActivityLevelCallbacks = []
 
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
+    loadScript = (scriptUrl, params = null) => {
+        const script = document.createElement('script');
+        script.src = scriptUrl + params;
+        document.body.appendChild(script);
 
-    injectMain = function (params) {
-        var s = document.createElement("script");
-        s.src = this.getFilePath("src/inject/js/maestro-main.js" + params);
-        (document.head || document.documentElement).appendChild(s);
+        return new Promise((res, rej) => {
+            script.onload = function () {
+                res();
+            }
+            script.onerror = function () {
+                rej();
+            }
+        });
     };
     injectOverlay = function () {
         var s = document.createElement("script");
@@ -194,7 +204,7 @@ class Globals {
         }, Object.keys(obj2));
 
         return diff;
-    }
+    };
     openNewTab = function (page) {
         let url = chrome.runtime.getURL(page);
         chrome.tabs.query({ url: url }, function (tabs) {
@@ -207,7 +217,7 @@ class Globals {
     };
     calculateRange = function (range = this.attributeTypes.range) {
         return { lowValue: range.lowValue / 255, highValue: range.highValue / 255 };
-    }
+    };
 
     prepareFetch = async function (method = this.httpMethods, url, params = {}, returnJson = true) {
         let options = {
@@ -225,7 +235,7 @@ class Globals {
             if (returnJson)
                 return response.json();
         } catch (e) { }
-    }
+    };
 
     getSystemInfo = async () => {
         try {
@@ -237,7 +247,7 @@ class Globals {
         }
     };
     getBrightness = async (fixtureId) => {
-        return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
+        return await this.getUrl(`${maestro.App.maestroUrl}api/${this.apiVersion}/brightness`);
     };
     getShows = async () => {
         try {
@@ -286,9 +296,7 @@ class Globals {
     }
     storeFixtureProfile = async (macroName, fixture) => {
         try {
-            let currentSetting = await this.getFixture(fixture.id);
-            await this.saveLocalSetting("macro_active_" + fixture.id, { "macroName": macroName, "fixture": currentSetting });
-            return currentSetting;
+            await this.saveLocalSetting("macro_active_" + fixture.id, { "macroName": macroName, "fixture": fixture });
         } catch (e) {
             console.error(e);
             return null;
@@ -303,7 +311,7 @@ class Globals {
                 resolve(Object.keys(items));
             });
         });
-    }
+    };
     deleteFixtureProfile = async (fixtureId) => {
         this.deleteLocalSetting("macro_active_" + fixtureId);
     };
@@ -319,7 +327,7 @@ class Globals {
             url = url.replace("*", "");
             return url;
         }
-    }
+    };
     saveSetting = (key, value) => {
         chrome.storage.sync.set({ [key]: value }, function () {
             return true;
@@ -375,7 +383,7 @@ class Globals {
     };
     prettyJSON = (data) => {
         return JSON.stringify(data, null, '\t');
-    }
+    };
     injectCSS = (css) => {
         let el = document.createElement('style');
         el.innerText = css;

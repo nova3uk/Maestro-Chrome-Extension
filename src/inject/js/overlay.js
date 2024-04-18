@@ -249,7 +249,7 @@ class OverlayApp extends Globals {
             div.style.color = '';
             div.style.backgroundColor = this.btnColors.backgroundColor;
         }
-        maestro.App.manualOverride(item, status);
+        maestro.Globals.manualOverride(item, status);
     };
     createCheckboxes = () => {
         this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1140px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 981px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 822px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 663px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 504px) {#div_maestro_ext_effect {display: none !important;}}');

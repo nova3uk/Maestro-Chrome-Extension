@@ -1,4 +1,4 @@
-(async function () {
+(async () => {
     getFromStore = async (key) => {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get([key], function (result) {
