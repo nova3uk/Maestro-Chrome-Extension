@@ -147,8 +147,6 @@ class Globals {
         } catch (e) {
             if (this.logging)
                 console.error("Cannot connect to the API, is Maestro running?", e);
-
-            throw e;
         }
     };
     formatDate = (d) => {
@@ -206,7 +204,6 @@ class Globals {
             if (this.logging) {
                 console.error("Cannot connect to the API, is Maestro running?", e);
             }
-            throw e;
         }
     };
     getBrightness = async (fixtureId) => {
@@ -219,14 +216,15 @@ class Globals {
             if (this.logging) {
                 console.error("Cannot connect to the API, is Maestro running?", e);
             }
-            throw e;
         }
     };
     getShowState = async () => {
         try {
             return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
         } catch (e) {
-            throw e;
+            if (this.logging) {
+                console.error("Cannot connect to the API, is Maestro running?", e);
+            }
         }
     };
     startCue = async (cue) => {
