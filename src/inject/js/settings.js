@@ -492,8 +492,8 @@ class SettingsApp extends Globals {
         });
     };
     changeStrobeParam = async (id) => {
-        let newStrobeValue = document.getElementById('strobe_val_' + id).value;
-        let newShutterValue = document.getElementById('shutter_val_' + id).value;
+        let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + id).value, 0, 255);
+        let newShutterValue = this.safeMinMax(document.getElementById('shutter_val_' + id).value, 0, 255);
 
         this.saveLocalSetting("strobe_" + id, { strobe: newStrobeValue, shutter: newShutterValue });
     };
@@ -712,18 +712,18 @@ class SettingsApp extends Globals {
             $('#panTiltFinder').modal('show');
 
             document.getElementById('panRange').addEventListener('input', function () {
-                document.getElementById('panRangeVal').value = this.value;
+                document.getElementById('panRangeVal').value = this.safeMinMax(this.value, 0, 255);
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRange').addEventListener('input', function () {
-                document.getElementById('tiltRangeVal').value = this.value;
+                document.getElementById('tiltRangeVal').value = this.safeMinMax(this.value, 0, 255);;
                 maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             });
             document.getElementById('tiltRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('tiltRange').value = this.value;
+                document.getElementById('tiltRange').value = this.safeMinMax(this.value, 0, 255);
             });
             document.getElementById('panRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('panRange').value = this.value;
+                document.getElementById('panRange').value = this.safeMinMax(this.value, 0, 255);
             });
             document.getElementById('panTiltReset').addEventListener('click', function () {
                 document.getElementById('panRange').value = 0;
