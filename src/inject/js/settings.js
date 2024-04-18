@@ -277,7 +277,7 @@ class SettingsApp extends Globals {
             await this.saveLocalSetting("fogTimer", fogTimer);
         });
         document.getElementById('fogTimerDuration').addEventListener('change', async () => {
-            let fogTimerDuration = this.safeMinMax(ocument.getElementById('fogTimerDuration').value, 1, 30);
+            let fogTimerDuration = this.safeMinMax(document.getElementById('fogTimerDuration').value, 1, 30);
             await this.saveLocalSetting("fogTimerDuration", fogTimerDuration);
         });
         document.getElementById('autoFogOnActivityPeakPercent').addEventListener('change', async () => {

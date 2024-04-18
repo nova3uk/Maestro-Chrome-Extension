@@ -106,11 +106,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
         //local settings
         chrome.storage.local.set({ autoFogOnActivityPeak: false });
         chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
-        chrome.storage.local.set({ autoFogOnActivityPeakDuration: 5 });
+        chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
         chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
         chrome.storage.local.set({ autoFogOnTimer: false });
         chrome.storage.local.set({ fogTimer: 10 });
-        chrome.storage.local.set({ fogTimerDuration: 5 });
+        chrome.storage.local.set({ fogTimerDuration: 3 });
 
         chrome.storage.local.set({ autoEffectsEnabled: false });
         chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
@@ -134,11 +134,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 //local settings
                 chrome.storage.local.set({ autoFogOnActivityPeak: false });
                 chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
-                chrome.storage.local.set({ autoFogOnActivityPeakDuration: 5 });
+                chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
                 chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
                 chrome.storage.local.set({ autoFogOnTimer: false });
                 chrome.storage.local.set({ fogTimer: 10 });
-                chrome.storage.local.set({ fogTimerDuration: 5 });
+                chrome.storage.local.set({ fogTimerDuration: 3 });
 
                 chrome.storage.local.set({ autoEffectsEnabled: false });
                 chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
