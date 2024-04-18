@@ -425,6 +425,8 @@ class App extends Globals {
                         //time or duration has been modified, kill and restart the timer
                         clearInterval(this.autoFogTimer);
                         this.autoFogTimer = null;
+
+                        this.autoFogOnTimer();
                     }
                 } else {
                     this.autoFogOnTimer();
