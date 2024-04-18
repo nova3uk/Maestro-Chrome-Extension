@@ -35,7 +35,7 @@ class App extends Globals {
             if (this.logging)
                 console.log("AutoFog toggle active.")
         };
-    }
+    };
     strobeParams;
     getAutoParams;
     startUp = async () => {
@@ -332,25 +332,30 @@ class App extends Globals {
     };
     getAutoParams = async () => {
         // get autofog params from backend
-        setInterval(() => {
-            chrome.runtime.sendMessage(this.ExtensionId, { getAutoProgramParams: true },
-                function (response) {
-                    if (response) {
-                        maestro.App.getAutoParams = { ...maestro.App.getAutoParams, ...response };
+        try {
+            setInterval(() => {
+                chrome.runtime.sendMessage(this.ExtensionId, { getAutoProgramParams: true },
+                    function (response) {
+                        if (response) {
+                            maestro.App.getAutoParams = { ...maestro.App.getAutoParams, ...response };
 
-                        maestro.App.getAutoParams.activityPeakFogMinimumDelay = maestro.App.getAutoParams.autoFogOnActivityPeakInterval * 60000;
-                        maestro.App.getAutoParams.activityPeakStrobeMinimumDelay = maestro.App.getAutoParams.autoStrobeOnActivityPeakInterval * 60000;
-                        maestro.App.getAutoParams.activityPeakEffectsMinimumDelay = maestro.App.getAutoParams.autoEffectsOnActivityPeakInterval * 60000;
+                            maestro.App.getAutoParams.activityPeakFogMinimumDelay = maestro.App.getAutoParams.autoFogOnActivityPeakInterval * 60000;
+                            maestro.App.getAutoParams.activityPeakStrobeMinimumDelay = maestro.App.getAutoParams.autoStrobeOnActivityPeakInterval * 60000;
+                            maestro.App.getAutoParams.activityPeakEffectsMinimumDelay = maestro.App.getAutoParams.autoEffectsOnActivityPeakInterval * 60000;
 
-                        if (maestro.App.getAutoParams.autoFogEnabled || maestro.App.getAutoParams.autoEffectsEnabled || maestro.App.getAutoParams.autoStrobeEnabled)
-                            maestro.App.switchAutoPrograms();
+                            if (maestro.App.getAutoParams.autoFogEnabled || maestro.App.getAutoParams.autoEffectsEnabled || maestro.App.getAutoParams.autoStrobeEnabled)
+                                maestro.App.switchAutoPrograms();
 
-                        if (this.logging)
-                            console.log("Auto params loaded.");
-                    }
-                });
-        }, 3000);
-    }
+                            if (this.logging)
+                                console.log("Auto params loaded.");
+                        }
+                    });
+            }, 3000);
+        } catch (e) {
+            if (this.logging)
+                console.error(e, "Error loading auto params!");
+        }
+    };
     reloadMonitor = function () {
         if (window.maestroOnReloadMonitor) return;
 
@@ -360,7 +365,7 @@ class App extends Globals {
             }
         };
         window.maestroOnReloadMonitor = true;
-    }
+    };
     isPageReloaded = function () {
         var perfEntries = performance.getEntriesByType("navigation");
 
@@ -370,7 +375,7 @@ class App extends Globals {
             }
         }
         return false;
-    }
+    };
     switchAutoPrograms = async () => {
         let autoFogOnActivityPeak = this.getAutoParams.autoFogOnActivityPeak;
         let autoFogOnTimer = this.getAutoParams.autoFogOnTimer;
@@ -480,7 +485,7 @@ class App extends Globals {
                 this.autoEffectsOnPeakTimer = null;
             }, autoEffectsOnActivityPeakDuration);
         }
-    }
+    };
     autoFogOnTimer = async () => {
         //from minutes to ms
         let frequency = this.getAutoParams.fogTimer * 60000;
@@ -488,49 +493,58 @@ class App extends Globals {
 
         this.getAutoParams.activeFogTimer = this.getAutoParams.fogTimer;
         this.getAutoParams.activeFogTimerDuration = this.getAutoParams.fogTimerDuration;
+        try {
+            this.autoFogTimer = setInterval(async () => {
+                //check its still active...
+                if (!this.getAutoParams.autoFogEnabled || !this.getAutoParams.autoFogOnTimer) {
+                    clearInterval(this.autoFogTimer);
+                    this.autoFogTimer = null;
+                    return;
+                }
 
-        this.autoFogTimer = setInterval(async () => {
-            //check its still active...
-            if (!this.getAutoParams.autoFogEnabled || !this.getAutoParams.autoFogOnTimer) {
-                clearInterval(this.autoFogTimer);
-                this.autoFogTimer = null;
-                return;
-            }
-
-            //activate fog
-            maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
-            setTimeout(() => {
-                //deactivate fog
-                maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
-            }, duration);
-        }, frequency);
+                //activate fog
+                maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
+                setTimeout(() => {
+                    //deactivate fog
+                    maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
+                }, duration);
+            }, frequency);
+        } catch (e) {
+            if (this.logging)
+                console.error('Fatal error starting auto fog timer:', e);
+        }
     };
     autoFogOnPeak = (level) => {
 
         if (!this.getAutoParams.autoFogEnabled || !this.getAutoParams.autoFogOnActivityPeak) {
             return;
         }
-        //no reactivation before minimum delay
-        if ((maestro.App.getAutoParams.activityPeakFogLastExecution + maestro.App.getAutoParams.activityPeakFogMinimumDelay) > Date.now()) return;
+        try {
+            //no reactivation before minimum delay
+            if ((maestro.App.getAutoParams.activityPeakFogLastExecution + maestro.App.getAutoParams.activityPeakFogMinimumDelay) > Date.now()) return;
 
-        let autoFogOnActivityPeakPercent = maestro.App.getAutoParams.autoFogOnActivityPeakPercent;
-        let autoFogOnActivityPeakDuration = maestro.App.getAutoParams.autoFogOnActivityPeakDuration * 1000;
+            let autoFogOnActivityPeakPercent = maestro.App.getAutoParams.autoFogOnActivityPeakPercent;
+            let autoFogOnActivityPeakDuration = maestro.App.getAutoParams.autoFogOnActivityPeakDuration * 1000;
 
-        if (level >= autoFogOnActivityPeakPercent) {
-            if (this.autoFogOnPeakTimer) return;
+            if (level >= autoFogOnActivityPeakPercent) {
+                if (this.autoFogOnPeakTimer) return;
 
-            //activate fog
-            maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
+                //activate fog
+                maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
 
-            maestro.App.getAutoParams.activityPeakFogLastExecution = Date.now();
-            this.autoFogOnPeakTimer = setTimeout(() => {
-                //deactivate fog
-                maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
-                this.autoFogOnPeakTimer = null;
-            }, autoFogOnActivityPeakDuration);
+                maestro.App.getAutoParams.activityPeakFogLastExecution = Date.now();
+                this.autoFogOnPeakTimer = setTimeout(() => {
+                    //deactivate fog
+                    maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
+                    this.autoFogOnPeakTimer = null;
+                }, autoFogOnActivityPeakDuration);
+            }
+        } catch (e) {
+            if (this.logging)
+                console.error('Fatal error starting auto fog on peak:', e);
         }
-    };
-}
+    }
+};
 
 // Initialize & assign to global object
 maestro.App = new App(document.currentScript.src);

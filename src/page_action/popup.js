@@ -1,6 +1,7 @@
 let storeSetting = function (key, value) {
     chrome.storage.sync.set({ [key]: value }, function () {
-        console.log('Value is set to ' + value);
+        if (document.getElementById("loggingToggle").checked)
+            console.log('Value is set to ' + value);
     });
 };
 let handleCheckboxChange = function (event) {
