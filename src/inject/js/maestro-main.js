@@ -425,8 +425,6 @@ class App extends Globals {
                         //time or duration has been modified, kill and restart the timer
                         clearInterval(this.autoFogTimer);
                         this.autoFogTimer = null;
-
-                        this.autoFogOnTimer();
                     }
                 } else {
                     this.autoFogOnTimer();
@@ -454,11 +452,18 @@ class App extends Globals {
             maestro.OverlayApp.checkBoxClick("STROBE_ON", true, 'div_maestro_ext_strobe');
 
             maestro.App.getAutoParams.activityPeakStrobeLastExecution = Date.now();
+
             this.autoStrobeOnPeakTimer = setTimeout(() => {
                 //deactivate Strobe
                 maestro.OverlayApp.checkBoxClick("STROBE_ON", false, 'div_maestro_ext_strobe');
                 this.autoStrobeOnPeakTimer = null;
+
+                if (this.logging)
+                    console.log('Auto Strobe Finished!');
             }, autoStrobeOnActivityPeakDuration);
+
+            if (this.logging)
+                console.log('Auto Strobe Started!');
         }
     };
     autoEffectsOnPeak = (level) => {
@@ -479,11 +484,18 @@ class App extends Globals {
             maestro.OverlayApp.checkBoxClick("EFFECT_ON", true, 'div_maestro_ext_effect');
 
             maestro.App.getAutoParams.activityPeakEffectsLastExecution = Date.now();
+
             this.autoEffectsOnPeakTimer = setTimeout(() => {
                 //deactivate Effect
                 maestro.OverlayApp.checkBoxClick("EFFECT_ON", false, 'div_maestro_ext_effect');
                 this.autoEffectsOnPeakTimer = null;
+
+                if (this.logging)
+                    console.log('Auto Effects Finished!');
             }, autoEffectsOnActivityPeakDuration);
+
+            if (this.logging)
+                console.log('Auto Effects Started!');
         }
     };
     autoFogOnTimer = async () => {
@@ -493,6 +505,7 @@ class App extends Globals {
 
         this.getAutoParams.activeFogTimer = this.getAutoParams.fogTimer;
         this.getAutoParams.activeFogTimerDuration = this.getAutoParams.fogTimerDuration;
+
         try {
             this.autoFogTimer = setInterval(async () => {
                 //check its still active...
@@ -504,9 +517,16 @@ class App extends Globals {
 
                 //activate fog
                 maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
+
+                if (this.logging)
+                    console.log('Auto FogOnTimer Started!');
+
                 setTimeout(() => {
                     //deactivate fog
                     maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
+
+                    if (this.logging)
+                        console.log('Auto FogOnTimer Finished!');
                 }, duration);
             }, frequency);
         } catch (e) {
@@ -533,11 +553,18 @@ class App extends Globals {
                 maestro.OverlayApp.checkBoxClick("FOG_ON", true, 'div_maestro_ext_fog');
 
                 maestro.App.getAutoParams.activityPeakFogLastExecution = Date.now();
+
                 this.autoFogOnPeakTimer = setTimeout(() => {
                     //deactivate fog
                     maestro.OverlayApp.checkBoxClick("FOG_ON", false, 'div_maestro_ext_fog');
                     this.autoFogOnPeakTimer = null;
+
+                    if (this.logging)
+                        console.log('Auto FogOnPeak Finished!');
                 }, autoFogOnActivityPeakDuration);
+
+                if (this.logging)
+                    console.log('Auto FogOnPeak Started!');
             }
         } catch (e) {
             if (this.logging)

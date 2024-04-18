@@ -104,6 +104,13 @@ class Globals {
     getHttpMethods = () => this.httpMethods;
 
     safeMinMax = (obj, minNumber, maxNumber) => {
+        try {
+            obj = Number(obj);
+        } catch (e) {
+            if (this.logging)
+                console.error(e);
+        }
+
         if (typeof obj === 'number' && !isNaN(obj)) {
             if (obj < minNumber)
                 return minNumber;
