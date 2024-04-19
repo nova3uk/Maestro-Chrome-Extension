@@ -1,13 +1,24 @@
 MaestroDMX is an autonomous lighting designer-in-a-box that listens to music and makes decisions like a professional lighting designer.
 See https://www.maestrodmx.com/ for more information.
 
+You can install the ready Chrome Extension from the Chrome Web Store
+
+https://chromewebstore.google.com/detail/maestrodmx-enhancer-exten/ekhcjlogeglabdkdaohikndckadbhaia
+
 This Chrome Extension is currently only for the purpose of temporarily adding functionaity not yet available in the official software, by means of manipulation of the web interface. It is of course only available on versions of Chrome which can run Extensions, therefore desktop only not mobile.
 
-Currently it supports 3 main functions:
+Currently supporting Maestro Firmware versions 1.2.0 and 1.3.0!
+
+**Main Functions**
 
 1. Adding the possibility to Strobe fixtures which depend on a Shutter, or a Strobe channel - fixtures using normal RGB values will already work. In general this usually means moving head fixtures or similar with a color wheel.
 2. Adding a Footer bar with Latching Manual Overrides (Blackout, Blinder, Strobe, Fog and Effect) which is visible on any page, not only the Show Page. These buttons are Latching (they stay on until turned off, no more finger holding). The footer bar also has some info, such as the version of the plugin, the current time and also mini Sound Input level, and Activity Level monitors.
 3. Macros. Adding the possibility to store a fixtures DMX settings in a macro, and recalling it later. For example to set movers to a specific colour and location.
+4. Auto Fog Control. Enable Fog firing on schedule, with adjustable spray time.
+5. Auto Fog on Audio Activity (React to Sound). Fog can be triggered based on the peak excitment of the music, with adjustable spray time and minimum frequency gaps.
+6. Auto Strobe on Audio Activity. Strobe your fixtures based on the peak of music excitment. Adjustable minimum excitement level to trigger, effect latching time and minimum intervals.
+7. Auto Effect on Audio Activity. Trigger fixture Effects based on the peak of the music excitment. Adjustable minimum excitement level to trigger, effect latching time and minimum intervals.
+8. Color overrides. Force every fixture to a specific RGBUAV color.
 
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
