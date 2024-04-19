@@ -325,14 +325,14 @@ class SettingsApp extends Globals {
             return macros;
         });
     };
-    applyMacro = async (macroName) => {
+    applyMacro = async (macroName, stageId) => {
         try {
             var promiseArray = [];
             var keys = await this.retrieveAllKeys()
             this.currentCue = await this.getShowState();
 
             let macros = await this.loadMacros();
-            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
+            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
 
             if (macros) {
                 const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
@@ -373,15 +373,17 @@ class SettingsApp extends Globals {
             applyButton.disabled = true;
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = false;
+
+            document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
         } catch (e) {
             if (this.logging)
                 console.error('Error applying Macro:', e);
         }
     }
-    revertMacro = async (macroName) => {
+    revertMacro = async (macroName, stageId) => {
         this.currentCue = await this.getShowState();
         var macros = await this.loadMacros();
-        macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
+        macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
         var promiseArray = [];
 
         if (macros) {
@@ -413,11 +415,13 @@ class SettingsApp extends Globals {
             deleteButton.disabled = false;
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = true;
+
+            document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
         }
     };
-    deleteMacro = async (macroName) => {
+    deleteMacro = async (macroName, stageId) => {
         await this.loadMacros().then(macros => {
-            macros = macros.filter(macro => macro.macro.name !== macroName && macro.macro.stageId == this.stageId);
+            macros = macros.filter(macro => macro.macro.name !== macroName && macro.macro.stageId == stageId);
             maestro.SettingsApp.saveLocalSetting("macros", macros);
 
             const macroRow = document.querySelector('tr[data-id="' + macroName + '"]');
@@ -429,7 +433,6 @@ class SettingsApp extends Globals {
     checkRunningMacros = async (macros) => {
         if (!macros)
             macros = await this.loadMacros();
-
         macros = macros.filter(macro => macro.macro.stageId == this.stageId);
 
         for (let macro of macros) {
@@ -442,6 +445,7 @@ class SettingsApp extends Globals {
                     applyButton.disabled = true;
                     const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macro.macro.name}"]`);
                     clearButton.disabled = false;
+                    document.querySelector(`[data-id="${macro.macro.name}"][data-stageid="${macro.macro.stageId}"]`).classList.add('macro-active');
                 }
             }
         }
@@ -590,7 +594,7 @@ class SettingsApp extends Globals {
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         if (row.pantilt && !row.ignore) {
-                            return '<span role="button" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
+                            return '<span role="button" name="panOrTilt" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
                         }
                     }
                 },
@@ -827,74 +831,118 @@ class SettingsApp extends Globals {
     }
     macroTable = (macros) => {
         var tData = [];
-
         for (let macro of macros) {
             var fixtures = macro.macro.fixtures;
             tData.push({
+                stageId: macro.macro.stageId,
                 name: macro.macro.name,
                 length: fixtures.length,
+                fixtureName: fixtures.map(fixture => fixture.name)
             });
         };
-
+        //'let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
 
         $('#macros').bootstrapTable({
             columns: [{
                 field: 'name',
                 title: 'Macro Name'
             }, {
+                field: 'fixtures',
+                title: 'Fixtures Affected'
+            }, {
                 field: 'length',
-                title: 'Number of Fixtures'
+                title: '#'
             }],
             data: tData,
-            columns: [{}, {},
-            {
-                field: 'button_apply',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return `<button class="btn btn-danger" name="btn_apply" data-id="${row.name}">Apply</button>`;
-                }
-            },
-            {
-                field: 'button_clear',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return `<button class="btn btn-success" name="btn_clr" data-id="${row.name}" disabled>Clear</button>`;
-                }
-            },
-            {
-                field: 'button_delete',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return `<button class="btn btn-warning" name="btn_delete" data-id="${row.name}">Delete</button>`;
-                }
-            }],
+            columns: [
+                {
+                    field: 'name',
+                    title: 'Macro Name',
+                    align: 'left',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<span>${row.name}</span><span name="editMacroName" role="button" class="cursor-pointer ms-1" style="position:relative;bottom:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-toggle="tooltip" data-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span>`;
+                    }
+                }, {},
+                {
+                    field: 'fixtures',
+                    align: 'left',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        let fixtureNames = "";
+                        for (let fixture of row.fixtureName) {
+                            fixtureNames += `<span>${fixture}</span><br>`;
+                        }
+                        return fixtureNames;
+                    }
+                },
+                {
+                    field: 'button_apply',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<button class="btn btn-danger" name="btn_apply" data-id="${row.name}" data-stageid="${row.stageId}">Apply</button>`;
+                    }
+                },
+                {
+                    field: 'button_clear',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<button class="btn btn-success" name="btn_clr" data-id="${row.name}" data-stageid="${row.stageId}" disabled>Clear</button>`;
+                    }
+                },
+                {
+                    field: 'button_delete',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<button class="btn btn-warning" name="btn_delete" data-id="${row.name}" data-stageid="${row.stageId}">Delete</button>`;
+                    }
+                }],
             rowAttributes: function (row, index) {
                 return {
-                    'data-id': row.name
+                    'data-id': row.name,
+                    'data-stageid': row.stageId,
                 }
             }
         });
+        $('span[name="editMacroName"]').on('click', function (btn) {
+            var macro = this.dataset.name
+            var newName = prompt('Enter a new name for the macro', macro);
+            if (newName == null || newName == "") {
+                return;
+            }
+            maestro.SettingsApp.loadMacros().then(macros => {
+                if (macros.find(macro => macro.macro.name == newName && macro.macro.stageId == this.dataset.stageid)) {
+                    return alert('Macro name already exists');
+                }
+                for (let m of macros) {
+                    if (m.macro.name == macro && m.macro.stageId == this.dataset.stageid) {
+                        m.macro.name = newName;
+                    }
+                }
+                maestro.SettingsApp.saveLocalSetting("macros", macros);
+                document.location.reload();
+            });
+        });
         $('button[name="btn_apply"]').on('click', function (btn) {
-            var macro = this.dataset.id
-            maestro.SettingsApp.applyMacro(macro);
+            maestro.SettingsApp.applyMacro(this.dataset.id, this.dataset.stageid);
         });
         $('button[name="btn_clr"]').on('click', function (btn) {
-            var macro = this.dataset.id
-            maestro.SettingsApp.revertMacro(macro);
+            maestro.SettingsApp.revertMacro(this.dataset.id, this.dataset.stageid);
         });
         $('button[name="btn_delete"]').on('click', function (btn) {
             if (confirm('Are you sure you want to delete this macro?')) {
-                var macro = this.dataset.id
-                maestro.SettingsApp.deleteMacro(macro);
+                maestro.SettingsApp.deleteMacro(this.dataset.id, this.dataset.stageid);
             }
         });
     };

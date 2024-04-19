@@ -1,5 +1,5 @@
 ; (async () => {
-    manualOverride = async (mode, onOrOff) => {
+    maestro.Globals.manualOverride = async (mode, onOrOff) => {
         let url = `api/${maestro.App.apiVersion}/triggers/state`;
         let data;
         method = "PATCH";

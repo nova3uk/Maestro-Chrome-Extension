@@ -288,7 +288,8 @@ class OverlayApp extends Globals {
     clearCheckboxes = (checkedBox) => {
         if (checkedBox !== "maestro_ext_strobe" && checkedBox.toLowerCase() !== "strobe") {
             maestro.App.latchedOn = false;
-            maestro.App.setStrobe(false, false);
+            maestro.App.setStrobe(
+                false, false);
         }
         const buttonNames = ['Blackout', 'Blinder', 'Strobe', 'Fog', 'Effect'];
         for (let item of buttonNames) {
