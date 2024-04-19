@@ -92,11 +92,12 @@ class OverlayApp extends Globals {
     };
 
 
-    createText = (text, id) => {
+    createText = (text, id, cssClass = null) => {
         let textElement = document.createElement('span');
         textElement.textContent = text;
         textElement.style.color = '#f4f5f5';
         textElement.style.marginLeft = '10px';
+        textElement.className = (cssClass || '');
         textElement.id = (id || '');
         return textElement;
     };
@@ -252,7 +253,7 @@ class OverlayApp extends Globals {
         maestro.Globals.manualOverride(item, status);
     };
     createCheckboxes = () => {
-        this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1140px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 981px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 822px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 663px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 504px) {#div_maestro_ext_effect {display: none !important;}}');
+        this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
 
         // Create the checkboxes
         this.blackoutCheckbox = this.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {
@@ -327,6 +328,27 @@ class OverlayApp extends Globals {
             observer.observe(document, { childList: true, subtree: true });
         });
     };
+    autoEffectsActive = async () => {
+        let autoFogEnabled = maestro.App.getAutoParams.autoFogEnabled;
+        let autoFogOnActivityPeak = maestro.App.getAutoParams.autoFogOnActivityPeak;
+        let autoFogOnTimer = maestro.App.getAutoParams.autoFogOnTimer;
+        let autoEffectsEnabled = maestro.App.getAutoParams.autoEffectsEnabled;
+        let autoStrobeEnabled = maestro.App.getAutoParams.autoStrobeEnabled;
+        let lightning;
+
+        if (!document.getElementById('effectsActiveIcon')) {
+            lightning = this.createText('', 'effectsActiveIcon');
+            this.cornerText.appendChild(lightning);
+        } else {
+            lightning = document.getElementById('effectsActiveIcon');
+        }
+
+        if ((autoFogEnabled && autoFogOnActivityPeak || autoFogOnTimer) || autoEffectsEnabled || autoStrobeEnabled) {
+            lightning.innerHTML = '<span class="tooltip" data-toggle="tooltip" data-placement="top" title="Auto programs active"><svg width="26" height="26" title="Auto programs active" stroke="currentColor" style="animation: 0.525s ease-in-out 0s infinite normal none running strobeAnimation;" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z"></path></svg></span>';
+        } else {
+            lightning.innerHTML = '';
+        }
+    }
     loadCornerText = async () => {
         try {
             this.cornerText = document.createElement('div');
@@ -334,7 +356,7 @@ class OverlayApp extends Globals {
             this.cornerText.style.bottom = '10px';
             this.cornerText.style.left = '10px';
             this.cornerText.style.color = '#f4f5f5';
-            this.cornerText.style.width = '300px';
+            this.cornerText.style.width = '320px';
             this.cornerText.style.height = '30px';
             this.cornerText.style.zIndex = '100001';
             this.cornerText.style.display = 'flex';
@@ -370,8 +392,9 @@ class OverlayApp extends Globals {
                 let hours = now.getHours().toString().padStart(2, '0');
                 let minutes = now.getMinutes().toString().padStart(2, '0');
                 let seconds = now.getSeconds().toString().padStart(2, '0');
-                clock.textContent = `${hours}:${minutes}:${seconds}`;
+                clock.textContent = `${hours}:${minutes}`;
             }
+
             updateClock();
             setInterval(updateClock, 1000);
         } catch (e) {

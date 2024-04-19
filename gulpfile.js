@@ -7,7 +7,7 @@ let currentVersion = manifest.version;
 
 function build(callback) {
     gulp
-        .src(["src/**", "_locales/**", "manifest.json", "README.md", "LICENSE", "favicon-maestro.png"], { base: "." })
+        .src(["src/**", "_locales/**", "manifest.json", "README.md", "LICENSE"], { base: "." })
         .pipe(zip("maestro-extension-." + currentVersion + ".zip"))
         .pipe(gulp.dest("deployments"));
 

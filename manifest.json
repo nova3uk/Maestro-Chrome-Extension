@@ -8,7 +8,7 @@
   },
   "action": {
     "default_popup": "src/page_action/page_action.html",
-    "default_icon": "favicon-maestro.png"
+    "default_icon": "src/img/favicon-maestro.png"
   },
   "default_locale": "en",
   "permissions": ["storage", "tabs", "downloads"],
@@ -39,6 +39,10 @@
         "src/inject/css/overlay.css",
         "src/inject/css/settings.css",
         "src/img/settings.svg",
+        "src/img/lightning-charge.svg",
+        "src/img/lightning-charge-fill.svg",
+        "src/img/fire.svg",
+        "src/img/cloud-haze.svg",
         "src/external/bootstrap.bundle.min.js",
         "src/external/bootstrap-icons.css",
         "src/external/bootstrap.min.css",

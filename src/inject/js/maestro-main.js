@@ -305,6 +305,7 @@ class App extends Globals {
                                 console.log("Auto params loaded.");
                         }
                     });
+                maestro.OverlayApp.autoEffectsActive();
             }, 3000);
         } catch (e) {
             if (this.logging)
