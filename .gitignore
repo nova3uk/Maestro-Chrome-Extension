@@ -1,4 +1,6 @@
 .vscode/
 deployments/
 node_modules/
+package-lock.json
+package.json
 *.zip
