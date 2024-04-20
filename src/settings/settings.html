@@ -77,7 +77,7 @@
             </div>
 
             <div class="tab-pane" id="tabpanel-1" role="tabpanel" aria-labelledby="simple-tab-1">
-                <h6>
+                <p>
                     Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
                     store it locally.<br>
                     You can download the Config which *includes* the Fixture Backup and all settings in this
@@ -88,7 +88,7 @@
                     If you're not sure, go to Stages and Download Stage from the Maestro which will give you a
                     backup
                     of the current stage before you import a config and overwrite the fixtures.
-                </h6>
+                </p>
                 <i>Please note. You can import a file from a different stage, but it will fail if the fixtures
                     do not match.</i>
                 <br><br>
@@ -114,49 +114,51 @@
 
                 </i>
                 <br><br>
-                <div class="row">
-                    <div class="form-check form-switch col-auto">
-                        <input class="form-check-input" type="checkbox" id="autoFogEnabled">
-                        <label class="form-check-label" for="autoFogEnabled">Enabled (Global Switch)</label>
+                <div class="mx-3">
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoFogEnabled">
+                            <label class="form-check-label" for="autoFogEnabled">Enabled (Global Switch)</label>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="form-check form-switch col-auto">
-                        <input class="form-check-input" type="checkbox" id="autoFogOnActivityPeak">
-                        <label class="form-check-label" for="autoFogOnActivityPeak">Autofog on Audio Activity
-                            Peak (minimum 1 minute between executions)</label>
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoFogOnActivityPeak">
+                            <label class="form-check-label" for="autoFogOnActivityPeak">Autofog on Audio Activity
+                                Peak (minimum 1 minute between executions)</label>
+                        </div>
                     </div>
-                </div>
-                <div class="row my-3">
-                    <div class="col-auto">
-                        Fog Trigger(% Activity) <input type="number" min="80" max="99" style="width:70px;"
-                            class="form-control" id="autoFogOnActivityPeakPercent">
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            Fog Trigger(% Activity) <input type="number" min="80" max="99" style="width:70px;"
+                                class="form-control" id="autoFogOnActivityPeakPercent">
+                        </div>
+                        <div class="col-auto">
+                            Fog Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoFogOnActivityPeakDuration">
+                        </div>
+                        <div class="col-auto">
+                            Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoFogOnActivityPeakInterval">
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        Fog Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoFogOnActivityPeakDuration">
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoFogOnTimer">
+                            <label class="form-check-label" for="autoFogOnTimer">Autofog On Timer(1-15 Mins)</label>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoFogOnActivityPeakInterval">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-check form-switch col-auto">
-                        <input class="form-check-input" type="checkbox" id="autoFogOnTimer">
-                        <label class="form-check-label" for="autoFogOnTimer">Autofog On Timer(1-15 Mins)</label>
-                    </div>
-                </div>
-                <div class="row my-3">
-                    <div class="col-auto">
-                        Fog Timer(In Minutes) <input type="number" min="1" max="15" style="width:70px;"
-                            class="form-control" id="fogTimer">
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            Fog Timer(In Minutes) <input type="number" min="1" max="15" style="width:70px;"
+                                class="form-control" id="fogTimer">
 
-                    </div>
-                    <div class="col-auto">
-                        Fog Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="fogTimerDuration">
+                        </div>
+                        <div class="col-auto">
+                            Fog Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="fogTimerDuration">
 
+                        </div>
                     </div>
                 </div>
             </div>
@@ -174,44 +176,46 @@
                     helps you avoid this.
                 </i>
                 <br><br>
-                <div class="row">
-                    <div class="form-check form-switch col-auto">
-                        <input class="form-check-input" type="checkbox" id="autoStrobeEnabled">
-                        <label class="form-check-label" for="autoStrobeEnabled">Auto Strobe</label>
+                <div class="mx-3">
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoStrobeEnabled">
+                            <label class="form-check-label" for="autoStrobeEnabled">Auto Strobe</label>
+                        </div>
                     </div>
-                </div>
-                <div class="row my-3">
-                    <div class="col-auto">
-                        Strobe Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
-                            class="form-control" id="autoStrobeOnActivityPeakPercent">
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            Strobe Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
+                                class="form-control" id="autoStrobeOnActivityPeakPercent">
+                        </div>
+                        <div class="col-auto">
+                            Strobe Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoStrobeOnActivityPeakDuration">
+                        </div>
+                        <div class="col-auto">
+                            Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoStrobeOnActivityPeakInterval">
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        Strobe Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoStrobeOnActivityPeakDuration">
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoEffectsEnabled">
+                            <label class="form-check-label" for="autoEffectsEnabled">Auto Effect</label>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoStrobeOnActivityPeakInterval">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-check form-switch col-auto">
-                        <input class="form-check-input" type="checkbox" id="autoEffectsEnabled">
-                        <label class="form-check-label" for="autoEffectsEnabled">Auto Effect</label>
-                    </div>
-                </div>
-                <div class="row my-3">
-                    <div class="col-auto">
-                        Effect Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
-                            class="form-control" id="autoEffectsOnActivityPeakPercent">
-                    </div>
-                    <div class="col-auto">
-                        Effect Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoEffectsOnActivityPeakDuration">
-                    </div>
-                    <div class="col-auto">
-                        Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
-                            class="form-control" id="autoEffectsOnActivityPeakInterval">
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            Effect Threshold(% Activity) <input type="number" min="80" max="99" style="width:70px;"
+                                class="form-control" id="autoEffectsOnActivityPeakPercent">
+                        </div>
+                        <div class="col-auto">
+                            Effect Duration(In Seconds) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoEffectsOnActivityPeakDuration">
+                        </div>
+                        <div class="col-auto">
+                            Minimum Interval(In Minutes) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoEffectsOnActivityPeakInterval">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -266,7 +270,6 @@
                 </table>
             </div>
             <div class="tab-pane" id="tabpanel-5" role="tabpanel" aria-labelledby="simple-tab-5">
-                <h2 class="mt-3"></h2>
                 <div>
                     <p class="h6">Enable Strobe Triggering</p>
 
@@ -289,7 +292,7 @@
                     refreshing the main MaestroDMX page to ensure you have the latest config.
                 </div>
 
-                <table id="fixtures" class="table my-1">
+                <table id="fixtures" class="table">
                     <thead class="table-light">
                         <tr>
                             <th data-field="pantilt"></th>
@@ -304,7 +307,7 @@
                         </tr>
                     </thead>
                 </table>
-                <div class="float-end my-2">
+                <div style="width:100%;text-align: right;" class="my-2">
                     <button id="addMacro" class="btn btn-primary">Add Macro</button>
                 </div>
             </div>
@@ -324,7 +327,7 @@
                 <div class="my-5"></div>
             </div>
         </div>
-
+        <div class="my-5"></div>
         <!-- Modal Pan/Tilt Finder -->
         <div id="panTiltFinder" class="modal fade" role="dialog">
             <div class="modal-dialog">
