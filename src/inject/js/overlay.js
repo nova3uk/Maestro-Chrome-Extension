@@ -258,7 +258,7 @@ class OverlayApp extends Globals {
             console.log('Checkbox clicked:', item, status);
     };
     createCheckboxes = () => {
-        this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
+        this.injectCSS('[role=presentation] {height: calc(100vh - 100px); top:-100px;};#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
 
         // Create the checkboxes
         this.blackoutCheckbox = this.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {

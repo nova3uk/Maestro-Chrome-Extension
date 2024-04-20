@@ -127,10 +127,11 @@ class Globals {
 
     // Handler for the proxy
     activityLevelHdlr = {
-        set(target, property, value) {
+        async set(target, property, value) {
             for (let i = 0; i < maestro.Globals.arrActivityLevelCallbacks.length; i++) {
-                if (typeof maestro.Globals.arrActivityLevelCallbacks[i] === 'function')
-                    maestro.Globals.debounce(maestro.Globals.arrActivityLevelCallbacks[i](value), 50);
+                if (typeof maestro.Globals.arrActivityLevelCallbacks[i] === 'function') {
+                    await maestro.Globals.arrActivityLevelCallbacks[i](value);
+                }
             }
 
             target[property] = value;
@@ -383,6 +384,26 @@ class Globals {
             });
         });
     };
+    getRemoteSetting = async (key) => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage(this.ExtensionId, { getLocalSetting: true, key: key },
+                function (result) {
+                    if (result === undefined) {
+                        resolve(null);
+                    } else {
+                        resolve(result);
+                    }
+                });
+        });
+    };
+    saveRemoteSetting = async (key, value) => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage(this.ExtensionId, { saveLocalSetting: true, key: key, value: value },
+                function (result) {
+                    resolve(result);
+                });
+        });
+    }
     prettyJSON = (data) => {
         return JSON.stringify(data, null, '\t');
     };

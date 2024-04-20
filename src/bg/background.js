@@ -39,6 +39,17 @@ chrome.runtime.onMessageExternal.addListener(
                 return sendResponse(response);
             });
         }
+        if (request.getLocalSetting) {
+            let value = await this.getLocalSetting(request.key);
+            return sendResponse(value);
+        };
+        if (request.saveLocalSetting) {
+            return new Promise((resolve, reject) => {
+                chrome.storage.local.set({ [request.key]: request.value }).then(() => {
+                    resolve(sendResponse(true));
+                });
+            });
+        };
         if (request.getAutoProgramParams) {
             let autoFogEnabled = await this.getSetting("autoFogToggle");
             let autoFogOnActivityPeak = await this.getLocalSetting("autoFogOnActivityPeak");
