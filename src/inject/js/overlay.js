@@ -116,9 +116,9 @@ class OverlayApp extends Globals {
         checkbox.style.cursor = 'pointer';
         checkbox.style.width = '0px';
         checkbox.style.height = '0px';
-        checkbox.addEventListener('change', function () {
+        checkbox.addEventListener('change', function (event) {
             maestro.OverlayApp.clearCheckboxes(id);
-            onChange(this.checked);
+            onChange(this.checked, event);
         });
 
         let checkboxContainer = document.createElement('div');
@@ -236,27 +236,27 @@ class OverlayApp extends Globals {
 
         return select;
     };
-    checkBoxClick = (item, status, id) => {
+    checkBoxClick = async (item, status, id) => {
         let checkbox = document.querySelector(`#${id} > input[type='checkbox']`);
         checkbox.checked = status;
 
-        try{
-        if (status === true) {
-            let div = document.getElementById(id);
-            div.style.color = this.btnColors.font;
-            div.style.backgroundColor = this.btnColors.active;
-        } else {
-            let div = document.getElementById(id);
-            div.checked = false;
-            div.style.color = '';
-            div.style.backgroundColor = this.btnColors.backgroundColor;
+        try {
+            if (status === true) {
+                let div = document.getElementById(id);
+                div.style.color = this.btnColors.font;
+                div.style.backgroundColor = this.btnColors.active;
+            } else {
+                let div = document.getElementById(id);
+                div.checked = false;
+                div.style.color = '';
+                div.style.backgroundColor = this.btnColors.backgroundColor;
+            }
+        } catch (e) {
+            if (this.logging)
+                console.error("Error setting checkbox color", e);
         }
-    } catch (e) {
-        if (this.logging)
-            console.error("Error setting checkbox color", e);
-    }
 
-        maestro.Globals.manualOverride(item, status);
+        await maestro.Globals.manualOverride(item, status);
     };
     createCheckboxes = () => {
         this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
@@ -268,7 +268,7 @@ class OverlayApp extends Globals {
         this.blinderCheckbox = this.createCheckbox('maestro_ext_blinder', 'BLINDER', function (checked) {
             maestro.OverlayApp.checkBoxClick("WHITEOUT", checked, 'div_maestro_ext_blinder');
         });
-        this.strobeCheckbox = this.createCheckbox('maestro_ext_strobe', 'STROBE', function (checked) {
+        this.strobeCheckbox = this.createCheckbox('maestro_ext_strobe', 'STROBE', function (checked, e) {
             maestro.OverlayApp.checkBoxClick("STROBE_ON", checked, 'div_maestro_ext_strobe');
         });
         this.fogCheckbox = this.createCheckbox('maestro_ext_fog', 'FOG', function (checked) {
@@ -351,14 +351,14 @@ class OverlayApp extends Globals {
             }
 
             if ((autoFogEnabled && autoFogOnActivityPeak || autoFogOnTimer) || autoEffectsEnabled || autoStrobeEnabled) {
-                lightning.innerHTML = '<span class="tooltip" data-toggle="tooltip" data-placement="top" title="Auto programs active"><svg width="26" height="26" title="Auto programs active" stroke="currentColor" style="animation: 1.525s ease-in-out 0s infinite normal none running strobeAnimation;" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z"></path></svg></span>';
+                if (lightning.innerHTML === '')
+                    lightning.innerHTML = '<span class="tooltip" data-toggle="tooltip" data-placement="top" title="Auto programs active"><svg width="26" height="26" title="Auto programs active" stroke="currentColor" style="animation: 0.525s ease-in-out 0s infinite normal none running strobeAnimation;" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z"></path></svg></span>';
             } else {
                 lightning.innerHTML = '';
             }
         } catch (e) {
             if (this.logging)
                 console.error("Error checking for auto effects active", e);
-
         }
     }
     loadCornerText = async () => {
