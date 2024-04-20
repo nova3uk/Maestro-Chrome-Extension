@@ -240,6 +240,7 @@ class OverlayApp extends Globals {
         let checkbox = document.querySelector(`#${id} > input[type='checkbox']`);
         checkbox.checked = status;
 
+        try{
         if (status === true) {
             let div = document.getElementById(id);
             div.style.color = this.btnColors.font;
@@ -250,6 +251,11 @@ class OverlayApp extends Globals {
             div.style.color = '';
             div.style.backgroundColor = this.btnColors.backgroundColor;
         }
+    } catch (e) {
+        if (this.logging)
+            console.error("Error setting checkbox color", e);
+    }
+
         maestro.Globals.manualOverride(item, status);
     };
     createCheckboxes = () => {
