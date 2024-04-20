@@ -130,7 +130,7 @@ class Globals {
         set(target, property, value) {
             for (let i = 0; i < maestro.Globals.arrActivityLevelCallbacks.length; i++) {
                 if (typeof maestro.Globals.arrActivityLevelCallbacks[i] === 'function')
-                    this.debounce(maestro.Globals.arrActivityLevelCallbacks[i](value), 50);
+                    maestro.Globals.debounce(maestro.Globals.arrActivityLevelCallbacks[i](value), 50);
             }
 
             target[property] = value;

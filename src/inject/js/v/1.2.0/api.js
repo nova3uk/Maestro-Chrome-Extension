@@ -33,9 +33,6 @@
             if (mode == "STROBE_ON") {
                 maestro.App.latchedOn = onOrOff;
                 maestro.App.setStrobe(onOrOff, true)
-            } else {
-                maestro.App.latchedOn = false;
-                maestro.App.setStrobe(false);
             }
 
             if (maestro.Globals.logging)
