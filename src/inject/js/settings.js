@@ -834,6 +834,7 @@ class SettingsApp extends Globals {
         for (let macro of macros) {
             var fixtures = macro.macro.fixtures;
             tData.push({
+                macro: macro,
                 stageId: macro.macro.stageId,
                 name: macro.macro.name,
                 length: fixtures.length,

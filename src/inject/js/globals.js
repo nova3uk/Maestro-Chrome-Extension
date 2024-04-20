@@ -98,6 +98,8 @@ class Globals {
         name: "",
         fixtures: []
     };
+
+
     // Variable to be monitored
     activityLevelRoot = 0;
     arrActivityLevelCallbacks = []
