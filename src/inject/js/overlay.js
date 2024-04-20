@@ -43,12 +43,8 @@ class OverlayApp extends Globals {
         });
 
         this.createCheckboxes()
-
-        //watch for changes in the local storage
-        //this.timerMacroWatcher = setInterval(this.checkForRunningMacros, 5000);
     }
     checkForRunningMacros = async () => {
-        // Make a simple request:
         if (!document.getElementById('maestroMacrosRunning')) {
             let macros = this.createText('', 'maestroMacrosRunning');
             macros.style.color = 'red';
@@ -257,6 +253,9 @@ class OverlayApp extends Globals {
         }
 
         await maestro.Globals.manualOverride(item, status);
+
+        if (this.logging)
+            console.log('Checkbox clicked:', item, status);
     };
     createCheckboxes = () => {
         this.injectCSS('#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
@@ -287,6 +286,9 @@ class OverlayApp extends Globals {
         this.container.appendChild(this.strobeCheckbox);
         this.container.appendChild(this.fogCheckbox);
         this.container.appendChild(this.effectCheckbox);
+
+        if (maestro.App.logging)
+            console.log('Checkboxes created');
     };
     clearCheckbox = (btnId) => {
         let checkbox = document.getElementById(btnId);
@@ -494,6 +496,9 @@ class OverlayApp extends Globals {
             if (this.logging)
                 console.error("Error updating audio level meter", e);
         }
+
+        if (this.logging)
+            console.log('Audio level meter updated');
     }
 };
 

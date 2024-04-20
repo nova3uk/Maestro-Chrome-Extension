@@ -95,15 +95,8 @@ class App extends Globals {
         for (let fixture of this.fixtures) {
             for (let attr in fixture.attribute) {
                 if (this.allColors.includes(fixture.attribute[attr].type)) {
-                    if (onOrOff == 1) {
-                        if (fixture.attribute[attr].type == color) {
-                            await this.updateAttributeRange(fixture.id, attr, this.maxDmxVal, this.maxDmxVal);
-                        } else {
-                            await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.minDmxVal);
-                        }
-                    } else {
-                        await this.updateAttributeRange(fixture.id, attr, this.minDmxVal, this.maxDmxVal);
-                    }
+                    const rangeValue = onOrOff === 1 ? (fixture.attribute[attr].type === color ? this.maxDmxVal : this.minDmxVal) : (onOrOff === 0 ? this.minDmxVal : this.maxDmxVal);
+                    await this.updateAttributeRange(fixture.id, attr, rangeValue, rangeValue);
                 }
             }
         }
