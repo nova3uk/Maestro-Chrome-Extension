@@ -8,8 +8,10 @@
         if (this.strobeAt100Percent) {
             dimmer = 1;
         } else {
-            let brightness = await maestro.Globals.getBrightness();
-            dimmer = brightness.value;
+            if(mode == "STROBE_ON"){
+                let brightness = await maestro.Globals.getBrightness();
+                dimmer = brightness.value;
+            }
         }
 
         data = {
