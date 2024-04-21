@@ -99,7 +99,7 @@ class SettingsApp extends Globals {
         }
     };
     watchForStageChange = async () => {
-        try{
+        try {
             const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
             if (this.activeStageId != loadedStage.activeStageId) {
                 document.getElementById('panTiltFinder').style.display = "none";
@@ -110,7 +110,7 @@ class SettingsApp extends Globals {
                     window.location.reload();
                 });
             }
-        }catch(e){
+        } catch (e) {
             if (this.logging)
                 console.error('Error watching for stage change:', e);
         }
@@ -649,6 +649,7 @@ class SettingsApp extends Globals {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                     let panOrTilt = fixture.attribute.some(ele => ele.type === 'PAN' || ele.type === 'TILT');
                     let hasShutterOrStrobe = fixture.attribute.some(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
+                    let shutterOrStrobe = fixture.attribute.find(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
                     let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
                     let normalValue = shutterParams ? shutterParams.shutter : "";
                     let strobeValue = shutterParams ? shutterParams.strobe : "";
@@ -670,7 +671,8 @@ class SettingsApp extends Globals {
                         index: fixture.index,
                         pantilt: panOrTilt,
                         hasShutterOrStrobe: hasShutterOrStrobe,
-                        ignore: ignore
+                        ignore: ignore,
+                        shutterOrStrob: shutterOrStrobe
                     });
                     i++;
                 }
@@ -719,6 +721,16 @@ class SettingsApp extends Globals {
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return row.active == true ? 'Yes' : 'No';
+                    }
+                }, {
+                    field: 'channelType',
+                    title: 'Channel Type',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.shutterOrStrob)
+                            return row.shutterOrStrob.name
                     }
                 },
                 {
