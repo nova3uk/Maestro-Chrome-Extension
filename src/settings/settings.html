@@ -49,8 +49,10 @@
         <div class="tab-content pt-5">
             <div class="tab-pane active" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
                 <ol>
-                    <li>For your convenience, before you start modifying, take a backup of your Stage, from the MaestroDMX control panel,
-                        from this extension, you can take a backup of all the fixture settings and macros via the Backup & Restore tab.</li>
+                    <li>For your convenience, before you start modifying, take a backup of your Stage, from the
+                        MaestroDMX control panel,
+                        from this extension, you can take a backup of all the fixture settings and macros via the Backup
+                        & Restore tab.</li>
                     <li>Go to the <a id="controlPageLink" target="_blank">Control Page</a> Page on the Stages
                         tab.
                     </li>
@@ -247,6 +249,13 @@
                     Stages
                 </a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-cues" role="tab"
+                    aria-controls="tabpanel-cues" aria-selected="false">
+                    <img src="/src/img/music-note-list.svg" alt="Info" width="20" height="20">
+                    Cues
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content">
@@ -264,6 +273,7 @@
                             <th data-field="name" width="200" data-width="200">Macro Name</th>
                             <th data-field="length" width="50" data-width="50">#</th>
                             <th data-field="length">Fixtures Affected</th>
+                            <th data-field="length">Trigger Cue</th>
                             <th width="100" data-width="100"></th>
                             <th width="100" data-width="100"></th>
                             <th width="100" data-width="100"></th>
@@ -297,7 +307,7 @@
                     Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values or
                     refreshing the main MaestroDMX page to ensure you have the latest config.
                 </div>
-
+                <h2 class="mt-1"></h2>
                 <table id="fixtures" class="table">
                     <thead class="table-light">
                         <tr>
@@ -327,6 +337,30 @@
                             <th data-field="name" data-sortable="true">Stage Name</th>
                             <th data-field="fixtures" data-sortable="true">Fixture</th>
                             <th data-field="active" data-sortable="true">Active</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="my-5"></div>
+            </div>
+
+            <div class="tab-pane" id="tabpanel-cues" role="tabpanel" aria-labelledby="simple-tab-6">
+                <h2 class="mt-3"></h2>
+                <div>
+                    <p class="h6">Trigger Cue On Macro</p>
+                    You can "apply" a cue when a macro is triggered.<br>
+                    This is useful for setting up a cue to be triggered
+                    when a macro is activated. The cue will be triggered when the macro is activated.
+                </div>
+                <h2 class="mt-1"></h2>
+                <table id="cues" class="table my-1">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-field="cueName" data-sortable="false" width="500" data-width="500">Cue Name</th>
+                            <th data-field="groupModes" data-sortable="false" width="200" data-width="200">Group Modes
+                            </th>
+                            <th data-field="status" data-sortable="false" width="100" data-width="100">Status</th>
+                            <th data-field="macros" data-sortable="false">Select Macro</th>
+                            <th data-field="applyCue" data-sortable="false" width="100" data-width="100">Apply Cue</th>
                         </tr>
                     </thead>
                 </table>

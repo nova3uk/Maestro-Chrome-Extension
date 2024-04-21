@@ -86,8 +86,28 @@ class OverlayApp extends Globals {
         overlay.appendChild(container);
         return container;
     };
+    createDropdown = (id, onChange) => {
+        let select = document.createElement('select');
+        select.id = id;
 
+        let option = document.createElement('option');
+        option.value = "";
+        option.text = "-";
+        select.appendChild(option);
 
+        for (let color of maestro.App.commonColors) {
+            let option = document.createElement('option');
+            option.value = color;
+            option.text = color;
+            select.appendChild(option);
+        }
+
+        select.addEventListener('change', function () {
+            onChange(this.value);
+        });
+
+        return select;
+    };
     createText = (text, id, cssClass = null) => {
         let textElement = document.createElement('span');
         textElement.textContent = text;
@@ -208,29 +228,6 @@ class OverlayApp extends Globals {
                 svg.appendChild(path2);
                 return svg;
         }
-    };
-    //Create dropdown
-    createDropdown = (id, onChange) => {
-        let select = document.createElement('select');
-        select.id = id;
-
-        let option = document.createElement('option');
-        option.value = "";
-        option.text = "-";
-        select.appendChild(option);
-
-        for (let color of maestro.App.commonColors) {
-            let option = document.createElement('option');
-            option.value = color;
-            option.text = color;
-            select.appendChild(option);
-        }
-
-        select.addEventListener('change', function () {
-            onChange(this.value);
-        });
-
-        return select;
     };
     checkBoxClick = async (item, status, id) => {
         let checkbox = document.querySelector(`#${id} > input[type='checkbox']`);

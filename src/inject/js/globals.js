@@ -271,7 +271,7 @@ class Globals {
         }
     };
     startCue = async (cue) => {
-        return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/start_cue`, cue, false);
+        return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/start_cue`, { value: cue }, false);
     };
     stopShow = async () => {
         return await this.prepareFetch(this.httpMethods.POST, `${this.maestroUrl}api/${this.apiVersion}/show/stop`, {}, false);
