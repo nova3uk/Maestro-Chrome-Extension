@@ -803,18 +803,12 @@ class SettingsApp extends Globals {
             } else {
                 maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
             }
-            maestro.SettingsApp.sendReloadStrobeParams().then(() => {
-                document.location.reload();
-            });
-
         });
         $('input[name="shutter_val"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
-            maestro.SettingsApp.sendReloadStrobeParams();
         });
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
-            maestro.SettingsApp.sendReloadStrobeParams();
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;

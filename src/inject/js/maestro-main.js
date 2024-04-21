@@ -39,7 +39,8 @@ class App extends Globals {
         };
         this.init();
     }
-
+    intervalRefresh = null;
+    intervalRefreshTime = 5 * 1000;
     strobeParams = [];
     getAutoParams;
     autoStrobeOnPeakTimer = null;
@@ -66,6 +67,9 @@ class App extends Globals {
             if (this.logging)
                 console.error(e, "Error loading stage!");
         }
+        this.intervalRefresh = setInterval(async () => {
+            await this.getStrobeParams();
+        },this.intervalRefreshTime);
     };
     messageHdlr = async () => {
         try {
@@ -176,6 +180,9 @@ class App extends Globals {
                             throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
                         }
 
+                        if(normalValue == 0 && strobeValue == 0) continue;
+                        if(normalValue == strobeValue) continue;
+
                         let attributeId = fixture.attribute.findIndex(attr => attr.type === attributeType);
                         if (!attributeId) continue;
 
@@ -284,15 +291,20 @@ class App extends Globals {
         }
     };
     getStrobeParams = async () => {
+        try{
         // get strobe fixtures from backend
         await chrome.runtime.sendMessage(this.ExtensionId, { getStrobeFixtures: true },
             function (response) {
                 if (response) {
                     maestro.App.strobeParams = response;
-                    if (this.logging)
+                    if (this.logging)   
                         console.log("Strobe fixtures loaded.");
                 }
             });
+        } catch (e) {
+            if (this.logging)
+                console.error(e, "Error loading strobe fixtures!");
+        };
     };
     getIgnoreFixtures = async () => {
         // get strobe fixtures from backend
