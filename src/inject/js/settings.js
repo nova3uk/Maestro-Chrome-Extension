@@ -99,15 +99,20 @@ class SettingsApp extends Globals {
         }
     };
     watchForStageChange = async () => {
-        const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
-        if (this.activeStageId != loadedStage.activeStageId) {
-            document.getElementById('panTiltFinder').style.display = "none";
-            $('#modalStageReloaded').modal({ backdrop: 'static', keyboard: false });
-            $('#modalStageReloaded').modal('show');
+        try{
+            const loadedStage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
+            if (this.activeStageId != loadedStage.activeStageId) {
+                document.getElementById('panTiltFinder').style.display = "none";
+                $('#modalStageReloaded').modal({ backdrop: 'static', keyboard: false });
+                $('#modalStageReloaded').modal('show');
 
-            document.getElementById('btnReloadPage').addEventListener('click', function () {
-                window.location.reload();
-            });
+                document.getElementById('btnReloadPage').addEventListener('click', function () {
+                    window.location.reload();
+                });
+            }
+        }catch(e){
+            if (this.logging)
+                console.error('Error watching for stage change:', e);
         }
     };
     getBackupDate = async (stageId = this.stageId) => {
