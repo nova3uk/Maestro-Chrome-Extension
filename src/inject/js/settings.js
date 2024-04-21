@@ -717,7 +717,7 @@ class SettingsApp extends Globals {
                             return "";
                         if (!row.hasShutterOrStrobe)
                             return;
-                        return '<input type="number" style="width:70px;" name="shutter_val" data-id="' + row.id + '" id="shutter_val_' + row.id + '" min="0" max="255" value="' + (row.shutter || "") + '">';
+                        return `<input type="number" style="width:70px;" name="shutter_val" data-id="${row.id}" id="shutter_val_${row.id}" min="0" max="255" value="${row.shutter}">`;
                     }
                 },
                 {
@@ -732,7 +732,7 @@ class SettingsApp extends Globals {
                         if (!row.hasShutterOrStrobe)
                             return;
 
-                        return '<input type="number" style="width:70px;" name="shutter_strobe" data-id="' + row.id + '" id="strobe_val_' + row.id + '" min="0" max="255" value="' + (row.strobe || "") + '">';
+                        return `<input type="number" style="width:70px;" name="shutter_strobe" data-id="${row.id}" id="strobe_val_${row.id}" min="0" max="255" value="${row.strobe}">`;
                     }
                 },
                 {
