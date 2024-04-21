@@ -10,7 +10,7 @@ class SettingsApp extends Globals {
     activeStageId;
     ignoredFixtures = [];
 
-    start = async () => {
+    init = async () => {
         this.logging = await this.getSetting("loggingToggle");
 
         if (!await this.watchOffline()) {
@@ -28,6 +28,7 @@ class SettingsApp extends Globals {
         this.bindRestoreBtn();
         this.bindAutoFog();
         this.bindAutoEffects();
+        this.tabObserver();
 
         await this.loadMacros(function (macros) {
             maestro.SettingsApp.macroTable(macros);
@@ -42,6 +43,19 @@ class SettingsApp extends Globals {
         }, 5000);
 
     };
+    tabObserver = () => {
+        $('.nav-tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", async (e) => {
+            var id = $(e.target).attr("href").substr(1);
+            await this.saveLocalSetting('activeSettingsTab', id);
+        });
+        this.getLocalSetting('activeSettingsTab').then(tab => {
+            $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+        });
+    };
     watchOffline = async () => {
         try {
             let state = await this.getShowState();
@@ -55,6 +69,30 @@ class SettingsApp extends Globals {
                 $('#modalDown').modal('show');
             }, 500);
             return false;
+        }
+    };
+    sendReloadStage = async () => {
+        let tabId = await this.getLocalSetting("activeTab");
+        if (tabId) {
+            await chrome.runtime.sendMessage(tabId, { updateStage: true },
+                (response) => {
+                    if (response) {
+                        if (maestro.App.logging)
+                            console.log(response, "Sent reload stage message to content script");
+                    }
+                });
+        }
+    };
+    sendReloadStrobeParams = async () => {
+        let tabId = await this.getLocalSetting("activeTab");
+        if (tabId) {
+            await chrome.runtime.sendMessage(tabId, { updateStrobeParams: true },
+                (response) => {
+                    if (response) {
+                        if (maestro.App.logging)
+                            console.log(response, "Sent reload strobe params message to content script");
+                    }
+                });
         }
     };
     watchForStageChange = async () => {
@@ -389,6 +427,9 @@ class SettingsApp extends Globals {
             for (let macro of macros) {
                 for (let fixture of macro.macro.fixtures) {
                     let currentProfile = await this.getFixture(fixture.id);
+
+                    if (!currentProfile) continue;
+
                     let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
                     if (diff.length == 0) {
                         return alert('Macro is the same as the currently running Profile, and would have no effect.')
@@ -435,18 +476,22 @@ class SettingsApp extends Globals {
             for (let fixture of fixtures) {
                 let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
 
-                //get diff between original and current profile
-                let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
+                if (originalProfile) {
+                    //get diff between original and current profile
+                    let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
+                    promiseArray.push(new Promise((resolve, reject) => {
+                        try {
+                            maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
+                                resolve();
+                            });
+                        } catch (e) {
+                            reject(e)
+                        }
+                    }))
+                } else {
+                    maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                }
 
-                promiseArray.push(new Promise((resolve, reject) => {
-                    try {
-                        maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
-                            resolve();
-                        });
-                    } catch (e) {
-                        reject(e)
-                    }
-                }))
                 await Promise.all(promiseArray).then(() => {
                     maestro.SettingsApp.deleteFixtureProfile(fixture.id);
                 });
@@ -758,13 +803,18 @@ class SettingsApp extends Globals {
             } else {
                 maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
             }
-            document.location.reload();
+            maestro.SettingsApp.sendReloadStrobeParams().then(() => {
+                document.location.reload();
+            });
+
         });
         $('input[name="shutter_val"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
+            maestro.SettingsApp.sendReloadStrobeParams();
         });
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
+            maestro.SettingsApp.sendReloadStrobeParams();
         });
         $('.panOrTilt').on('click', function (btn) {
             let id = this.dataset.id;
@@ -875,7 +925,9 @@ class SettingsApp extends Globals {
     macroTable = (macros) => {
         var tData = [];
         for (let macro of macros) {
-            var fixtures = macro.macro.fixtures;
+            //make sure the fixture affected by the macro is still in the stage
+            var fixtures = macro.macro.fixtures.filter(fixture => this.activeStage.fixture.some(activeFixture => activeFixture.id === fixture.id));
+
             tData.push({
                 macro: macro,
                 stageId: macro.macro.stageId,
@@ -1044,4 +1096,4 @@ class SettingsApp extends Globals {
     };
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
-maestro.SettingsApp.start();
+maestro.SettingsApp.init();

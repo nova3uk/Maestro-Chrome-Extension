@@ -11,6 +11,13 @@ chrome.runtime.onMessage.addListener(function (
 });
 chrome.runtime.onMessageExternal.addListener(
     async function (request, sender, sendResponse) {
+        if (request.ping) {
+            return new Promise((resolve, reject) => {
+                chrome.storage.local.set({ activeTab: sender.tab.id }).then(() => {
+                    resolve(sendResponse(true));
+                });
+            });
+        };
         if (request.getStrobeFixtures) {
             this.retrieveAllKeys().then(keys => {
                 let response = [];

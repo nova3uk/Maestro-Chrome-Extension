@@ -175,10 +175,10 @@ class Globals {
         };
     };
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
-    isNumeric = function (value) {
+    isNumeric = (value) => {
         return !isNaN(parseFloat(value)) && isFinite(value);
     };
-    getQueryStringParameter(key, url = window.location.search) {
+    getQueryStringParameter = (key, url = window.location.search) => {
         const urlParams = new URLSearchParams(url);
         return urlParams.get(key);
     };
@@ -208,7 +208,7 @@ class Globals {
 
         return diff;
     };
-    openNewTab = function (page) {
+    openNewTab = (page) => {
         let url = chrome.runtime.getURL(page);
         chrome.tabs.query({ url: url }, function (tabs) {
             if (tabs.length > 0) {
@@ -218,7 +218,7 @@ class Globals {
             }
         });
     };
-    calculateRange = function (range = this.attributeTypes.range) {
+    calculateRange = (range = this.attributeTypes.range) => {
         return { lowValue: range.lowValue / 255, highValue: range.highValue / 255 };
     };
 
@@ -318,7 +318,7 @@ class Globals {
     deleteFixtureProfile = async (fixtureId) => {
         this.deleteLocalSetting("macro_active_" + fixtureId);
     };
-    injectOverlay = function () {
+    injectOverlay = () => {
         var s = document.createElement("script");
         s.src = this.getFilePath("src/inject/js/overlay.js");
         (document.head || document.documentElement).appendChild(s);

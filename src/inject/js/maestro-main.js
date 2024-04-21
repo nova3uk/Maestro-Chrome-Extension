@@ -37,6 +37,7 @@ class App extends Globals {
             if (this.logging)
                 console.log("AutoFog toggle active.")
         };
+        this.init();
     }
 
     strobeParams = [];
@@ -53,18 +54,31 @@ class App extends Globals {
     activePeakFogLastExecution = null;
     activeFogOnTimerLastExecution = null;
 
-    startUp = async () => {
+    init = async () => {
         try {
-            this.getStrobeParams();
+            this.messageHdlr();
             this.getIgnoreFixtures();
             this.getAutoParams();
             this.getStage();
             this.bindStrobeButton();
             this.reloadMonitor();
         } catch (e) {
-            this.startTimer();
             if (this.logging)
                 console.error(e, "Error loading stage!");
+        }
+    };
+    messageHdlr = async () => {
+        try {
+            await chrome.runtime.sendMessage(this.ExtensionId, { ping: true },
+                (response) => {
+                    if (response) {
+                        if (maestro.App.logging)
+                            console.log(response, "Ping");
+                    }
+                });
+        } catch (e) {
+            if (this.logging)
+                console.error(e, "Error loading messageHdlr.");
         }
     };
     clearStage = () => {
@@ -76,9 +90,12 @@ class App extends Globals {
     };
     getStage = async () => {
         this.clearStage();
+        this.getStrobeParams();
+
         const stage = await this.getUrl(`/api/${this.apiVersion}/output/stage`);
         this.stageId = stage.activeStageId;
         this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
+
 
         //Shutter channel based Strobing Fixtures with a Colorwheel
         //we do not need to worry about max dimmer or setting to whiter as the maestro does this already
@@ -118,6 +135,8 @@ class App extends Globals {
 
         this.strobeActive = onOrOff;
         this.latchedOn = latched;
+
+        await this.getStrobeParams();
 
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
@@ -264,15 +283,9 @@ class App extends Globals {
                 console.error("Could not bind Strobe Button onClick event!")
         }
     };
-    startTimer = () => {
-        this.btnTimer = setTimeout(this.startUp, 1000);
-    };
-    clearTimer = () => {
-        clearTimeout(this.btnTimer);
-    };
     getStrobeParams = async () => {
         // get strobe fixtures from backend
-        chrome.runtime.sendMessage(this.ExtensionId, { getStrobeFixtures: true },
+        await chrome.runtime.sendMessage(this.ExtensionId, { getStrobeFixtures: true },
             function (response) {
                 if (response) {
                     maestro.App.strobeParams = response;
@@ -297,7 +310,7 @@ class App extends Globals {
 
         window.onload = function () {
             if (maestro.App.isPageReloaded()) {
-                maestro.App.startUp();
+                maestro.App.init();
             }
         };
         window.maestroOnReloadMonitor = true;
@@ -605,4 +618,3 @@ class App extends Globals {
 
 // Initialize & assign to global object
 maestro.App = new App(document.currentScript.src);
-maestro.App.startUp();
