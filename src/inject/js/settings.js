@@ -1153,8 +1153,7 @@ class SettingsApp extends Globals {
             tData.push({
                 id: stage.id,
                 name: stage.name,
-                fixtures: activeStage.fixture.length,
-                active: stage.id == activeStage.stageId ? "Yes" : ""
+                active: stage.id == activeStage.id ? "Yes" : ""
             });
         }
 
@@ -1162,9 +1161,6 @@ class SettingsApp extends Globals {
             columns: [{
                 field: 'name',
                 title: 'Stage Name'
-            }, {
-                field: 'fixtures',
-                title: 'Fixtures'
             }, {
                 field: 'active',
                 title: 'Active'
