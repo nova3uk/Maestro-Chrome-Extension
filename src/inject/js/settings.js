@@ -13,10 +13,6 @@ class SettingsApp extends Globals {
     init = async () => {
         this.logging = await this.getSetting("loggingToggle");
 
-        if (!await this.watchOffline()) {
-            return;
-        }
-
         await this.getStages();
         this.activeStageId = this.stageId;
 
@@ -34,14 +30,12 @@ class SettingsApp extends Globals {
         await this.loadMacros(async (macros) => {
             await maestro.SettingsApp.macroTable(macros);
             await maestro.SettingsApp.checkRunningMacros(macros)
+            this.hideLoader();
         });
 
         setInterval(() => {
             this.watchForStageChange();
-        }, 5000);
-        setInterval(() => {
-            this.debounce(this.watchOffline(), 5000);
-        }, 30000);
+        }, 60000);
 
         setTimeout(() => {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -49,6 +43,14 @@ class SettingsApp extends Globals {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         }, 1000);
+    };
+    showLoader = () => {
+        document.body.style.overflow = "hidden";
+        document.getElementById('modalLoading').style.display = "block";
+    };
+    hideLoader = () => {
+        document.getElementById('modalLoading').style.display = "none";
+        document.body.style.overflow = "auto";
     };
     tabObserver = () => {
         $('.nav-tabs a').click(function (e) {
@@ -462,6 +464,7 @@ class SettingsApp extends Globals {
     };
     applyMacro = async (macroName, stageId) => {
         try {
+            this.showLoader();
             const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
             deleteButton.disabled = true;
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
@@ -520,15 +523,18 @@ class SettingsApp extends Globals {
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = false;
             document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
+            this.hideLoader();
         } catch (e) {
             if (this.logging)
                 console.error('Error applying Macro:', e);
 
+            this.hideLoader();
             alert(this.fatalErrorMsg);
         }
     }
     revertMacro = async (macroName, stageId) => {
         try {
+            this.showLoader();
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = true;
 
@@ -569,11 +575,13 @@ class SettingsApp extends Globals {
                 deleteButton.disabled = false;
 
                 document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
+                this.hideLoader();
             }
         } catch (e) {
             if (this.logging)
                 console.error('Error reverting Macro:', e);
 
+            this.hideLoader();
             alert(this.fatalErrorMsg);
         }
     };
@@ -1444,6 +1452,7 @@ class SettingsApp extends Globals {
         });
     }
     switchGobos = async (fixtureId, onOrOff = true, exceptOpen = true) => {
+        this.showLoader();
         let stage = await this.getActiveStage();
         let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
 
@@ -1468,8 +1477,10 @@ class SettingsApp extends Globals {
                 index++;
             }
         }
+        this.hideLoader();
     }
     switchPrisms = async (fixtureId, onOrOff = true, exceptOpen = true) => {
+        this.showLoader();
         let stage = await this.getActiveStage();
         let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
 
@@ -1494,29 +1505,7 @@ class SettingsApp extends Globals {
                 index++;
             }
         }
-    }
-    switchColorWheel = async (fixtureId, onOrOff = true, color = [...this.allColors]) => {
-        let stage = await this.getActiveStage();
-        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
-
-        for (let fixture of fixtures) {
-            let index = 0;
-            for (let attr of fixture.attribute) {
-                if (attr.type == "COLOR_WHEEL") {
-                    // attr.colorWheelSetting.colors.forEach(setting => {
-                    //     if (onOrOff == false) {
-                    //         setting["enabled"] = false;
-                    //     } else {
-                    //         setting["enabled"] = true;
-                    //     }
-                    // });
-                    //attr.colorWheelSetting.colors = _.uniqBy(attr.colorWheelSetting.colors, 'name');
-                    await this.saveLocalSetting("color_wheel_state_" + fixture.id, { stageId: stage.stageId, prism: onOrOff, profile: fixture })
-                    await this.patchFixture(fixture.id, { fixture: fixture });
-                }
-                index++;
-            }
-        }
+        this.hideLoader();
     }
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
