@@ -25,6 +25,7 @@ class SettingsApp extends Globals {
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
         this.bindMacroBtn();
         this.cuesTable();
+        this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoFog();
         this.bindAutoEffects();
@@ -35,7 +36,6 @@ class SettingsApp extends Globals {
             await maestro.SettingsApp.checkRunningMacros(macros)
         });
 
-
         setInterval(() => {
             this.watchForStageChange();
         }, 5000);
@@ -43,6 +43,12 @@ class SettingsApp extends Globals {
             this.watchOffline();
         }, 5000);
 
+        setTimeout(() => {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        }, 1000);
     };
     tabObserver = () => {
         $('.nav-tabs a').click(function (e) {
@@ -739,13 +745,12 @@ class SettingsApp extends Globals {
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         if (row.pantilt && !row.ignore) {
-                            return '<span role="button" name="panOrTilt" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
+                            return '<span role="button" name="panOrTilt" class="panOrTilt cursor-pointer" data-id="' + row.id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Set Pan/Tilt"><img src="pan_tilt.svg"></span>';
                         }
                     }
                 },
                 {
                     field: 'name',
-                    title: 'Fixture Name',
                     align: 'left',
                     valign: 'middle',
                     clickToSelect: false,
@@ -755,7 +760,6 @@ class SettingsApp extends Globals {
                 },
                 {}, {}, {
                     field: 'active',
-                    title: 'Active',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
@@ -764,7 +768,6 @@ class SettingsApp extends Globals {
                     }
                 }, {
                     field: 'channelType',
-                    title: 'Channel Type',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
@@ -775,7 +778,6 @@ class SettingsApp extends Globals {
                 },
                 {
                     field: 'shutter',
-                    title: 'Shutter Open',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
@@ -789,7 +791,6 @@ class SettingsApp extends Globals {
                 },
                 {
                     field: 'strobe',
-                    title: 'Strobe',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
@@ -860,7 +861,7 @@ class SettingsApp extends Globals {
         });
         $('#fixtures thead th').each(function (tr) {
             if (tr == 0) {
-                let s = $('<span role="button" class="panOrTilt cursor-pointer" data-id="panOrTiltAll" data-toggle="tooltip" data-placement="top" title="Set Pan/Tilt for All Movers"><img src="pan_tilt.svg">');
+                let s = $('<span role="button" class="panOrTilt cursor-pointer" data-id="panOrTiltAll" data-bs-toggle="tooltip" data-bs-placement="top" title="Set Pan/Tilt for All Movers"><img src="pan_tilt.svg">');
                 $(this).find(".th-inner").append(s)
             }
         })
@@ -1024,7 +1025,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return `<span>${row.name}</span><span name="editMacroName" role="button" class="cursor-pointer ms-1" style="position:relative;bottom:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-toggle="tooltip" data-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span>`;
+                        return `<span>${row.name}</span><span name="editMacroName" role="button" class="cursor-pointer ms-1" style="position:relative;bottom:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span>`;
                     }
                 }, {},
                 {
@@ -1048,7 +1049,7 @@ class SettingsApp extends Globals {
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         if (row.cueId)
-                            return `<span>${row.cueName}</span><span name="remove_cue" role="button" style="position:relative; top:-5px;" data-macroName="${row.name}" data-stageId="${row.stageId}"><img src="/src/img/x.svg" width="20" height="20"></span>`;
+                            return `<span class="badge text-bg-warning" name="remove_cue" role="button" style="position:relative; top:-0px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Cue Trigger" data-macroName="${row.name}" data-stageId="${row.stageId}">${row.cueName}&nbsp;<img src="/src/img/x.svg" width="20" height="20"></span>`;
                     }
                 },
                 {
@@ -1170,7 +1171,7 @@ class SettingsApp extends Globals {
                 } else {
                     return {
                         css: {
-                            'background-color': '#ffcce0'
+                            'background-color': '#edebe6'
                         }
                     }
 
@@ -1216,16 +1217,6 @@ class SettingsApp extends Globals {
         }
 
         $('#cues').bootstrapTable({
-            columns: [{
-                field: 'cueName',
-                title: 'Cue Name'
-            }, {
-                field: 'groupModes',
-                title: 'Group Modes'
-            }, {
-                field: 'status',
-                title: 'Status'
-            }],
             data: tData,
             columns: [{}, {}, {},
             {
@@ -1271,7 +1262,7 @@ class SettingsApp extends Globals {
                 } else {
                     return {
                         css: {
-                            'background-color': '#ffcce0'
+                            'background-color': '#edebe6'
                         }
                     }
 
@@ -1339,23 +1330,183 @@ class SettingsApp extends Globals {
 
         return select;
     };
-    // disableGobos = async (fixtureId) => {
-    //     // let stage = await this.getActiveStage();
-    //     // let fixtures = stage.find(stage => stage.id == this.stageId).fixture;
+    togglesTable = async (activeStage, activeFixtureGroups) => {
+        var tData = [];
 
-    //     // for (let fixture of fixtures) {
-    //     //     let gobos = fixture.attribute.find(attr => attr.type == 'GOBO');
-    //     //     for (let gobo of gobos) {
-    //     //         let update = {
-    //     //             attribute: {
-    //     //                 [gobo]: 0
-    //     //             }
-    //     //         };
-    //     //         await this.putAttribute(fixtureId, gobo, update);
-    //     //     }
-    //     // }
+        for (let group of activeFixtureGroups) {
+            let i = 0;
+            if (group.fixtureId) {
+                for (let fixtureId of group.fixtureId) {
+                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    let attributeTypes = fixture.attribute.map(attr => attr.type);
+                    let goboState = await this.getLocalSetting("gobo_state_" + fixtureId);
+                    let prismState = await this.getLocalSetting("prism_state_" + fixtureId);
 
-    // }    
+                    tData.push({
+                        id: fixture.id,
+                        name: fixture.name,
+                        active: fixture.enabled,
+                        attributes: attributeTypes,
+                        goboState: goboState ? goboState.gobo : false,
+                        prismState: prismState ? prismState.prism : false
+                    });
+                }
+            }
+        }
+
+        $('#toggles').bootstrapTable({
+            data: tData,
+            columns: [
+                {},
+                {
+                    field: 'toggles',
+                    align: 'left',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.active == false) return;
+                        let btns = "";
+                        let btnState = false;
+                        if (row.attributes.includes('GOBO')) {
+                            if (row.goboState)
+                                btnState = row.goboState;
+                            btns += `<div class="d-inline" style="position:relative; margin-right: 10px;">`;
+                            btns += `<button class="btn btn-warning" name="btn_disable_gobos" data-id="${row.id}"${btnState == false ? ' disabled' : ''}>Gobos Off</button>&nbsp;`;
+                            btns += `<button class="btn btn-success" name="btn_enable_gobos" data-id="${row.id}"${btnState == true ? ' disabled' : ''}>Gobos On</button>&nbsp;`;
+                            btns += `</div>`;
+                        }
+                        if (row.attributes.includes('PRISM')) {
+                            if (row.prismState)
+                                btnState = row.prismState;
+                            btns += `<div class="d-inline" style="position:relative; margin-right: 10px;">`;
+                            btns += `<button class="btn btn-warning" name="btn_disable_prism" data-id="${row.id}"${row.id}"${btnState == false ? ' disabled' : ''}>Prism Off</button>&nbsp;`;
+                            btns += `<button class="btn btn-success" name="btn_enable_prism" data-id="${row.id}"${row.id}"${btnState == true ? ' disabled' : ''}>Prism On</button>&nbsp;`;
+                            btns += `</div>`;
+                        }
+
+                        if (btns == "") return
+                        return btns;
+                    }
+                }],
+            rowAttributes: function (row, index) {
+                return {
+                    'data-id': row.id,
+                    'data-stage-active': row.active
+                }
+            },
+            rowStyle: function (row, index) {
+                if (row.active) {
+                    return {
+                        css: {
+                            'background-color': '#66ffcc'
+                        }
+                    }
+                } else {
+                    return {
+                        css: {
+                            'background-color': '#ffcce0'
+                        }
+                    }
+
+                }
+            }
+        });
+        $('button[name="btn_disable_gobos"]').on('click', async function (btn) {
+            btn.currentTarget.disabled = true;
+            $('button[name="btn_enable_gobos"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            await maestro.SettingsApp.switchGobos(this.dataset.id, false);
+        });
+        $('button[name="btn_enable_gobos"]').on('click', async function (btn) {
+            btn.currentTarget.disabled = true;
+            $('button[name="btn_disable_gobos"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            await maestro.SettingsApp.switchGobos(this.dataset.id);
+        });
+        $('button[name="btn_disable_prism"]').on('click', async function (btn) {
+            btn.currentTarget.disabled = true;
+            $('button[name="btn_enable_prism"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            await maestro.SettingsApp.switchPrisms(this.dataset.id, false);
+        });
+        $('button[name="btn_enable_prism"]').on('click', async function (btn) {
+            btn.currentTarget.disabled = true;
+            $('button[name="btn_disable_prism"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            await maestro.SettingsApp.switchPrisms(this.dataset.id);
+
+        });
+    }
+    switchGobos = async (fixtureId, onOrOff = true, exceptOpen = true) => {
+        let stage = await this.getActiveStage();
+        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+
+        for (let fixture of fixtures) {
+            let index = 0;
+            for (let attr of fixture.attribute) {
+                if (attr.type == "GOBO") {
+                    attr.goboSetting.steps.forEach(setting => {
+                        if (onOrOff == false) {
+                            if (exceptOpen && (setting.name.toLowerCase() == "open" || setting.name.toLowerCase() == "no gobo" || setting.name.toLowerCase() == "gobo off" || setting.name.toLowerCase() == "gobo open" || setting.name.toLowerCase() == "none")) {
+                                setting.enabled = true;
+                            } else {
+                                setting.enabled = false;
+                            }
+                        } else {
+                            setting.enabled = true;
+                        }
+                    });
+                    await this.putAttribute(fixture.id, index, { attribute: attr });
+                    await this.saveLocalSetting("gobo_state_" + fixture.id, { stageId: stage.stageId, gobo: onOrOff })
+                }
+                index++;
+            }
+        }
+    }
+    switchPrisms = async (fixtureId, onOrOff = true, exceptOpen = true) => {
+        let stage = await this.getActiveStage();
+        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+
+        for (let fixture of fixtures) {
+            let index = 0;
+            for (let attr of fixture.attribute) {
+                if (attr.type == "PRISM") {
+                    attr.prismSetting.steps.forEach(setting => {
+                        if (onOrOff == false) {
+                            if (exceptOpen && (setting.name.toLowerCase() == "open" || setting.name.toLowerCase() == "no prism" || setting.name.toLowerCase() == "prism off" || setting.name.toLowerCase() == "none")) {
+                                setting.enabled = true;
+                            } else {
+                                setting.enabled = false;
+                            }
+                        } else {
+                            setting.enabled = true;
+                        }
+                    });
+                    await this.putAttribute(fixture.id, index, { attribute: attr });
+                    await this.saveLocalSetting("prism_state_" + fixture.id, { stageId: stage.stageId, prism: onOrOff })
+                }
+                index++;
+            }
+        }
+    }
+    switchColorWheel = async (fixtureId, onOrOff = true, color = [...this.allColors]) => {
+        let stage = await this.getActiveStage();
+        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+
+        for (let fixture of fixtures) {
+            let index = 0;
+            for (let attr of fixture.attribute) {
+                if (attr.type == "COLOR_WHEEL") {
+                    // attr.colorWheelSetting.colors.forEach(setting => {
+                    //     if (onOrOff == false) {
+                    //         setting["enabled"] = false;
+                    //     } else {
+                    //         setting["enabled"] = true;
+                    //     }
+                    // });
+                    attr.colorWheelSetting.colors = _.uniqBy(attr.colorWheelSetting.colors, 'name');
+                    await this.patchFixture(fixture.id, { fixture: fixture });
+                }
+                index++;
+            }
+        }
+    }
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
 maestro.SettingsApp.init();

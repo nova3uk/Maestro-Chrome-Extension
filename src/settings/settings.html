@@ -269,10 +269,17 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-cues" role="tab"
+                <a class="nav-link" id="simple-tab-7" data-bs-toggle="tab" href="#tabpanel-cues" role="tab"
                     aria-controls="tabpanel-cues" aria-selected="false">
                     <img src="/src/img/music-note-list.svg" alt="Info" width="20" height="20">
                     Cues
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles" role="tab"
+                    aria-controls="tabpanel-toggles" aria-selected="false">
+                    <img src="/src/img/sliders2.svg" alt="Info" width="20" height="20">
+                    Fixtue Toggles
                 </a>
             </li>
         </ul>
@@ -331,12 +338,12 @@
                     <thead class="table-light">
                         <tr>
                             <th data-field="pantilt"></th>
-                            <th data-field="name">Fixture Name</th>
-                            <th data-field="fixtureGroup">Fixture Group</th>
-                            <th data-field="fixturePosition">Arrangement</th>
+                            <th data-field="name">Name</th>
+                            <th data-field="fixtureGroup">Group</th>
+                            <th data-field="fixturePosition">Order</th>
                             <th data-field="active">Active</th>
                             <th data-field="channelType">Active</th>
-                            <th data-field="shutter" width="50" data-width="50">Shutter Open</th>
+                            <th data-field="shutter" width="50" data-width="50">Open</th>
                             <th data-field="strobe" width="50" data-width="50">Strobe</th>
                             <th data-field="ignore"></th>
                             <th data-field="select"></th>
@@ -363,7 +370,7 @@
                 <div class="my-5"></div>
             </div>
 
-            <div class="tab-pane" id="tabpanel-cues" role="tabpanel" aria-labelledby="simple-tab-6">
+            <div class="tab-pane" id="tabpanel-cues" role="tabpanel" aria-labelledby="simple-tab-7">
                 <h2 class="mt-3"></h2>
                 <div>
                     <p class="h6">Trigger Cue On Macro</p>
@@ -383,6 +390,32 @@
                             <th data-field="status" data-sortable="false" width="100" data-width="100">Status</th>
                             <th data-field="macros" data-sortable="false">Select Macro</th>
                             <th data-field="applyCue" data-sortable="false" width="100" data-width="100">Apply Cue</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="my-5"></div>
+            </div>
+
+            <div class="tab-pane" id="tabpanel-toggles" role="tabpanel" aria-labelledby="simple-tab-8">
+                <h2 class="mt-3"></h2>
+                <div>
+                    <p class="h6">Toggle Fixture Settings</p>
+                    In the MaestroDMX Interface you need to switch all toggles on one by one, these fixture toggles help
+                    to automate the process.<br>
+                    If you label a Gobo or Prism as any of [Open, No Gobo/No Prism, Gobo Off/Prism Off, Gobo Open/Prism
+                    Open, None] the toggle will
+                    disable all Gobos/Prisms except Open.<br>
+                </div>
+                <h2 class="mt-1"></h2>
+                <table id="toggles" class="table my-1">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-field="name" data-sortable="false" width="500" data-width="500">
+                                Fixture Name
+                            </th>
+                            <th data-field="toggles" data-sortable="false">
+                                Toggles
+                            </th>
                         </tr>
                     </thead>
                 </table>
