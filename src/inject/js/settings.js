@@ -694,8 +694,7 @@ class SettingsApp extends Globals {
                 for (let fixtureId of group.fixtureId) {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                     let panOrTilt = fixture.attribute.some(ele => ele.type === 'PAN' || ele.type === 'TILT');
-                    let hasShutterOrStrobe = fixture.attribute.some(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
-                    let shutterOrStrobe = fixture.attribute.find(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
+                    let hasShutterOrStrobe = fixture.attribute.find(ele => ele.type === 'SHUTTER' || ele.type === 'STROBE');
                     let shutterParams = await this.getLocalSetting("strobe_" + fixture.id);
                     let normalValue = shutterParams ? shutterParams.shutter : "";
                     let strobeValue = shutterParams ? shutterParams.strobe : "";
@@ -717,8 +716,7 @@ class SettingsApp extends Globals {
                         index: fixture.index,
                         pantilt: panOrTilt,
                         hasShutterOrStrobe: hasShutterOrStrobe,
-                        ignore: ignore,
-                        shutterOrStrob: shutterOrStrobe
+                        ignore: ignore
                     });
                     i++;
                 }
@@ -772,8 +770,8 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.shutterOrStrob)
-                            return row.shutterOrStrob.name
+                        if (row.hasShutterOrStrobe)
+                            return `<span class="text-capitalize">${row.hasShutterOrStrobe.type.charAt(0).toUpperCase() + row.hasShutterOrStrobe.type.slice(1).toLowerCase()}</span>`;
                     }
                 },
                 {

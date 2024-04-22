@@ -30,6 +30,13 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
+                <a class="nav-link" id="simple-tab-0b" data-bs-toggle="tab" href="#tabpanel-strobing" role="tab"
+                    aria-controls="tabpanel-strobing" aria-selected="true">
+                    <img src="info-circle.svg" alt="Info" width="20" height="20">
+                    Strobe Triggering
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
                 <a class="nav-link" id="simple-tab-2" data-bs-toggle="tab" href="#tabpanel-fog" role="tab"
                     aria-controls="tabpanel-fog" aria-selected="false">
                     <img src="/src/img/cloud-haze.svg" alt="Info" width="20" height="20">
@@ -107,7 +114,28 @@
                     feature for your own security.
                 </p>
             </div>
-
+            <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
+                <h5>Enable Strobe Triggering</h5>
+                <div>
+                    If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or Shutter
+                    channel,
+                    you can set specific parameters in the Fixtures tab below to to fix it.
+                    <br>
+                    <ol>
+                        <li>
+                            Set "Shutter Open" value, representing the normal open state for the Shutter or Strobe
+                        </li>
+                        <li>
+                            Set "Strobe" value, corresponding to the strobe function of the fixture. You can fine-tune
+                            the Strobe value according to the DMX values specified in the fixture's manual, enabling
+                            adjustment for strobe speed.
+                        </li>
+                    </ol>
+                    Once the parameters are set correctly, when you use the "Strobe" button on the footer, or in the
+                    Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values or
+                    refreshing the main MaestroDMX page to ensure you have the latest config.
+                </div>
+            </div>
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
                 <h5>Backup & Restore</h5>
                 <p>
@@ -306,6 +334,9 @@
                         <img src="info-circle.svg" alt="Info" width="20" height="20">
                         <i>You can create macros via the Fixtures Tab</i>
                     </p>
+                    <p>
+                        See "Creating Macros" Section above for information on how to create a macro and how they work.
+                    </p>
                 </div>
                 <table id="macros" class="table my-2">
                     <thead class="table-light">
@@ -326,27 +357,6 @@
                 </table>
             </div>
             <div class="tab-pane" id="tabpanel-fixtures" role="tabpanel" aria-labelledby="simple-tab-5">
-                <div>
-                    <p class="h6">Enable Strobe Triggering</p>
-
-                    If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or Shutter
-                    channel,
-                    you can set specific parameters here to to fix it.
-                    <br>
-                    <ol>
-                        <li>
-                            Set "Shutter Open" value, representing the normal open state for the Shutter or Strobe
-                        </li>
-                        <li>
-                            Set "Strobe" value, corresponding to the strobe function of the fixture. You can fine-tune
-                            the Strobe value according to the DMX values specified in the fixture's manual, enabling
-                            adjustment for strobe speed.
-                        </li>
-                    </ol>
-                    Once the parameters are set correctly, when you use the "Strobe" button on the footer, or in the
-                    Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values or
-                    refreshing the main MaestroDMX page to ensure you have the latest config.
-                </div>
                 <h2 class="mt-1"></h2>
                 <table id="fixtures" class="table">
                     <thead class="table-light">
@@ -356,7 +366,7 @@
                             <th data-field="fixtureGroup">Group</th>
                             <th data-field="fixturePosition">Order</th>
                             <th data-field="active">Active</th>
-                            <th data-field="channelType">Active</th>
+                            <th data-field="channelType">Type</th>
                             <th data-field="shutter" width="50" data-width="50">Open</th>
                             <th data-field="strobe" width="50" data-width="50">Strobe</th>
                             <th data-field="ignore"></th>
