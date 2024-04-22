@@ -65,7 +65,7 @@ class SettingsApp extends Globals {
     };
     watchOffline = async () => {
         try {
-            let state = await this.getShowState();
+            await this.getShowState();
             $('#modalDown').modal('hide');
             return true;
         } catch (e) {
@@ -523,49 +523,58 @@ class SettingsApp extends Globals {
         } catch (e) {
             if (this.logging)
                 console.error('Error applying Macro:', e);
+
+            alert(this.fatalErrorMsg);
         }
     }
     revertMacro = async (macroName, stageId) => {
-        this.currentCue = await this.getShowState();
-        var macros = await this.loadMacros();
-        macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
-        var promiseArray = [];
+        try {
+            this.currentCue = await this.getShowState();
+            var macros = await this.loadMacros();
+            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
+            var promiseArray = [];
 
-        if (macros) {
-            var fixtures = macros[0].macro.fixtures;
+            if (macros) {
+                var fixtures = macros[0].macro.fixtures;
 
-            for (let fixture of fixtures) {
-                let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
+                for (let fixture of fixtures) {
+                    let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
 
-                if (originalProfile) {
-                    //get diff between original and current profile
-                    let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
-                    promiseArray.push(new Promise((resolve, reject) => {
-                        try {
-                            maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
-                                resolve();
-                            });
-                        } catch (e) {
-                            reject(e)
-                        }
-                    }))
-                } else {
-                    maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                    if (originalProfile) {
+                        //get diff between original and current profile
+                        let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
+                        promiseArray.push(new Promise((resolve, reject) => {
+                            try {
+                                maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
+                                    resolve();
+                                });
+                            } catch (e) {
+                                reject(e)
+                            }
+                        }))
+                    } else {
+                        maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                    }
+
+                    await Promise.all(promiseArray).then(() => {
+                        maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                    });
                 }
 
-                await Promise.all(promiseArray).then(() => {
-                    maestro.SettingsApp.deleteFixtureProfile(fixture.id);
-                });
+                const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+                applyButton.disabled = false;
+                const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                deleteButton.disabled = false;
+                const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+                clearButton.disabled = true;
+
+                document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
             }
+        } catch (e) {
+            if (this.logging)
+                console.error('Error reverting Macro:', e);
 
-            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-            applyButton.disabled = false;
-            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-            deleteButton.disabled = false;
-            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-            clearButton.disabled = true;
-
-            document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
+            alert(this.fatalErrorMsg);
         }
     };
     deleteMacro = async (macroName, stageId) => {
@@ -1180,102 +1189,106 @@ class SettingsApp extends Globals {
 
     };
     cuesTable = async (stages) => {
-        let cues = await this.getCues();
-        let showState = await this.getShowState();
-        const activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
-        let macroNames = [];
+        try {
+            let cues = await this.getCues();
+            let showState = await this.getShowState();
+            const activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
+            let macroNames = [];
 
-        for (let cue of cues) {
-            if (cue.uuid === activeCue.uuid) {
-                cue.active = true;
-                cue.playInder = activeCue.playIndex;
-                cue.playTime = activeCue.playTime;
-                cue.type = activeCue.type;
+            for (let cue of cues) {
+                if (cue.uuid === activeCue.uuid) {
+                    cue.active = true;
+                    cue.playInder = activeCue.playIndex;
+                    cue.playTime = activeCue.playTime;
+                    cue.type = activeCue.type;
+                }
             }
-        }
 
-        await this.loadMacros().then((macros) => {
-            for (let macro of macros) {
-                macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
-            }
-        });
-
-        var tData = [];
-
-        for (let cue of cues) {
-            tData.push({
-                id: cue.uuid,
-                cueName: cue.name,
-                active: cue.active,
-                status: cue.active ? "Running" : "",
-                groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`,
-                list: macroNames
+            await this.loadMacros().then((macros) => {
+                for (let macro of macros) {
+                    macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
+                }
             });
-        }
 
-        $('#cues').bootstrapTable({
-            data: tData,
-            columns: [{}, {}, {},
-            {
-                field: 'applyCue',
-                title: 'Select Macro',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    let select = `<select name="macroList" data-id="${row.id}" class="form-select" style="width: 100%;">`;
-                    select += '<option value="">-</option>';
-                    for (let item of row.list) {
-                        select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
-                    }
-                    select += '</select>';
+            var tData = [];
 
-                    return select;
-                }
-            },
-            {
-                field: 'button_apply',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
-                }
-            }],
-            rowAttributes: function (row, index) {
-                return {
-                    'data-id': row.id,
-                    'data-stage-active': row.active
-                }
-            },
-            rowStyle: function (row, index) {
-                if (row.active) {
-                    return {
-                        css: {
-                            'background-color': '#66ffcc'
-                        }
-                    }
-                } else {
-                    return {
-                        css: {
-                            'background-color': '#edebe6'
-                        }
-                    }
-
-                }
+            for (let cue of cues) {
+                tData.push({
+                    id: cue.uuid,
+                    cueName: cue.name,
+                    active: cue.active,
+                    status: cue.active ? "Running" : "",
+                    groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`,
+                    list: macroNames
+                });
             }
-        });
-        $('button[name="btn_show_apply"]').on('click', async function (btn) {
-            let cues = await maestro.SettingsApp.getCues();
-            let macro = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"]`).value;
-            let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
-            if (macro == "") return alert('Please select a macro');
-            let cue = cues.find(cue => cue.uuid == this.dataset.id);
 
-            await maestro.SettingsApp.applyCueToMacro(macro, stageId, cue.uuid);
-        });
+            $('#cues').bootstrapTable({
+                data: tData,
+                columns: [{}, {}, {},
+                {
+                    field: 'applyCue',
+                    title: 'Select Macro',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        let select = `<select name="macroList" data-id="${row.id}" class="form-select" style="width: 100%;">`;
+                        select += '<option value="">-</option>';
+                        for (let item of row.list) {
+                            select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
+                        }
+                        select += '</select>';
 
+                        return select;
+                    }
+                },
+                {
+                    field: 'button_apply',
+                    title: '',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
+                    }
+                }],
+                rowAttributes: function (row, index) {
+                    return {
+                        'data-id': row.id,
+                        'data-stage-active': row.active
+                    }
+                },
+                rowStyle: function (row, index) {
+                    if (row.active) {
+                        return {
+                            css: {
+                                'background-color': '#66ffcc'
+                            }
+                        }
+                    } else {
+                        return {
+                            css: {
+                                'background-color': '#edebe6'
+                            }
+                        }
+
+                    }
+                }
+            });
+            $('button[name="btn_show_apply"]').on('click', async function (btn) {
+                let cues = await maestro.SettingsApp.getCues();
+                let macro = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"]`).value;
+                let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
+                if (macro == "") return alert('Please select a macro');
+                let cue = cues.find(cue => cue.uuid == this.dataset.id);
+
+                await maestro.SettingsApp.applyCueToMacro(macro, stageId, cue.uuid);
+            });
+        } catch (e) {
+            if (this.logging)
+                console.error('Error loading cues:', e);
+        };
     };
     removeCueFromMacro = async (macroName, stageId) => {
         let macros = await this.loadMacros();

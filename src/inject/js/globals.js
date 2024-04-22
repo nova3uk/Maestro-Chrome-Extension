@@ -21,6 +21,7 @@ class Globals {
     };
 
     // Public variables
+    fatalErrorMsg = "Sorry, there was a problem processing your request.\n\nPlease reload the page and try again."
     systemInfo;
     apiVersion = "v1";
     logging;
@@ -268,6 +269,7 @@ class Globals {
             if (this.logging) {
                 console.error("Cannot connect to the API, is Maestro running?", e);
             }
+            throw e;
         }
     };
     startCue = async (cue) => {
