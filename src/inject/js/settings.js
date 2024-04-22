@@ -1245,6 +1245,16 @@ class SettingsApp extends Globals {
                 formatter: function (value, row, index) {
                     return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
                 }
+            },
+            {
+                field: 'color_wheel',
+                title: '',
+                align: 'center',
+                valign: 'middle',
+                clickToSelect: false,
+                formatter: function (value, row, index) {
+                    return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
+                }
             }],
             rowAttributes: function (row, index) {
                 return {
@@ -1360,7 +1370,7 @@ class SettingsApp extends Globals {
                 {},
                 {
                     field: 'toggles',
-                    align: 'left',
+                    align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
@@ -1370,17 +1380,17 @@ class SettingsApp extends Globals {
                         if (row.attributes.includes('GOBO')) {
                             if (row.goboState)
                                 btnState = row.goboState;
-                            btns += `<div class="d-inline" style="position:relative; margin-right: 10px;">`;
-                            btns += `<button class="btn btn-warning" name="btn_disable_gobos" data-id="${row.id}"${btnState == false ? ' disabled' : ''}>Gobos Off</button>&nbsp;`;
-                            btns += `<button class="btn btn-success" name="btn_enable_gobos" data-id="${row.id}"${btnState == true ? ' disabled' : ''}>Gobos On</button>&nbsp;`;
-                            btns += `</div>`;
+                            btns += `<div class="d-inline">`;
+                            btns += `<button class="btn btn-warning my-1 mr-2" style="width:120px;" name="btn_disable_gobos" data-id="${row.id}"${btnState == false ? ' disabled' : ''}>Gobos Off</button>&nbsp;`;
+                            btns += `<button class="btn btn-success my-1 mr-2" style="width:120px;" name="btn_enable_gobos" data-id="${row.id}"${btnState == true ? ' disabled' : ''}>Gobos On</button>&nbsp;`;
+                            btns += `</div><br>`;
                         }
                         if (row.attributes.includes('PRISM')) {
                             if (row.prismState)
                                 btnState = row.prismState;
-                            btns += `<div class="d-inline" style="position:relative; margin-right: 10px;">`;
-                            btns += `<button class="btn btn-warning" name="btn_disable_prism" data-id="${row.id}"${row.id}"${btnState == false ? ' disabled' : ''}>Prism Off</button>&nbsp;`;
-                            btns += `<button class="btn btn-success" name="btn_enable_prism" data-id="${row.id}"${row.id}"${btnState == true ? ' disabled' : ''}>Prism On</button>&nbsp;`;
+                            btns += `<div class="d-inline">`;
+                            btns += `<button class="btn btn-warning my-1" style="width:120px;" name="btn_disable_prism" data-id="${row.id}"${row.id}"${btnState == false ? ' disabled' : ''}>Prism Off</button>&nbsp;`;
+                            btns += `<button class="btn btn-success my-1" style="width:120px;" name="btn_enable_prism" data-id="${row.id}"${row.id}"${btnState == true ? ' disabled' : ''}>Prism On</button>&nbsp;`;
                             btns += `</div>`;
                         }
 
@@ -1500,7 +1510,8 @@ class SettingsApp extends Globals {
                     //         setting["enabled"] = true;
                     //     }
                     // });
-                    attr.colorWheelSetting.colors = _.uniqBy(attr.colorWheelSetting.colors, 'name');
+                    //attr.colorWheelSetting.colors = _.uniqBy(attr.colorWheelSetting.colors, 'name');
+                    await this.saveLocalSetting("color_wheel_state_" + fixture.id, { stageId: stage.stageId, prism: onOrOff, profile: fixture })
                     await this.patchFixture(fixture.id, { fixture: fixture });
                 }
                 index++;
