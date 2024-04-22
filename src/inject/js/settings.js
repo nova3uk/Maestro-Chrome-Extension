@@ -17,7 +17,7 @@ class SettingsApp extends Globals {
         this.activeStageId = this.stageId;
 
         this.controlPageLink();
-        this.stageTable(this.stage);
+        this.stageTable();
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
         this.bindMacroBtn();
         this.cuesTable();
@@ -1144,16 +1144,17 @@ class SettingsApp extends Globals {
             }
         });
     };
-    stageTable = (stages) => {
+    stageTable = () => {
+        let stages = this.stage;
+        let activeStage = this.activeStage;
         var tData = [];
-        let activeStage = stages.activeStageId;
 
         for (let stage of stages.stage) {
             tData.push({
                 id: stage.id,
                 name: stage.name,
-                fixtures: stage.fixture.length,
-                active: stage.id == activeStage ? "Yes" : ""
+                fixtures: activeStage.fixture.length,
+                active: stage.id == activeStage.stageId ? "Yes" : ""
             });
         }
 
