@@ -48,6 +48,22 @@
 
         <div class="tab-content pt-5">
             <div class="tab-pane active" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
+                <h6>Connecting to the MaestroDMX</h6>
+                The plugin will work when your MaestroDMX is running and available on the network.<br>
+                It can work with http://maestro.local or http://10.0.0.200 or http://192.168.37.1 which are the deafult
+                address and ips of the MaestroDMX. By deafult it's looking for maestro.local which should work in most
+                cases<br><br>
+                If you are using a different IP, you may need to modify your hosts file to point to the correct IP.<br>
+                Instructions on how to modify the hosts file can be found, for example at
+                <a
+                    href="https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/">HowToGeek</a><br>
+                where if your maestro was working for example at ip address 192.168.100.100, you would add a line to
+                hosts file like:<br>
+                <span
+                    style="border: 1px solid black; background-color: lightgrey;padding-left: 3px;padding-right:3px">maestro.local
+                    192.168.100.100</span>
+                <br><br>
+                <h6>Creating Macros</h6>
                 <ol>
                     <li>For your convenience, before you start modifying, take a backup of your Stage, from the
                         MaestroDMX control panel,
@@ -84,21 +100,24 @@
                     Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
                     store it locally.<br>
                     You can download the Config which *includes* the Fixture Backup and all settings in this
-                    page.<br>
-                    Restore can be used to upload the earlier downloaded Config file.<br>
+                    page.<br><br>
+                    If you want backup of the settings, without the fixtures, you can download the Config file only via
+                    the Download Config button.<br><br>
+                    Restore Backup can be used to upload the earlier downloaded Backup or Config file.<br>
                     If you restore a config which contains a Fixture Backup, it will overwrite the current stage's
-                    fixture settings!<br>
+                    fixture settings!<br><br>
                     If you're not sure, go to Stages and Download Stage from the Maestro which will give you a
-                    backup
-                    of the current stage before you import a config and overwrite the fixtures.
+                    backup of the current stage before you import a config and overwrite the fixtures.
                 </p>
                 <i>Please note. You can import a file from a different stage, but it will fail if the fixtures
                     do not match.</i>
                 <br><br>
                 <div class="my-3">
-                    <button class="btn btn-warning" id="backupFixtures">Backup Now</button>
-                    <button class="btn btn-info" id="downloadConfig">Download Config</button>
-                    <button class="btn btn-info" id="restoreConfig">Restore Config</button>
+                    <button class="btn btn-warning" id="backupFixtures">Backup Fixtures</button>
+                    <button class="btn btn-info" id="downloadBackup">Download Backup</button>
+                    <button class="btn btn-secondary" id="downloadConfig">Download Config</button>
+                    <button class="btn btn-danger" id="clearConfig">Clear Config</button>
+                    <button class="btn btn-danger" id="restoreBackup">Restore Backup</button><br><br>
                     <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
                 </div>
             </div>

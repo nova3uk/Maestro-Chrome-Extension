@@ -24,8 +24,8 @@ class SettingsApp extends Globals {
         this.stageTable(this.stage);
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
         this.bindMacroBtn();
-        this.bindBackupBtn();
-        this.bindRestoreBtn();
+        this.cuesTable();
+        this.loadBackupRestoreBtns();
         this.bindAutoFog();
         this.bindAutoEffects();
         this.tabObserver();
@@ -35,9 +35,7 @@ class SettingsApp extends Globals {
             await maestro.SettingsApp.checkRunningMacros(macros)
         });
 
-        this.cuesTable();
 
-        this.getBackupDate();
         setInterval(() => {
             this.watchForStageChange();
         }, 5000);
@@ -115,7 +113,14 @@ class SettingsApp extends Globals {
                 console.error('Error watching for stage change:', e);
         }
     };
-    getBackupDate = async (stageId = this.stageId) => {
+    loadBackupRestoreBtns = async (stageId = this.stageId, bindBtns = true) => {
+        if (bindBtns) {
+            this.bindBackupBtn();
+            this.bindRestoreBackupBtn();
+            this.bindConfigBtn();
+            this.bindClearConfigBtn();
+        }
+
         let backupDate = await this.getLocalSetting("fixture_backup").then(backupData => {
             if (backupData && backupData.stageId == stageId) {
                 return backupData.date;
@@ -125,25 +130,60 @@ class SettingsApp extends Globals {
             backupDate = this.formatDate(new Date(JSON.parse(backupDate)));
             backupDate = `${backupDate} - <a href="#" id="restoreBackup">Restore</a>`;
             document.getElementById('backupDate').innerHTML = backupDate;
-
-            document.getElementById('restoreBackup').addEventListener('click', async () => {
-                if (confirm('Are you sure you want to restore this backup?\n\nALL CURRENT FIXTURE SETTINGS IN THIS STAGE WILL BE OVERWRITTEN!!!\n\nIf a Show Cue is currently running, it will be stopped by resoring this backup.')) {
-                    await this.restoreAllFixtures();
-                }
-            });
         } else {
             document.getElementById('backupDate').innerText = "Never";
         }
-
         document.getElementById('backupFixtures').addEventListener('click', async () => {
             if (confirm('Are you sure you want to backup all fixtures?\n\nThis will overwrite the current backup.')) {
                 await this.backupAllFixtures();
-                this.getBackupDate();
+                this.loadBackupRestoreBtns(this.stageId, false);
             }
         });
     }
-    bindBackupBtn = async () => {
+    bindClearConfigBtn = async () => {
+        document.getElementById('clearConfig').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to clear the current config?')) {
+                chrome.storage.local.clear(function () {
+                    //local settings
+                    chrome.storage.local.set({ autoFogOnActivityPeak: false });
+                    chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
+                    chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
+                    chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
+                    chrome.storage.local.set({ autoFogOnTimer: false });
+                    chrome.storage.local.set({ fogTimer: 10 });
+                    chrome.storage.local.set({ fogTimerDuration: 3 });
+
+                    chrome.storage.local.set({ autoEffectsEnabled: false });
+                    chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
+                    chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
+                    chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
+
+                    chrome.storage.local.set({ autoStrobeEnabled: false });
+                    chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
+                    chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
+                    chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
+
+                    document.location.reload();
+                });
+            };
+        });
+    };
+    //download eveyrthign except fixture backup
+    bindConfigBtn = async () => {
         document.getElementById('downloadConfig').addEventListener('click', async () => {
+            chrome.storage.local.get(null, function (items) {
+                delete items.fixture_backup;
+                var result = maestro.SettingsApp.prettyJSON(items);
+                var url = 'data:application/json;base64,' + btoa(result);
+                chrome.downloads.download({
+                    url: url,
+                    filename: `backup_config_${Date.now()}_${maestro.SettingsApp.activeStage.name.replace(/[^a-z0-9]/gi, '_')}.json`
+                });
+            });
+        });
+    };
+    bindBackupBtn = async () => {
+        document.getElementById('downloadBackup').addEventListener('click', async () => {
             chrome.storage.local.get(null, function (items) {
                 var result = maestro.SettingsApp.prettyJSON(items);
                 var url = 'data:application/json;base64,' + btoa(result);
@@ -154,9 +194,9 @@ class SettingsApp extends Globals {
             });
         });
     };
-    bindRestoreBtn = async () => {
+    bindRestoreBackupBtn = async () => {
         try {
-            document.getElementById('restoreConfig').addEventListener('click', async () => {
+            document.getElementById('restoreBackup').addEventListener('click', async () => {
                 var input = document.createElement('input');
                 input.id = 'fileInput';
                 input.type = 'file';
@@ -1299,6 +1339,23 @@ class SettingsApp extends Globals {
 
         return select;
     };
+    // disableGobos = async (fixtureId) => {
+    //     // let stage = await this.getActiveStage();
+    //     // let fixtures = stage.find(stage => stage.id == this.stageId).fixture;
+
+    //     // for (let fixture of fixtures) {
+    //     //     let gobos = fixture.attribute.find(attr => attr.type == 'GOBO');
+    //     //     for (let gobo of gobos) {
+    //     //         let update = {
+    //     //             attribute: {
+    //     //                 [gobo]: 0
+    //     //             }
+    //     //         };
+    //     //         await this.putAttribute(fixtureId, gobo, update);
+    //     //     }
+    //     // }
+
+    // }    
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
 maestro.SettingsApp.init();
