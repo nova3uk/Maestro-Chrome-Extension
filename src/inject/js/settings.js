@@ -40,8 +40,8 @@ class SettingsApp extends Globals {
             this.watchForStageChange();
         }, 5000);
         setInterval(() => {
-            this.watchOffline();
-        }, 5000);
+            this.debounce(this.watchOffline(), 5000);
+        }, 30000);
 
         setTimeout(() => {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -462,6 +462,11 @@ class SettingsApp extends Globals {
     };
     applyMacro = async (macroName, stageId) => {
         try {
+            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+            deleteButton.disabled = true;
+            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+            applyButton.disabled = true;
+
             var promiseArray = [];
             var keys = await this.retrieveAllKeys()
             this.currentCue = await this.getShowState();
@@ -512,13 +517,8 @@ class SettingsApp extends Globals {
                     }
                 }
             }
-            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-            deleteButton.disabled = true;
-            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-            applyButton.disabled = true;
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = false;
-
             document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
         } catch (e) {
             if (this.logging)
@@ -529,6 +529,9 @@ class SettingsApp extends Globals {
     }
     revertMacro = async (macroName, stageId) => {
         try {
+            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+            clearButton.disabled = true;
+
             this.currentCue = await this.getShowState();
             var macros = await this.loadMacros();
             macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
@@ -560,13 +563,10 @@ class SettingsApp extends Globals {
                         maestro.SettingsApp.deleteFixtureProfile(fixture.id);
                     });
                 }
-
                 const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
                 applyButton.disabled = false;
                 const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
                 deleteButton.disabled = false;
-                const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
-                clearButton.disabled = true;
 
                 document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
             }
