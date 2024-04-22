@@ -1242,16 +1242,6 @@ class SettingsApp extends Globals {
                 formatter: function (value, row, index) {
                     return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
                 }
-            },
-            {
-                field: 'color_wheel',
-                title: '',
-                align: 'center',
-                valign: 'middle',
-                clickToSelect: false,
-                formatter: function (value, row, index) {
-                    return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
-                }
             }],
             rowAttributes: function (row, index) {
                 return {
