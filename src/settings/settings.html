@@ -19,14 +19,14 @@
                 <a class="nav-link active" id="simple-tab-0" data-bs-toggle="tab" href="#tabpanel-info" role="tab"
                     aria-controls="tabpanel-info" aria-selected="true">
                     <img src="info-circle.svg" alt="Info" width="20" height="20">
-                    Instructions
+                    Startup Info
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-backup" role="tab"
-                    aria-controls="tabpanel-backup" aria-selected="false">
-                    <img src="/src/img/database-fill-check.svg" alt="Info" width="20" height="20">
-                    Backup & Restore
+                <a class="nav-link" id="simple-tab-0a" data-bs-toggle="tab" href="#tabpanel-macrohelp" role="tab"
+                    aria-controls="tabpanel-macrohelp" aria-selected="true">
+                    <img src="info-circle.svg" alt="Info" width="20" height="20">
+                    Creating Macros
                 </a>
             </li>
             <li class="nav-item" role="presentation">
@@ -44,11 +44,18 @@
                     Auto Strobe & Effects
                 </a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-backup" role="tab"
+                    aria-controls="tabpanel-backup" aria-selected="false">
+                    <img src="/src/img/database-fill-check.svg" alt="Info" width="20" height="20">
+                    Backup & Restore
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content pt-5">
-            <div class="tab-pane active" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
-                <h6>Connecting to the MaestroDMX</h6>
+            <div class="tab-pane active collapse" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
+                <h5>Connecting to the MaestroDMX</h5>
                 The plugin will work when your MaestroDMX is running and available on the network.<br>
                 It can work with http://maestro.local or http://10.0.0.200 or http://192.168.37.1 which are the deafult
                 address and ips of the MaestroDMX. By deafult it's looking for maestro.local which should work in most
@@ -58,19 +65,24 @@
                 <a href="https://docs.rackspace.com/docs/modify-your-hosts-file" target="_blank">How to Edit
                     Hosts File</a><br>
                 where if your maestro was working for example at ip address 192.168.100.100, you would add a line to
-                hosts file like:<br>
+                hosts file like:
                 <span
                     style="border: 1px solid black; background-color: lightgrey;padding-left: 3px;padding-right:3px">maestro.local
                     192.168.100.100</span>
-                <br><br>
-                <h6>Creating Macros</h6>
+                <br>
+            </div>
+            <div class="tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-0a">
+                <h5>Creating Macros</h5>
                 <ol>
                     <li>For your convenience, before you start modifying, take a backup of your Stage, from the
                         MaestroDMX control panel,
                         from this extension, you can take a backup of all the fixture settings and macros via the Backup
                         & Restore tab.</li>
-                    <li>Go to the <a id="controlPageLink" target="_blank">Control Page</a> Page on the Stages
-                        tab.
+                    <li>You can set toggles via thethe <a id="controlPageLink" target="_blank">Control Page</a> Page on
+                        the Stages
+                        tab. You can also set Pan/Tilt positions via the Pan/Tilt Finder, on the Fixtures Tab below.<br>
+                        If your fixture(s) have Gobo or Prism, you can disable or enable all of them using the Fixture
+                        Toggles tab below.
                     </li>
                     <li>Set all the toggles the way you want them, for each fixture you want to include in the
                         Macro.
@@ -86,7 +98,8 @@
                 <ol>
                     <li>Use it to set the toggles to the stored state.</li>
                     <li>Clear the Macro to revert all toggles to the previous state.</li>
-                    <li>Remember - the macro changes the Fixture Settings, not the Show Cue.</li>
+                    <li>Remember - the Macro applies ALL current settings, so if you have modified the Control page, the
+                        Pan/Tilt or used a Fixture Toggle below it will be recorded to the macro!</li>
                 </ol>
                 <p class="text-danger font-weight-bold">Remember to back up your Stage and Fixtures before
                     testing
@@ -96,6 +109,7 @@
             </div>
 
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
+                <h5>Backup & Restore</h5>
                 <p>
                     Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
                     store it locally.<br>
@@ -262,10 +276,10 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-stages" role="tab"
-                    aria-controls="tabpanel-stages" aria-selected="false">
-                    <img src="/src/img/shop-window.svg" alt="Info" width="20" height="20">
-                    Stages
+                <a class="nav-link" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles" role="tab"
+                    aria-controls="tabpanel-toggles" aria-selected="false">
+                    <img src="/src/img/sliders2.svg" alt="Info" width="20" height="20">
+                    Fixture Toggles
                 </a>
             </li>
             <li class="nav-item" role="presentation">
@@ -276,10 +290,10 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles" role="tab"
-                    aria-controls="tabpanel-toggles" aria-selected="false">
-                    <img src="/src/img/sliders2.svg" alt="Info" width="20" height="20">
-                    Fixtue Toggles
+                <a class="nav-link" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-stages" role="tab"
+                    aria-controls="tabpanel-stages" aria-selected="false">
+                    <img src="/src/img/shop-window.svg" alt="Info" width="20" height="20">
+                    Stages
                 </a>
             </li>
         </ul>
@@ -299,7 +313,7 @@
                             <th data-field="name" width="200" data-width="200">Macro Name</th>
                             <th data-field="length" width="50" data-width="50">#</th>
                             <th data-field="length">Fixtures Affected</th>
-                            <th data-field="length">Trigger Cue</th>
+                            <th data-field="length">Cue Triggered</th>
                             <th width="100" data-width="100"></th>
                             <th width="100" data-width="100"></th>
                             <th width="100" data-width="100"></th>

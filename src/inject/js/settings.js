@@ -1043,7 +1043,6 @@ class SettingsApp extends Globals {
                 },
                 {
                     field: 'cue',
-                    title: 'Trigger Cue',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
