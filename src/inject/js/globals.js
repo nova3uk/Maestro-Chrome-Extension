@@ -1,6 +1,7 @@
 var maestro = maestro || {};
 class Globals {
-    constructor(scriptSource) {
+    constructor(scriptSource, debugFecth = false) {
+        if (debugFecth) this.replaceFetch();
         this.init(scriptSource);
     }
 
@@ -39,6 +40,8 @@ class Globals {
     shutterFixtures = [];
     strobeFixtures = [];
     currentCue = [];
+    cues = [];
+    activeStageFixtureGroups = [];
     eventManual;
     pageObserver;
     maxDmxVal = 1;
@@ -104,7 +107,25 @@ class Globals {
     // Variable to be monitored
     activityLevelRoot = 0;
     arrActivityLevelCallbacks = []
+    replaceFetch = () => {
+        const originalFetch = window.fetch;
 
+        window.fetch = async (url, options) => {
+            console.log(Date.now() + ' Request:', url, options);
+            let startTime = Date.now();
+            const response = await originalFetch(url, options);
+            let endTime = Date.now();
+            let execTime = endTime - startTime;
+            if (execTime < 1000)
+                execTime = execTime + 'ms';
+            if (execTime >= 1000)
+                execTime = (execTime / 1000).toFixed(2) + 's';
+
+            console.log(`${Date.now()} ${execTime} Response:'`, response);
+
+            return response;
+        };
+    };
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     loadScript = (scriptUrl, params = null) => {
         const script = document.createElement('script');
@@ -281,22 +302,25 @@ class Globals {
     getFixture = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
     };
-    getStages = async (force = false) => {
-        if (!this.stage || force) {
+    getStages = async (forceRefresh = false) => {
+        if (!this.stage || forceRefresh) {
             const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
+
             this.stageId = stage.activeStageId;
             this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
             this.stage = stage;
             this.groups = stage.stage.find(ele => ele.id == stage.activeStageId).fixtureGroup;
-
-            await this.getActiveStage();
+            this.activeStage = stage.stage.find(ele => ele.id == stage.activeStageId);
+            this.activeStageFixtureGroups = this.activeStage.fixtureGroup;
         }
         return this.stage;
     };
-    getActiveStage = async () => {
-        const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}`);
-        this.activeStage = stage;
-        this.activeStageFixtureGroups = stage.fixtureGroup
+    getActiveStage = async (forceRefresh = false) => {
+        if (!this.stage || forceRefresh) {
+            const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}`);
+            this.activeStage = stage;
+            return this.activeStage;
+        }
         return this.activeStage;
     }
     storeFixtureProfile = async (macroName, fixture) => {
@@ -426,4 +450,3 @@ class Globals {
     };
 }
 maestro.Globals = new Globals(document.currentScript.src);
-// maestro.Globals.init(document.currentScript.src);   

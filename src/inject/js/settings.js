@@ -6,7 +6,7 @@ class SettingsApp extends Globals {
         this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();
     }
-    currentFixture;
+
     activeStageId;
     ignoredFixtures = [];
 
@@ -28,8 +28,10 @@ class SettingsApp extends Globals {
         this.tabObserver();
 
         await this.loadMacros(async (macros) => {
-            await maestro.SettingsApp.macroTable(macros);
-            await maestro.SettingsApp.checkRunningMacros(macros)
+            if (macros) {
+                await maestro.SettingsApp.macroTable(macros);
+                await maestro.SettingsApp.checkRunningMacros(macros)
+            }
             this.hideLoader();
         });
 
@@ -451,6 +453,9 @@ class SettingsApp extends Globals {
     loadMacros = (callback) => {
         return this.getLocalSetting("macros").then(macros => {
             if (!macros) {
+                if (typeof callback == "function") {
+                    callback(macros);
+                }
                 return;
             }
             //only for currently active stage
@@ -512,12 +517,12 @@ class SettingsApp extends Globals {
                         this.storeFixtureProfile(macroName, currentProfile);
                     });
 
-                    if (macro.macro.cueId) {
-                        await this.getCues().then(async (cues) => {
-                            let cueIndex = cues.findIndex(cue => cue.uuid === macro.macro.cueId);
-                            await this.startCue(cueIndex);
-                        })
-                    }
+                    // if (macro.macro.cueId) {
+                    //     await this.getCues().then(async (cues) => {
+                    //         let cueIndex = cues.findIndex(cue => cue.uuid === macro.macro.cueId);
+                    //         await this.startCue(cueIndex);
+                    //     })
+                    // }
                 }
             }
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
@@ -599,6 +604,7 @@ class SettingsApp extends Globals {
     checkRunningMacros = async (macros) => {
         if (!macros)
             macros = await this.loadMacros();
+
         macros = macros.filter(macro => macro.macro.stageId == this.stageId);
 
         for (let macro of macros) {
@@ -1153,7 +1159,8 @@ class SettingsApp extends Globals {
             tData.push({
                 id: stage.id,
                 name: stage.name,
-                active: stage.id == activeStage.id ? "Yes" : ""
+                active: stage.id == activeStage.id ? "Yes" : "",
+                fixtures: (stage.fixture ? stage.fixture.length : 0),
             });
         }
 
@@ -1161,6 +1168,9 @@ class SettingsApp extends Globals {
             columns: [{
                 field: 'name',
                 title: 'Stage Name'
+            }, {
+                field: 'fixtures',
+                title: 'Fixtures'
             }, {
                 field: 'active',
                 title: 'Active'
@@ -1319,9 +1329,13 @@ class SettingsApp extends Globals {
             document.location.reload();
         }
     }
-    getCues = async () => {
-        const show = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
-        return show.patternCue;
+    getCues = async (forceRefresh = false) => {
+        if (!this.cues || forceRefresh) {
+            const show = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show`);
+            this.cues = show.patternCue;
+            return this.cues;
+        }
+        return this.cues;
     }
     createShowDropdown = (id, data, onChange) => {
         let select = document.createElement('select');
@@ -1362,8 +1376,8 @@ class SettingsApp extends Globals {
                         name: fixture.name,
                         active: fixture.enabled,
                         attributes: attributeTypes,
-                        goboState: goboState ? goboState.gobo : false,
-                        prismState: prismState ? prismState.prism : false
+                        goboState: goboState,
+                        prismState: prismState
                     });
                 }
             }
@@ -1383,16 +1397,22 @@ class SettingsApp extends Globals {
                         let btns = "";
                         let btnState = false;
                         if (row.attributes.includes('GOBO')) {
-                            if (row.goboState)
+                            if (row.goboState) {
                                 btnState = row.goboState;
+                            } else {
+                                btnState = true;
+                            }
                             btns += `<div class="d-inline">`;
                             btns += `<button class="btn btn-warning my-1 mr-2" style="width:120px;" name="btn_disable_gobos" data-id="${row.id}"${btnState == false ? ' disabled' : ''}>Gobos Off</button>&nbsp;`;
                             btns += `<button class="btn btn-success my-1 mr-2" style="width:120px;" name="btn_enable_gobos" data-id="${row.id}"${btnState == true ? ' disabled' : ''}>Gobos On</button>&nbsp;`;
                             btns += `</div><br>`;
                         }
                         if (row.attributes.includes('PRISM')) {
-                            if (row.prismState)
+                            if (row.prismState) {
                                 btnState = row.prismState;
+                            } else {
+                                btnState = true;
+                            }
                             btns += `<div class="d-inline">`;
                             btns += `<button class="btn btn-warning my-1" style="width:120px;" name="btn_disable_prism" data-id="${row.id}"${row.id}"${btnState == false ? ' disabled' : ''}>Prism Off</button>&nbsp;`;
                             btns += `<button class="btn btn-success my-1" style="width:120px;" name="btn_enable_prism" data-id="${row.id}"${row.id}"${btnState == true ? ' disabled' : ''}>Prism On</button>&nbsp;`;
