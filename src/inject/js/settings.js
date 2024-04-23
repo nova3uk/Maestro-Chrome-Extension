@@ -905,56 +905,85 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id);
         });
         $('.panOrTilt').on('click', function (btn) {
-            let id = this.dataset.id;
-            let fixtureNames = "";
-            let fixtureIds = [];
-
-            if (id == "panOrTiltAll") {
-                let fixtures = maestro.SettingsApp.getAllMovers();
-
-                for (let f of fixtures) {
-                    if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
-                        fixtureNames += `<span class="text-danger">(ignored)${f.name}</span><br>`;
-                    } else {
-                        fixtureNames += `<span>${f.name}</span><br>`;
-                        fixtureIds.push(f.id);
-                    }
-                }
-                document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
-                document.getElementById('fixtureName').innerHTML = fixtureNames;
-            } else {
-                fixtureIds.push(id);
-                let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
-
-                document.getElementById('panTiltFinder').dataset.id = JSON.stringify(id);
-                document.getElementById('fixtureName').innerText = fixture.name;
-            }
-
-            $('#panTiltFinder').modal('show');
-
-            document.getElementById('panRange').addEventListener('input', function () {
-                document.getElementById('panRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
-            });
-            document.getElementById('tiltRange').addEventListener('input', function () {
-                document.getElementById('tiltRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);;
-                maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
-            });
-            document.getElementById('tiltRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('tiltRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-            });
-            document.getElementById('panRangeVal').addEventListener('change', function (ele) {
-                document.getElementById('panRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-            });
-            document.getElementById('panTiltReset').addEventListener('click', function () {
-                document.getElementById('panRange').value = 0;
-                document.getElementById('tiltRange').value = 0;
-                document.getElementById('panRangeVal').value = "";
-                document.getElementById('tiltRangeVal').value = "";
-                maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
-            });
+            maestro.SettingsApp.panOrTiltOpen(this);
         });
     }
+    panOrTiltOpen = (btn) => {
+        let id = btn.dataset.id;
+        let fixtureNames = "";
+        let fixtureIds = [];
+
+        if (id == "panOrTiltAll") {
+            this.preloadPanTilValues(id);
+            let fixtures = maestro.SettingsApp.getAllMovers();
+
+            for (let f of fixtures) {
+                if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
+                    fixtureNames += `<span class="text-danger">(ignored)${f.name}</span><br>`;
+                } else {
+                    fixtureNames += `<span>${f.name}</span><br>`;
+                    fixtureIds.push(f.id);
+                }
+            }
+
+            document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
+            document.getElementById('fixtureName').innerHTML = fixtureNames;
+        } else {
+            this.preloadPanTilValues(id);
+
+            fixtureIds.push(id);
+            let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+
+            document.getElementById('panTiltFinder').dataset.id = JSON.stringify(id);
+            document.getElementById('fixtureName').innerText = fixture.name;
+        }
+
+        $('#panTiltFinder').modal('show');
+
+        document.getElementById('panRange').addEventListener('input', function () {
+            document.getElementById('panRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        });
+        document.getElementById('tiltRange').addEventListener('input', function () {
+            document.getElementById('tiltRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);;
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        });
+        document.getElementById('tiltRangeVal').addEventListener('change', function () {
+            document.getElementById('tiltRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        });
+        document.getElementById('panRangeVal').addEventListener('change', function (ele) {
+            document.getElementById('panRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        });
+        document.getElementById('panTiltReset').addEventListener('click', function () {
+            document.getElementById('panRange').value = 0;
+            document.getElementById('tiltRange').value = 0;
+            document.getElementById('panRangeVal').value = "";
+            document.getElementById('tiltRangeVal').value = "";
+            maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        });
+    };
+    preloadPanTilValues = async (id) => {
+        let currentSetting;
+        if (id == "panOrTiltAll") {
+            currentSetting = await maestro.SettingsApp.getLocalSetting("panTiltAll");
+            if (currentSetting) {
+                document.getElementById('panRange').value = currentSetting.pan;
+                document.getElementById('tiltRange').value = currentSetting.tilt;
+                document.getElementById('panRangeVal').value = currentSetting.pan;
+                document.getElementById('tiltRangeVal').value = currentSetting.tilt;
+            }
+        } else {
+            currentSetting = await maestro.SettingsApp.getLocalSetting("panTilt_" + id);
+            if (currentSetting) {
+                document.getElementById('panRange').value = currentSetting.pan;
+                document.getElementById('tiltRange').value = currentSetting.tilt;
+                document.getElementById('panRangeVal').value = currentSetting.pan;
+                document.getElementById('tiltRangeVal').value = currentSetting.tilt;
+            }
+        }
+    };
     resetPanTiltHandler = async (id) => {
         let ids = JSON.parse(id);
         if (Array.isArray(ids)) {
@@ -972,16 +1001,20 @@ class SettingsApp extends Globals {
         }
     };
     resetPanTiltAll = async (ids) => {
+        this.deleteLocalSettingg("panTiltAll");
         for (let id of ids) {
             await this.resetPanTilt(id);
         }
     }
     panTiltAll = async (ids) => {
+        this.saveLocalSetting("panTiltAll", { pan: this.safeMinMax(document.getElementById('panRange').value, 0, 255), tilt: this.safeMinMax(document.getElementById('tiltRange').value, 0, 255) });
         for (let id of ids) {
             await this.setPanTilt(id);
         }
     };
     setPanTilt = async (id) => {
+        this.saveLocalSetting("panTilt_" + id, { pan: this.safeMinMax(document.getElementById('panRange').value, 0, 255), tilt: this.safeMinMax(document.getElementById('tiltRange').value, 0, 255) });
+
         let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
         let ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
         if (ignoreFixtures) return;
@@ -989,8 +1022,8 @@ class SettingsApp extends Globals {
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
 
-        let panValue = document.getElementById('panRange').value;
-        let tiltValue = document.getElementById('tiltRange').value;
+        let panValue = this.safeMinMax(document.getElementById('panRange').value, 0, 255);
+        let tiltValue = this.safeMinMax(document.getElementById('tiltRange').value, 0, 255);
 
         let panRange = this.calculateRange({ lowValue: panValue, highValue: panValue });
         let titRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
@@ -1020,7 +1053,6 @@ class SettingsApp extends Globals {
             let cue = cues.find(cue => cue.uuid == macro.macro.cueId);
 
             if (!cue) {
-                await maestro.SettingsApp.removeCueFromMacro(macro.macro.name, macro.macro.stageId);
                 macro.macro.cueId = null;
             }
 
