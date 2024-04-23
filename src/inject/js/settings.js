@@ -492,50 +492,54 @@ class SettingsApp extends Globals {
                 }
             }
 
-            for (let macro of macros) {
-                for (let fixture of macro.macro.fixtures) {
-                    let currentProfile = await this.getFixture(fixture.id);
+            for (let fixture of macros[0].macro.fixtures) {
+                let currentProfile = await this.getFixture(fixture.id);
+                //let currentProfile = this.activeStage.fixture.find(f => f.id == fixture.id);
 
-                    if (!currentProfile) continue;
+                this.activeStage.fixture
 
-                    let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
-                    if (diff.length == 0) {
-                        return alert('Macro is the same as the currently running Profile, and would have no effect.')
-                    }
+                if (!currentProfile) continue;
 
-                    //save original profile prior to modification
-                    promiseArray.push(new Promise((resolve, reject) => {
-                        try {
-                            this.processAttributeChanges(diff, fixture.id, fixture, currentProfile).then(() => {
-                                resolve();
-                            });
-                        } catch (e) {
-                            reject(e)
-                        }
-                    }));
-
-                    await Promise.all(promiseArray).then(() => {
-                        this.storeFixtureProfile(macroName, currentProfile);
-                    }).then(async () => {
-                        if (macro.macro.cueId) {
-                            await this.getCues().then(async (cues) => {
-                                let cueIndex = cues.findIndex(cue => cue.uuid === macro.macro.cueId);
-                                await this.startCue(cueIndex);
-                            })
-                        }
-                    });
-
+                let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
+                if (diff.length == 0) {
+                    return alert('Macro is the same as the currently running Profile, and would have no effect.')
                 }
+
+                //save original profile prior to modification
+                promiseArray.push(new Promise((resolve, reject) => {
+                    try {
+                        this.processAttributeChanges(diff, fixture.id, fixture, currentProfile).then(() => {
+                            resolve();
+                        });
+                    } catch (e) {
+                        reject(e)
+                    }
+                }));
+
+                await Promise.all(promiseArray).then(() => {
+                    this.storeFixtureProfile(macroName, currentProfile);
+                });
             }
+
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = false;
             document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
+
+            if (macros[0].macro.cueId) {
+                await this.getCues().then(async (cues) => {
+                    let cueIndex = cues.findIndex(cue => cue.uuid === macros[0].macro.cueId);
+                    await this.startCue(cueIndex);
+                })
+            }
+
             this.hideLoader();
         } catch (e) {
             if (this.logging)
                 console.error('Error applying Macro:', e);
 
             this.hideLoader();
+
+
             alert(this.fatalErrorMsg);
         }
     }
@@ -582,6 +586,16 @@ class SettingsApp extends Globals {
                 deleteButton.disabled = false;
 
                 document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
+
+                if (macros[0].macro.cueIdEnd) {
+                    await this.getCues().then(async (cues) => {
+                        let cueIndex = cues.findIndex(cue => cue.uuid === macros[0].macro.cueIdEnd);
+                        await this.startCue(cueIndex);
+                    })
+                }
+
+                this.hideLoader();
+            } else {
                 this.hideLoader();
             }
         } catch (e) {
@@ -1118,7 +1132,8 @@ class SettingsApp extends Globals {
                 length: fixtures.length,
                 fixtureName: fixtures.map(fixture => fixture.name),
                 cueId: macro.macro.cueId,
-                cueName: cue ? cue.name : ""
+                cueName: cue ? cue.name : "",
+                cues: cues
             });
         };
 
@@ -1164,8 +1179,25 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.cueId)
-                            return `<span class="badge text-bg-warning" name="remove_cue" role="button" style="position:relative; top:-0px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Cue Trigger" data-macroName="${row.name}" data-stageId="${row.stageId}">${row.cueName}&nbsp;<img src="/src/img/x.svg" width="20" height="20"></span>`;
+                        if (!cues) return;
+
+                        let select = `<select name="startCueList" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        select += '<option value="">-- Start Cue --</option>';
+                        for (let cue of row.cues) {
+                            select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueId == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
+                        }
+                        select += '</select><br>';
+
+                        select += `<select name="endCueList" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        select += '<option value="">-- End Cue --</option>';
+                        for (let cue of row.cues) {
+                            select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueIdEnd == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
+                        }
+                        select += '</select>';
+
+                        return select;
+                        // if (row.cueId)
+                        //     return `<span class="badge text-bg-warning" name="remove_cue" role="button" style="position:relative; top:-0px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Cue Trigger" data-macroName="${row.name}" data-stageId="${row.stageId}">${row.cueName}&nbsp;<img src="/src/img/x.svg" width="20" height="20"></span>`;
                     }
                 },
                 {
@@ -1235,16 +1267,49 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.deleteMacro(this.dataset.id, this.dataset.stageid);
             }
         });
-        $('span[name="remove_cue"]').on('click', async function (btn) {
-            let row = document.querySelector(`[data-id="${this.dataset.macroname}"][data-stageid="${this.dataset.stageid}"]`);
-            if (row.classList.contains('macro-active')) return;
-
-            if (confirm('Are you sure you want to remove the Cue from this Macro?')) {
-                await maestro.SettingsApp.removeCueFromMacro(this.dataset.macroname, this.dataset.stageid);
+        $('select[name="startCueList"]').on('change', async function (btn) {
+            if (this.value == "") {
+                await maestro.SettingsApp.removeCueFromMacro(this.dataset.id, this.dataset.stageid);
                 await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
                 document.location.reload();
+            } else {
+                let cues = await maestro.SettingsApp.getCues(true);
+                let uuid = document.querySelector(`select[name="startCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
+
+                if (uuid == "") return alert('Please select a macro');
+
+                let cue = cues.find(cue => cue.uuid == uuid);
+                await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid);
+                await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
             }
         });
+        $('select[name="endCueList"]').on('change', async function (btn) {
+            if (this.value == "") {
+                await maestro.SettingsApp.removeCueFromMacro(this.dataset.macroname, this.dataset.stageid, true);
+                await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
+                document.location.reload();
+            } else {
+                let cues = await maestro.SettingsApp.getCues(true);
+                let uuid = document.querySelector(`select[name="endCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
+
+                if (uuid == "") return alert('Please select a macro');
+
+                let cue = cues.find(cue => cue.uuid == uuid);
+                await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, true);
+                await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
+            }
+        });
+
+        // $('span[name="remove_cue"]').on('click', async function (btn) {
+        //     let row = document.querySelector(`[data-id="${this.dataset.macroname}"][data-stageid="${this.dataset.stageid}"]`);
+        //     if (row.classList.contains('macro-active')) return;
+
+        //     if (confirm('Are you sure you want to remove the Cue from this Macro?')) {
+        //         await maestro.SettingsApp.removeCueFromMacro(this.dataset.macroname, this.dataset.stageid);
+        //         await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
+        //         document.location.reload();
+        //     }
+        // });
     };
     stageTable = () => {
         let stages = this.stage;
@@ -1323,7 +1388,7 @@ class SettingsApp extends Globals {
             }
 
             await this.loadMacros().then((macros) => {
-                if(macros){
+                if (macros) {
                     for (let macro of macros) {
                         macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
                     };
@@ -1348,13 +1413,29 @@ class SettingsApp extends Globals {
                 columns: [{}, {}, {},
                 {
                     field: 'applyCue',
-                    title: 'Select Macro',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if(row.list.length == 0) return;
+                        if (row.list.length == 0) return;
                         let select = `<select name="macroList" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        select += '<option value="">-</option>';
+                        for (let item of row.list) {
+                            select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
+                        }
+                        select += '</select>';
+
+                        return select;
+                    }
+                },
+                {
+                    field: 'applyCueEnd',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.list.length == 0) return;
+                        let select = `<select name="macroListEnd" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
                         select += '<option value="">-</option>';
                         for (let item of row.list) {
                             select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
@@ -1371,7 +1452,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if(row.list.length == 0) {
+                        if (row.list.length == 0) {
                             return `<button class="btn btn-primary" disabled>Apply</button>`;
                         }
                         return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
@@ -1402,27 +1483,41 @@ class SettingsApp extends Globals {
             });
             $('button[name="btn_show_apply"]').on('click', async function (btn) {
                 let cues = await maestro.SettingsApp.getCues();
-                let macro = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"]`).value;
-                let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
-                if (macro == "") return alert('Please select a macro');
-                let cue = cues.find(cue => cue.uuid == this.dataset.id);
+                let macroStart = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"]`).value;
+                let macroEnd = document.querySelector(`select[name="macroListEnd"][data-id="${this.dataset.id}"]`).value;
 
-                await maestro.SettingsApp.applyCueToMacro(macro, stageId, cue.uuid);
+
+                if (macroStart == "" && macroEnd == "") return alert('Please select a macro');
+
+                if (macroStart != "") {
+                    let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
+                    let cue = cues.find(cue => cue.uuid == this.dataset.id);
+                    await maestro.SettingsApp.applyCueToMacro(macroStart, stageId, cue.uuid);
+                }
+                if (macroEnd != "") {
+                    let stageId = document.querySelector(`select[name="macroListEnd"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
+                    let cue = cues.find(cue => cue.uuid == this.dataset.id);
+                    await maestro.SettingsApp.applyCueToMacro(macroEnd, stageId, cue.uuid, true);
+                }
             });
         } catch (e) {
             if (this.logging)
                 console.error('Error loading cues:', e);
         };
     };
-    removeCueFromMacro = async (macroName, stageId) => {
+    removeCueFromMacro = async (macroName, stageId, endCue = false) => {
         let macros = await this.loadMacros();
         let macro = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
         if (macro) {
-            delete macro.macro.cueId;
+            if (endCue) {
+                delete macro.macro.cueIdEnd;
+            } else {
+                delete macro.macro.cueId;
+            }
             this.saveLocalSetting("macros", macros);
         }
     }
-    applyCueToMacro = async (macroName, stageId, cueId) => {
+    applyCueToMacro = async (macroName, stageId, cueId, endCue = false) => {
         let row = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
         if (row.classList.contains('macro-active')) {
             alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
@@ -1432,7 +1527,12 @@ class SettingsApp extends Globals {
         let macros = await this.loadMacros();
         let macro = macros.find(macro => macro.macro.stageId == stageId && macro.macro.name == macroName);
         if (macro) {
-            macro.macro.cueId = cueId;
+            if (endCue) {
+                macro.macro.cueIdEnd = cueId;
+            } else {
+                macro.macro.cueId = cueId;
+            }
+
             maestro.SettingsApp.saveLocalSetting("macros", macros);
             await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
             document.location.reload();

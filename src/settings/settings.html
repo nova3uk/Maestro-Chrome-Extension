@@ -425,6 +425,12 @@
                     <p>
                         See "Creating Macros" Section above for information on how to create a macro and how they work.
                     </p>
+                    <p>
+                        You can "apply" a cue when a macro is triggered or cleared (Start Cue or End Cue).<br>
+                        You can select only a Start Cue or an End Cue, or both.<br>
+                        If another macro is triggered which also has a Start or End Cue whilst the first is still
+                        active, it will take over.
+                    </p>
                 </div>
                 <div class="text-danger my-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -440,7 +446,7 @@
                             <th data-field="name" width="200" data-width="200">Macro Name</th>
                             <th data-field="length" width="50" data-width="50">#</th>
                             <th data-field="length">Fixtures Affected</th>
-                            <th data-field="length">Cur Triggers</th>
+                            <th data-field="length">Cue Triggers</th>
                             <th data-field="length">End Cue</th>
                             <th width="100" data-width="100"></th>
                             <th width="100" data-width="100"></th>
@@ -495,11 +501,8 @@
                 <h2 class="mt-3"></h2>
                 <div>
                     <p class="h6">Trigger Cue On Macro</p>
-                    You can "apply" a cue when a macro is triggered.<br>
-                    This is useful for setting up a cue to be triggered when a macro is activated.<br>
-                    The cue will be triggered when the macro is activated, but it will not be deactivated when the macro
-                    is cleared.<br>
-                    If you subsequently apply another macro with a Cue trigger, then it will take over.<br>
+                    You can "apply" a cue when a macro is started or stopped.<br>
+                    More info is available on the Macros Tab.
                 </div>
                 <h2 class="mt-1"></h2>
                 <table id="cues" class="table my-1">
@@ -509,7 +512,8 @@
                             <th data-field="groupModes" data-sortable="false" width="300" data-width="300">Group Modes
                             </th>
                             <th data-field="status" data-sortable="false" width="100" data-width="100">Status</th>
-                            <th data-field="macros" data-sortable="false">Select Macro</th>
+                            <th data-field="macros" data-sortable="false">Macro on Start</th>
+                            <th data-field="macros" data-sortable="false">Macro on End</th>
                             <th data-field="applyCue" data-sortable="false" width="100" data-width="100">Apply Cue</th>
                         </tr>
                     </thead>
