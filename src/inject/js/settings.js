@@ -1248,7 +1248,7 @@ class SettingsApp extends Globals {
                     id: cue.uuid,
                     cueName: cue.name,
                     active: cue.active,
-                    status: cue.active ? "Running" : "",
+                    status: cue.active ? "Active" : "",
                     groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`,
                     list: macroNames
                 });
