@@ -449,4 +449,4 @@ class Globals {
             });
     };
 }
-maestro.Globals = new Globals(document.currentScript.src, true);
+maestro.Globals = new Globals(document.currentScript.src);

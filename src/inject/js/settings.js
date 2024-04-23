@@ -1034,7 +1034,6 @@ class SettingsApp extends Globals {
                 cueName: cue ? cue.name : ""
             });
         };
-        //'let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
 
         $('#macros').bootstrapTable({
             columns: [{
