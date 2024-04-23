@@ -348,10 +348,8 @@ class App extends Globals {
 
                             Object.freeze(maestro.App.autoParams);
 
-                            if (maestro.App.autoParams.autoFogEnabled || maestro.App.autoParams.autoEffectsEnabled || maestro.App.autoParams.autoStrobeEnabled){
+                            if (maestro.App.autoParams.autoFogEnabled || maestro.App.autoParams.autoEffectsEnabled || maestro.App.autoParams.autoStrobeEnabled) {
                                 maestro.App.switchAutoPrograms();
-                            }else{
-                                this.autoFogTimer = null;
                             }
 
                             if (this.logging)
@@ -504,19 +502,24 @@ class App extends Globals {
             return;
         }
 
-        if (!Number(this.autoParamsfogTimer) > 0)
-            this.autoParamsfogTimer = 10;
+        if (!Number(this.autoParams.fogTimer) > 0)
+            this.autoParams.fogTimer = 10;
         if (!Number(this.autoParams.fogTimerDuration) > 0)
             this.autoParams.fogTimerDuration = 3;
 
         //from minutes to ms
-        let frequency = this.autoParamsfogTimer * 60000;
+        let frequency = (this.autoParams.fogTimer * 60000) + (this.autoParams.fogTimerDuration * 1000);
         let duration = this.autoParams.fogTimerDuration * 1000;
 
         //already running
-        if (this.autoFogTimer) return;
+        if (this.autoFogTimer) {
+            this.autoFogTimerCountdown--;
+            return;
+        }
 
         try {
+            this.autoFogTimerCountdown = frequency / 1000;
+
             this.autoFogTimer = setInterval(async () => {
                 //check its still active...
                 if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnTimer) {
