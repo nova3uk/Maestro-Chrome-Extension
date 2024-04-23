@@ -853,7 +853,7 @@ class SettingsApp extends Globals {
                             if (row.shutterParams)
                                 values = row.shutterParams.find(ele => ele.channelId == channel.index);
                             response += `<label style="font-size:10px;position:relative;top:-10px;" for="strobe_val_${channel.index}_${row.id}">Ch ${channel.index + 1}</label><br>`;
-                            response += `<input type="number" style="width:70px;position:relative;top:-10px;" name="shutter_val" data-id="${row.id}" data-type="${channel.channel.type}" data-channelid="${channel.index}" id="shutter_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.shutter : ""}">`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="shutter_val" data-id="${row.id}" data-type="${channel.channel.type}" data-channelid="${channel.index}" id="shutter_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.shutter : ""}">`;
                         }
                         return response;
                     }
@@ -877,7 +877,7 @@ class SettingsApp extends Globals {
                                 values = row.shutterParams.find(ele => ele.channelId == channel.index);
 
                             response += `<label style="font-size:10px;position:relative;top:-10px;" for="strobe_val_${channel.index}_${row.id}">Ch ${channel.index + 1}</label><br>`;
-                            response += `<input type="number" style="width:70px;position:relative;top:-10px;" name="shutter_strobe" data-id="${row.id}" data-type="${channel.channel.type}"data-channelid="${channel.index}" id="strobe_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.strobe : ""}">`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="shutter_strobe" data-id="${row.id}" data-type="${channel.channel.type}"data-channelid="${channel.index}" id="strobe_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.strobe : ""}">`;
                         }
                         return response;
 
@@ -1351,7 +1351,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        let select = `<select name="macroList" data-id="${row.id}" class="form-select" style="width: 100%;">`;
+                        let select = `<select name="macroList" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
                         select += '<option value="">-</option>';
                         for (let item of row.list) {
                             select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
