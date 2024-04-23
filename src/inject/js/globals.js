@@ -1,7 +1,7 @@
 var maestro = maestro || {};
 class Globals {
-    constructor(scriptSource, debugFecth = false) {
-        if (debugFecth) this.replaceFetch();
+    constructor(scriptSource, debugFetch = false) {
+        if (debugFetch) this.replaceFetch();
         this.init(scriptSource);
     }
 
@@ -449,4 +449,4 @@ class Globals {
             });
     };
 }
-maestro.Globals = new Globals(document.currentScript.src);
+maestro.Globals = new Globals(document.currentScript.src, true);

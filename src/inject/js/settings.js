@@ -487,6 +487,7 @@ class SettingsApp extends Globals {
                 const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
                 if (runningMacroIds.length > 0) {
+                    this.hideLoader();
                     return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
                 }
             }
@@ -515,14 +516,15 @@ class SettingsApp extends Globals {
 
                     await Promise.all(promiseArray).then(() => {
                         this.storeFixtureProfile(macroName, currentProfile);
+                    }).then(async () => {
+                        if (macro.macro.cueId) {
+                            await this.getCues().then(async (cues) => {
+                                let cueIndex = cues.findIndex(cue => cue.uuid === macro.macro.cueId);
+                                await this.startCue(cueIndex);
+                            })
+                        }
                     });
 
-                    // if (macro.macro.cueId) {
-                    //     await this.getCues().then(async (cues) => {
-                    //         let cueIndex = cues.findIndex(cue => cue.uuid === macro.macro.cueId);
-                    //         await this.startCue(cueIndex);
-                    //     })
-                    // }
                 }
             }
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
@@ -629,13 +631,16 @@ class SettingsApp extends Globals {
                 let attrOld = oldProfile.attribute[attr];
                 let attrDiff = this.getObjectDiff(attrNew, attrOld);
 
+                //should never edit colorwheel, its not modifiable via attribute updates
+                if (attrNew.colorWheelSetting || attrOld.colorWheelSetting) continue;
+
                 for (let prop of attrDiff) {
                     let update = {
                         attribute: {
                             [prop]: attrNew[prop]
                         }
                     };
-                    await this.putAttribute(fixtureId, attr, update);
+                    this.putAttribute(fixtureId, attr, update);
                 }
             };
         } catch (e) {
@@ -1398,7 +1403,7 @@ class SettingsApp extends Globals {
                         let btnState = false;
                         if (row.attributes.includes('GOBO')) {
                             if (row.goboState) {
-                                btnState = row.goboState;
+                                btnState = row.goboState.gobo;
                             } else {
                                 btnState = true;
                             }
@@ -1409,7 +1414,7 @@ class SettingsApp extends Globals {
                         }
                         if (row.attributes.includes('PRISM')) {
                             if (row.prismState) {
-                                btnState = row.prismState;
+                                btnState = row.prismState.prism;
                             } else {
                                 btnState = true;
                             }
@@ -1488,8 +1493,8 @@ class SettingsApp extends Globals {
                             setting.enabled = true;
                         }
                     });
-                    await this.putAttribute(fixture.id, index, { attribute: attr });
-                    await this.saveLocalSetting("gobo_state_" + fixture.id, { stageId: stage.stageId, gobo: onOrOff })
+                    this.putAttribute(fixture.id, index, { attribute: attr });
+                    this.saveLocalSetting("gobo_state_" + fixture.id, { stageId: stage.stageId, gobo: onOrOff })
                 }
                 index++;
             }
