@@ -1214,17 +1214,24 @@ class SettingsApp extends Globals {
     };
     cuesTable = async (stages) => {
         try {
+            let activeCue;
             let cues = await this.getCues();
             let showState = await this.getShowState();
-            const activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
+
+            if (showState.currentCue)
+                activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
+
             let macroNames = [];
 
-            for (let cue of cues) {
-                if (cue.uuid === activeCue.uuid) {
-                    cue.active = true;
-                    cue.playInder = activeCue.playIndex;
-                    cue.playTime = activeCue.playTime;
-                    cue.type = activeCue.type;
+            if (activeCue) {
+                for (let cue of cues) {
+
+                    if (cue.uuid === activeCue.uuid) {
+                        cue.active = true;
+                        cue.playInder = activeCue.playIndex;
+                        cue.playTime = activeCue.playTime;
+                        cue.type = activeCue.type;
+                    }
                 }
             }
 
