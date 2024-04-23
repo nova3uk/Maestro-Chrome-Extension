@@ -264,7 +264,7 @@ class SettingsApp extends Globals {
         }
     };
     backupAllFixtures = async () => {
-        let fixtures = await this.getActiveStage();
+        let fixtures = await this.getActiveStage(true);
         let backupData = {
             stageId: this.stageId,
             date: JSON.stringify(new Date().getTime()),
@@ -685,7 +685,7 @@ class SettingsApp extends Globals {
             }
             const values = Array.from(checkboxes).map(checkbox => checkbox.value);
 
-            await this.getActiveStage();
+            await this.getActiveStage(true);
 
             let macroFixtures = maestro.SettingsApp.activeStage.fixture.filter(fixture => values.includes(fixture.id.toString()));
 
@@ -1323,8 +1323,10 @@ class SettingsApp extends Globals {
             }
 
             await this.loadMacros().then((macros) => {
-                for (let macro of macros) {
-                    macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
+                if(macros){
+                    for (let macro of macros) {
+                        macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
+                    };
                 }
             });
 
@@ -1351,6 +1353,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
+                        if(row.list.length == 0) return;
                         let select = `<select name="macroList" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
                         select += '<option value="">-</option>';
                         for (let item of row.list) {
@@ -1368,6 +1371,9 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
+                        if(row.list.length == 0) {
+                            return `<button class="btn btn-primary" disabled>Apply</button>`;
+                        }
                         return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
                     }
                 }],
