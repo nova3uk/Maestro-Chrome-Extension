@@ -1055,7 +1055,7 @@ class SettingsApp extends Globals {
         }
     };
     resetPanTiltAll = async (ids) => {
-        this.deleteLocalSettingg("panTiltAll");
+        this.deleteLocalSetting("panTiltAll");
         for (let id of ids) {
             await this.resetPanTilt(id);
         }
@@ -1085,6 +1085,7 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
     resetPanTilt = async (id) => {
+        this.saveLocalSetting("panTilt_" + id, { pan: 0, tilt: 0 });
         let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
         let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
         let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
