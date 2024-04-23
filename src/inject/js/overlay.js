@@ -335,11 +335,13 @@ class OverlayApp extends Globals {
     };
     autoEffectsActive = async () => {
         try {
-            let autoFogEnabled = maestro.App.getAutoParams.autoFogEnabled;
-            let autoFogOnActivityPeak = maestro.App.getAutoParams.autoFogOnActivityPeak;
-            let autoFogOnTimer = maestro.App.getAutoParams.autoFogOnTimer;
-            let autoEffectsEnabled = maestro.App.getAutoParams.autoEffectsEnabled;
-            let autoStrobeEnabled = maestro.App.getAutoParams.autoStrobeEnabled;
+            if (!maestro.App.autoParams) return;
+
+            let autoFogEnabled = maestro.App.autoParams.autoFogEnabled;
+            let autoFogOnActivityPeak = maestro.App.autoParams.autoFogOnActivityPeak;
+            let autoFogOnTimer = maestro.App.autoParams.autoFogOnTimer;
+            let autoEffectsEnabled = maestro.App.autoParams.autoEffectsEnabled;
+            let autoStrobeEnabled = maestro.App.autoParams.autoStrobeEnabled;
             let lightning;
 
             if (!document.getElementById('effectsActiveIcon')) {
