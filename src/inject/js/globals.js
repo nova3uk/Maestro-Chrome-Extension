@@ -230,6 +230,34 @@ class Globals {
 
         return diff;
     };
+    upprageShutterParams = async (fixtureId, shutterParams) => {
+        //new
+        //"strobe_373bdc30-c32e-409d-91e7-70cdde906b95" :[{"channelId" : "6", "shutter" : 200, "strobe" : 255}, {"channelId" : "13", "shutter" : 100, "strobe" : 255}]
+        //old
+        //strobe_1fa611c0-6f81-43cf-9153-5d01b9c2d2ee": {"shutter": 255,"strobe": 200}
+
+        try {
+            if (shutterParams) {
+                if (shutterParams.shutter || shutterParams.strobe) {
+                    let fixture = this.activeStage.fixture.find(ele => ele.id == fixtureId);
+                    let channel = fixture.attribute.filter(channel => channel.type === "SHUTTER" || channel.type === "STROBE")
+                        .map((channel) => ({ index: fixture.attribute.indexOf(channel), channel }));
+                    if (channel) {
+                        let newShutterParams = [];
+
+                        newShutterParams.push({ channelId: channel[0].index, shutter: shutterParams.shutter, strobe: shutterParams.strobe });
+                        this.saveLocalSetting("strobe_" + fixtureId, newShutterParams);
+
+                        return newShutterParams;
+                    }
+                }
+            }
+        } catch (e) {
+            if (this.logging)
+                console.error('Error upgrading shutter params:', e);
+        }
+        return shutterParams;
+    }
     openNewTab = (page) => {
         let url = chrome.runtime.getURL(page);
         chrome.tabs.query({ url: url }, function (tabs) {

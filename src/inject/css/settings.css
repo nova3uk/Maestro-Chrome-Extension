@@ -23,3 +23,15 @@
     min-height: 200px;
     height: auto;
 }
+table.table-bordered {
+    border: 1px solid #454444;
+    margin-top: 20px;
+}
+
+table.table-bordered>thead>tr>th {
+    border: 1px solid #454444;
+}
+
+table.table-bordered>tbody>tr>td {
+    border: 1px solid #454444;
+}

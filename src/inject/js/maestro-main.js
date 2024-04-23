@@ -100,9 +100,6 @@ class App extends Globals {
         this.stageId = stage.activeStageId;
         this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
 
-
-        //Shutter channel based Strobing Fixtures with a Colorwheel
-        //we do not need to worry about max dimmer or setting to whiter as the maestro does this already
         this.shutterFixtures = this.fixtures.filter(fixture =>
             fixture.enabled &&
             ["SHUTTER", "COLOR_WHEEL"].every(type =>
@@ -140,8 +137,7 @@ class App extends Globals {
         this.strobeActive = onOrOff;
         this.latchedOn = latched;
 
-        await this.getStrobeParams();
-
+        //await this.getStrobeParams();
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
             { fixtures: this.strobeFixtures, attributeType: "STROBE" }
@@ -151,8 +147,6 @@ class App extends Globals {
             try {
                 for (let fixture of fixtures) {
                     try {
-                        let normalValue = 0;
-                        let strobeValue = 0;
                         let ignore = false;
 
                         for (let i = 0; i < this.ignoreFixtures.length; i++) {
@@ -164,10 +158,10 @@ class App extends Globals {
                         if (ignore) continue;
 
                         let paramsFound = false
+                        let channels = null;
                         for (let i = 0; i < this.strobeParams.length; i++) {
-                            if (this.strobeParams[i]["strobe_" + fixture.id] != null) {
-                                normalValue = this.strobeParams[i]["strobe_" + fixture.id].shutter;
-                                strobeValue = this.strobeParams[i]["strobe_" + fixture.id].strobe;
+                            if (this.strobeParams[i]["strobe_" + fixture.id]) {
+                                channels = await this.upprageShutterParams(fixture.id, this.strobeParams[i]["strobe_" + fixture.id]);
                                 paramsFound = true;
                                 break;
                             }
@@ -176,19 +170,24 @@ class App extends Globals {
                         //no params set for this fixture, skip
                         if (!paramsFound) continue;
 
-                        if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
-                            throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
+                        for (let channel of channels) {
+                            let normalValue = channel.shutter;
+                            let strobeValue = channel.strobe;
+
+                            if (!this.isNumeric(normalValue) || !this.isNumeric(strobeValue)) {
+                                throw new Error(`Fixture ${fixture.name} normalValue and strobeValue must be numeric.`);
+                            }
+
+                            if (normalValue == 0 && strobeValue == 0) continue;
+                            if (normalValue == strobeValue) continue;
+
+                            let attributeId = channel.channelId;
+                            if (!attributeId) continue;
+
+                            let setValue = onOrOff == 1 ? strobeValue : normalValue;
+
+                            this.updateAttribute(fixture.id, attributeId, setValue);
                         }
-
-                        if (normalValue == 0 && strobeValue == 0) continue;
-                        if (normalValue == strobeValue) continue;
-
-                        let attributeId = fixture.attribute.findIndex(attr => attr.type === attributeType);
-                        if (!attributeId) continue;
-
-                        let setValue = onOrOff == 1 ? strobeValue : normalValue;
-
-                        this.updateAttribute(fixture.id, attributeId, setValue);
 
                         if (this.logging)
                             console.log(`Fixture ${fixture.name}, attribue ${attributeId} set to ${setValue}`);
@@ -254,9 +253,6 @@ class App extends Globals {
                 console.error('Fatal error updating fixture data:', error);
         }
     };
-
-    //the document is using dynamic css and labels, without ids.
-    //so its required to search for the button by text
     findByText = (needle, query = "*", haystack = document) => {
         return [...haystack.querySelectorAll(query)].filter(val =>
             Array.from(val.childNodes).some(({ nodeType, textContent, parentElement }) =>
@@ -536,8 +532,6 @@ class App extends Globals {
                 this.autoFogInterval = frequency;
                 this.autoFogDuration = duration;
 
-                //debounce - no reactivation before minimum delay
-                //we also check fog on timer - as we don't want to execute this if the timer has run also within the time limit
                 if (!this.activePeakFogLastExecution)
                     this.activePeakFogLastExecution = await maestro.Globals.getRemoteSetting("activePeakFogLastExecution") || 0;
 
@@ -585,8 +579,6 @@ class App extends Globals {
             if (!Number(this.autoParamsautoFogOnActivityPeakInterval) > 0)
                 this.autoParamsautoFogOnActivityPeakInterval = 2;
 
-            //debounce - no reactivation before minimum delay
-            //we also check fog on timer - as we don't want to execute this if the timer has run also within the time limit
             if (!this.activePeakFogLastExecution)
                 this.activePeakFogLastExecution = await maestro.Globals.getRemoteSetting("activePeakFogLastExecution") || 0;
 
