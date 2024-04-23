@@ -40,7 +40,7 @@ class Globals {
     shutterFixtures = [];
     strobeFixtures = [];
     currentCue = [];
-    cues = [];
+    cues;
     activeStageFixtureGroups = [];
     eventManual;
     pageObserver;
