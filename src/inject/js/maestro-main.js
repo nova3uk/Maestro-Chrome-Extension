@@ -348,8 +348,11 @@ class App extends Globals {
 
                             Object.freeze(maestro.App.autoParams);
 
-                            if (maestro.App.autoParams.autoFogEnabled || maestro.App.autoParams.autoEffectsEnabled || maestro.App.autoParams.autoStrobeEnabled)
+                            if (maestro.App.autoParams.autoFogEnabled || maestro.App.autoParams.autoEffectsEnabled || maestro.App.autoParams.autoStrobeEnabled){
                                 maestro.App.switchAutoPrograms();
+                            }else{
+                                this.autoFogTimer = null;
+                            }
 
                             if (this.logging)
                                 console.log("Auto params loaded.");
