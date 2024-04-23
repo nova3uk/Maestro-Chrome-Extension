@@ -19,6 +19,8 @@ Currently supporting Maestro Firmware versions 1.2.0 and 1.3.0!
 6. Auto Strobe on Audio Activity. Strobe your fixtures based on the peak of music excitment. Adjustable minimum excitement level to trigger, effect latching time and minimum intervals.
 7. Auto Effect on Audio Activity. Trigger fixture Effects based on the peak of the music excitment. Adjustable minimum excitement level to trigger, effect latching time and minimum intervals.
 8. Color overrides. Force every fixture to a specific RGBUAV color.
+9. Stage Cue trigger on Macro.
+10. Fixture Toggles - bulk edit split channels, such as Gobo or Prism.
 
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
