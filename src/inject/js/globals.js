@@ -48,6 +48,7 @@ class Globals {
     minDmxVal = 0;
     audioLevel = 0;
     activityLevel = 0;
+
     allColors = [
         "RED",
         "GREEN",
@@ -299,8 +300,18 @@ class Globals {
             }
         }
     };
-    getBrightness = async (fixtureId) => {
-        return await this.getUrl(`${maestro.App.maestroUrl}api/${this.apiVersion}/brightness`);
+    getBrightness = async () => {
+        if (this.brightness) {
+            if (this.brightnessUpdate) {
+                if (this.brightnessUpdate + 5000 > Date.now()) {
+                    return this.brightness;
+                }
+            }
+        }
+
+        this.brightness = await this.getUrl(`${maestro.App.maestroUrl}api/${this.apiVersion}/brightness`);
+        this.brightnessUpdate = Date.now();
+        return this.brightness;
     };
     getShows = async () => {
         try {

@@ -342,13 +342,13 @@ class App extends Globals {
                         if (response) {
                             //maestro.App.autoParams = { ...maestro.App.autoParams, ...response };
                             maestro.App.autoParams = response;
-                            maestro.App.autoParamsactivePeakFogMinimumDelay = maestro.App.autoParamsautoFogOnActivityPeakInterval * 60000;
-                            maestro.App.autoParamsactivePeakStrobeMinimumDelay = maestro.App.autoParamsautoStrobeOnActivityPeakInterval * 60000;
-                            maestro.App.autoParamsactivePeakEffectsMinimumDelay = maestro.App.autoParamsautoEffectsOnActivityPeakInterval * 60000;
+                            maestro.App.autoParams.activePeakFogMinimumDelay = maestro.App.autoParams.autoFogOnActivityPeakInterval * 60000;
+                            maestro.App.autoParams.activePeakStrobeMinimumDelay = maestro.App.autoParams.autoStrobeOnActivityPeakInterval * 60000;
+                            maestro.App.autoParams.activePeakEffectsMinimumDelay = maestro.App.autoParams.autoEffectsOnActivityPeakInterval * 60000;
 
-                            Object.freeze(maestro.AppautoParams);
+                            Object.freeze(maestro.App.autoParams);
 
-                            if (maestro.App.autoParamsautoFogEnabled || maestro.App.autoParamsautoEffectsEnabled || maestro.App.autoParamsautoStrobeEnabled)
+                            if (maestro.App.autoParams.autoFogEnabled || maestro.App.autoParams.autoEffectsEnabled || maestro.App.autoParams.autoStrobeEnabled)
                                 maestro.App.switchAutoPrograms();
 
                             if (this.logging)
@@ -363,11 +363,11 @@ class App extends Globals {
         }
     };
     switchAutoPrograms = () => {
-        let autoFogEnabled = this.autoParamsautoFogEnabled;
-        let autoFogOnActivityPeak = this.autoParamsautoFogOnActivityPeak;
-        let autoFogOnTimer = this.autoParamsautoFogOnTimer;
-        let autoEffectsEnabled = this.autoParamsautoEffectsEnabled;
-        let autoStrobeEnabled = this.autoParamsautoStrobeEnabled;
+        let autoFogEnabled = this.autoParams.autoFogEnabled;
+        let autoFogOnActivityPeak = this.autoParams.autoFogOnActivityPeak;
+        let autoFogOnTimer = this.autoParams.autoFogOnTimer;
+        let autoEffectsEnabled = this.autoParams.autoEffectsEnabled;
+        let autoStrobeEnabled = this.autoParams.autoStrobeEnabled;
 
         if (autoEffectsEnabled) {
             var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoEffectsOnPeak);
@@ -410,25 +410,25 @@ class App extends Globals {
         };
     };
     autoStrobeOnPeak = async (level) => {
-        if (!this.autoParamsautoStrobeEnabled) {
+        if (!this.autoParams.autoStrobeEnabled) {
             return;
         }
 
-        if (!Number(maestro.App.autoParamsautoStrobeOnActivityPeakPercent) > 0)
-            maestro.App.autoParamsautoStrobeOnActivityPeakPercent = 95;
-        if (!Number(maestro.App.autoParamsautoStrobeOnActivityPeakDuration) > 0)
-            maestro.App.autoParamsautoStrobeOnActivityPeakDuration = 2;
-        if (!Number(maestro.App.autoParamsautoStrobeOnActivityPeakInterval) > 0)
-            maestro.App.autoParamsautoStrobeOnActivityPeakInterval = 2;
+        if (!Number(maestro.App.autoParams.autoStrobeOnActivityPeakPercent) > 0)
+            maestro.App.autoParams.autoStrobeOnActivityPeakPercent = 95;
+        if (!Number(maestro.App.autoParams.autoStrobeOnActivityPeakDuration) > 0)
+            maestro.App.autoParams.autoStrobeOnActivityPeakDuration = 2;
+        if (!Number(maestro.App.autoParams.autoStrobeOnActivityPeakInterval) > 0)
+            maestro.App.autoParams.autoStrobeOnActivityPeakInterval = 2;
 
         //debounce - no reactivation before minimum delay
         if (!this.activePeakStrobeLastExecution)
             this.activePeakStrobeLastExecution = await maestro.Globals.getRemoteSetting("activePeakStrobeLastExecution") || 0;
 
-        if ((this.activePeakStrobeLastExecution + maestro.App.autoParamsactivePeakStrobeMinimumDelay) > Date.now()) return;
+        if ((this.activePeakStrobeLastExecution + maestro.App.autoParams.activePeakStrobeMinimumDelay) > Date.now()) return;
 
-        let autoStrobeOnActivityPeakPercent = maestro.App.autoParamsautoStrobeOnActivityPeakPercent;
-        let autoStrobeOnActivityPeakDuration = (maestro.App.autoParamsautoStrobeOnActivityPeakDuration || 2) * 1000;
+        let autoStrobeOnActivityPeakPercent = maestro.App.autoParams.autoStrobeOnActivityPeakPercent;
+        let autoStrobeOnActivityPeakDuration = (maestro.App.autoParams.autoStrobeOnActivityPeakDuration || 2) * 1000;
 
         if (level >= autoStrobeOnActivityPeakPercent) {
             if (this.autoStrobeOnPeakTimer) return;
@@ -454,25 +454,25 @@ class App extends Globals {
         }
     };
     autoEffectsOnPeak = async (level) => {
-        if (!this.autoParamsautoEffectsEnabled) {
+        if (!this.autoParams.autoEffectsEnabled) {
             return;
         }
 
-        if (!Number(maestro.App.autoParamsautoEffectsOnActivityPeakPercent) > 0)
-            this.autoParamsautoEffectsOnActivityPeakPercent = 95;
-        if (!Number(maestro.App.autoParamsautoEffectsOnActivityPeakDuration) > 0)
-            this.autoParamsautoEffectsOnActivityPeakDuration = 2;
-        if (!Number(maestro.App.autoParamsautoEffectsOnActivityPeakInterval) > 0)
-            this.autoParamsautoEffectsOnActivityPeakInterval = 2;
+        if (!Number(maestro.App.autoParams.autoEffectsOnActivityPeakPercent) > 0)
+            this.autoParams.autoEffectsOnActivityPeakPercent = 95;
+        if (!Number(maestro.App.autoParams.autoEffectsOnActivityPeakDuration) > 0)
+            this.autoParams.autoEffectsOnActivityPeakDuration = 2;
+        if (!Number(maestro.App.autoParams.autoEffectsOnActivityPeakInterval) > 0)
+            this.autoParams.autoEffectsOnActivityPeakInterval = 2;
 
         //debounce - no reactivation before minimum delay
         if (!this.activePeakEffectsLastExecution)
             this.activePeakEffectsLastExecution = await maestro.Globals.getRemoteSetting("activePeakEffectsLastExecution") || 0;
 
-        if ((this.activePeakEffectsLastExecution + this.autoParamsactivePeakEffectsMinimumDelay) > Date.now()) return;
+        if ((this.activePeakEffectsLastExecution + this.autoParams.activePeakEffectsMinimumDelay) > Date.now()) return;
 
-        let autoEffectsOnActivityPeakPercent = this.autoParamsautoEffectsOnActivityPeakPercent;
-        let autoEffectsOnActivityPeakDuration = this.autoParamsautoEffectsOnActivityPeakDuration * 1000;
+        let autoEffectsOnActivityPeakPercent = this.autoParams.autoEffectsOnActivityPeakPercent;
+        let autoEffectsOnActivityPeakDuration = this.autoParams.autoEffectsOnActivityPeakDuration * 1000;
 
         if (level >= autoEffectsOnActivityPeakPercent) {
             if (this.autoEffectsOnPeakTimer) return;
@@ -497,18 +497,18 @@ class App extends Globals {
         }
     };
     autoFogOnTimer = () => {
-        if (!this.autoParamsautoFogEnabled || !this.autoParamsautoFogOnTimer) {
+        if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnTimer) {
             return;
         }
 
         if (!Number(this.autoParamsfogTimer) > 0)
             this.autoParamsfogTimer = 10;
-        if (!Number(this.autoParamsfogTimerDuration) > 0)
-            this.autoParamsfogTimerDuration = 3;
+        if (!Number(this.autoParams.fogTimerDuration) > 0)
+            this.autoParams.fogTimerDuration = 3;
 
         //from minutes to ms
         let frequency = this.autoParamsfogTimer * 60000;
-        let duration = this.autoParamsfogTimerDuration * 1000;
+        let duration = this.autoParams.fogTimerDuration * 1000;
 
         //already running
         if (this.autoFogTimer) return;
@@ -516,7 +516,7 @@ class App extends Globals {
         try {
             this.autoFogTimer = setInterval(async () => {
                 //check its still active...
-                if (!this.autoParamsautoFogEnabled || !this.autoParamsautoFogOnTimer) {
+                if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnTimer) {
                     clearInterval(this.autoFogTimer);
                     this.autoFogTimer = null;
                     return;
@@ -567,17 +567,17 @@ class App extends Globals {
     };
     autoFogOnPeak = async (level) => {
 
-        if (!this.autoParamsautoFogEnabled || !this.autoParamsautoFogOnActivityPeak) {
+        if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnActivityPeak) {
             return;
         }
         try {
             //local settings
-            if (!Number(this.autoParamsautoFogOnActivityPeakPercent) > 0)
-                this.autoParamsautoFogOnActivityPeakPercent = 95;
-            if (!Number(this.autoParamsautoFogOnActivityPeakDuration) > 0)
-                this.autoParamsautoFogOnActivityPeakDuration = 3;
-            if (!Number(this.autoParamsautoFogOnActivityPeakInterval) > 0)
-                this.autoParamsautoFogOnActivityPeakInterval = 2;
+            if (!Number(this.autoParams.autoFogOnActivityPeakPercent) > 0)
+                this.autoParams.autoFogOnActivityPeakPercent = 95;
+            if (!Number(this.autoParams.autoFogOnActivityPeakDuration) > 0)
+                this.autoParams.autoFogOnActivityPeakDuration = 3;
+            if (!Number(this.autoParams.autoFogOnActivityPeakInterval) > 0)
+                this.autoParams.autoFogOnActivityPeakInterval = 2;
 
             if (!this.activePeakFogLastExecution)
                 this.activePeakFogLastExecution = await maestro.Globals.getRemoteSetting("activePeakFogLastExecution") || 0;
@@ -585,11 +585,11 @@ class App extends Globals {
             if (!this.activeFogOnTimerLastExecution)
                 this.activeFogOnTimerLastExecution = await maestro.Globals.getRemoteSetting("activeFogOnTimerLastExecution") || 0;
 
-            if ((this.activePeakFogLastExecution + this.autoParamsactivePeakFogMinimumDelay) > Date.now()) return;
-            if ((this.activeFogOnTimerLastExecution + this.autoParamsactivePeakFogMinimumDelay) > Date.now()) return;
+            if ((this.activePeakFogLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) return;
+            if ((this.activeFogOnTimerLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) return;
 
-            let autoFogOnActivityPeakPercent = this.autoParamsautoFogOnActivityPeakPercent;
-            let autoFogOnActivityPeakDuration = this.autoParamsautoFogOnActivityPeakDuration * 1000;
+            let autoFogOnActivityPeakPercent = this.autoParams.autoFogOnActivityPeakPercent;
+            let autoFogOnActivityPeakDuration = this.autoParams.autoFogOnActivityPeakDuration * 1000;
 
             if (level >= autoFogOnActivityPeakPercent) {
                 if (this.autoFogOnPeakTimer) return;
