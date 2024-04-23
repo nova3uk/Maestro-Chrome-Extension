@@ -1019,6 +1019,11 @@ class SettingsApp extends Globals {
             var fixtures = macro.macro.fixtures.filter(fixture => this.activeStage.fixture.some(activeFixture => activeFixture.id === fixture.id));
             let cue = cues.find(cue => cue.uuid == macro.macro.cueId);
 
+            if (!cue) {
+                await maestro.SettingsApp.removeCueFromMacro(macro.macro.name, macro.macro.stageId);
+                macro.macro.cueId = null;
+            }
+
             tData.push({
                 macro: macro,
                 stageId: macro.macro.stageId,
