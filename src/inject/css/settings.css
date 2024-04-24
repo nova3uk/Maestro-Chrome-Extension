@@ -35,3 +35,9 @@ table.table-bordered>thead>tr>th {
 table.table-bordered>tbody>tr>td {
     border: 1px solid #454444;
 }
+custom-range {
+    background: gray;
+  }
+  table.bg-green>tbody>tr>td {
+    background-color: #66ffcc;
+  }

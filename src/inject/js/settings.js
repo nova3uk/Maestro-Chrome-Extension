@@ -22,6 +22,7 @@ class SettingsApp extends Globals {
         this.bindMacroBtn();
         this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
+        this.dimmersTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoFog();
         this.bindAutoEffects();
@@ -1603,7 +1604,6 @@ class SettingsApp extends Globals {
         var tData = [];
 
         for (let group of activeFixtureGroups) {
-            let i = 0;
             if (group.fixtureId) {
                 for (let fixtureId of group.fixtureId) {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
@@ -1707,7 +1707,7 @@ class SettingsApp extends Globals {
             await maestro.SettingsApp.switchPrisms(this.dataset.id);
 
         });
-    }
+    };
     switchGobos = async (fixtureId, onOrOff = true, exceptOpen = true) => {
         this.showLoader();
         let stage = await this.getActiveStage();
@@ -1735,7 +1735,7 @@ class SettingsApp extends Globals {
             }
         }
         this.hideLoader();
-    }
+    };
     switchPrisms = async (fixtureId, onOrOff = true, exceptOpen = true) => {
         this.showLoader();
         let stage = await this.getActiveStage();
@@ -1763,7 +1763,281 @@ class SettingsApp extends Globals {
             }
         }
         this.hideLoader();
+    };
+    dimmersTable = async (activeStage, activeFixtureGroups) => {
+        var tData = [];
+
+        for (let group of activeFixtureGroups) {
+            if (group.fixtureId) {
+                for (let fixtureId of group.fixtureId) {
+                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    for (let attribute of fixture.attribute) {
+                        if (attribute.type == "DIMMER" || attribute.type == "MASTER_DIMMER") {
+                            tData.push(
+                                {
+                                    id: fixture.id,
+                                    active: fixture.enabled,
+                                    name: fixture.name,
+                                    attributes: attribute,
+                                    type: attribute.type,
+                                    groupName: group.name
+                                });
+                        }
+                    }
+                }
+            }
+        }
+
+        $('#dimmers').bootstrapTable({
+            data: tData,
+            columns: [
+                {
+                    field: 'name',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<h6>${row.name}</h6>`;
+                    }
+                },
+                {
+                    field: 'group',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<h6>${row.groupName}</h6>`;
+                    }
+                },
+                {
+                    field: 'type',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return `<span>${row.attributes.type}</span>`;
+                    }
+                },
+                {
+                    field: 'dimmers',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.active == false) return;
+                        let response = "";
+
+                        //response += `<span id="${row.id}" class="" style="width:400px;display:inline-block;white-space: nowrap;">`;
+                        if (row.attributes.staticValue) {
+                            response += `<table class="table table-borderless bg-green">`;
+                            response += `<tr>`;
+                            response += `   <td width="15%">`;
+                            response += `   </td>`;
+                            response += `   <td width="70%">`;
+                            response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="int" data-fixtureid="${row.id}" id="${row.id}_dimmer" value="${row.attributes.staticValue.value}"><span class="me-2">255</span>`;
+                            response += `   </td>`;
+                            response += `   <td width="15%" style="text-align:left">`;
+                            response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${row.id}_dimmerVal" data-fixtureid="${row.id}" data-type="int" value="${row.attributes.staticValue.value}">`;
+                            response += `   </td>`;
+                            response += `</tr>`;
+                            response += `</table>`;
+                        }
+                        if (row.attributes.range) {
+                            response += `<table class="table table-borderless bg-green">`;
+                            response += `<tr>`;
+                            response += `   <td width="15%" style="text-align:right">`;
+                            response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${row.id}_dimmerValLow" data-fixtureid="${row.id}" data-type="dec" data-val="low" value="${Math.floor(255 * row.attributes.range.lowValue)}">`;
+                            response += `   </td>`;
+                            response += `   <td width="70%">`;
+                            response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="low" data-fixtureid="${row.id}" id="${row.id}_dimmer_low" value="${Math.floor(255 * row.attributes.range.lowValue)}"><span class="me-2">255</span>`;
+                            response += `   </td>`;
+                            response += `   <td width="15%">`;
+                            response += `   </td>`;
+                            response += `</tr>`;
+                            response += `<tr>`;
+                            response += `   <td width="15%">`;
+                            response += `   </td>`;
+                            response += `   <td with="70%">`;
+                            response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="high" data-fixtureid="${row.id}" id="${row.id}_dimmer_high" value="${Math.floor(255 * row.attributes.range.highValue)}"><span class="me-2">255</span>`;
+                            response += `   </td>`;
+                            response += `   <td width="15%" style="text-align:left">`;
+                            response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${row.id}_dimmerValHigh" data-fixtureid="${row.id}" data-type="dec" data-val="high" value="${Math.floor(255 * row.attributes.range.highValue)}">`;
+                            response += `    </td>`;
+                            response += `</tr>`;
+                            response += `</table>`;
+                        }
+
+                        return response;
+                    }
+                }],
+            rowAttributes: function (row, index) {
+                return {
+                    'data-id': row.id,
+                    'data-stage-active': row.active
+                }
+            },
+            rowStyle: function (row, index) {
+                if (row.active) {
+                    return {
+                        css: {
+                            'background-color': '#66ffcc'
+                        }
+                    }
+                } else {
+                    return {
+                        css: {
+                            'background-color': ''
+                        }
+                    }
+
+                }
+            }
+        });
+
+        $('input[name="dimmerRangeNum"]').on('change', function (ele) {
+            if (this.dataset.type == "int") {
+                //cannot be higher than the high values minimum current value
+                document.getElementById(`${this.dataset.fixtureid}_dimmer`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                maestro.SettingsApp.setDimmer(this.dataset.fixtureid, maestro.SettingsApp.safeMinMax(this.value, 0, 255));
+            }
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "low") {
+                    //cannot be higher than the high values minimum current value
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_dimmerValLow`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value;
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "high") {
+                    //cannot be lower than the low values maximum current value
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value;
+                        maestro.SettingsApp.setDimmer(this.dataset.fixtureid, this.value, document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+
+                }
+
+                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(this.dataset.fixtureid, document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value, document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value), 100);
+            }
+
+        })
+        $('input[name="dimmerRange"]').on('input', function (ele) {
+            if (this.dataset.type == "int") {
+                document.getElementById(`${this.dataset.fixtureid}_dimmerVal`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                maestro.SettingsApp.setDimmer(this.dataset.fixtureid, maestro.SettingsApp.safeMinMax(this.value, 0, 255));
+            }
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "low") {
+                    //cannot be higher than the high values minimum current value
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "high") {
+                    //cannot be lower than the low values maximum current value
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+
+                //maestro.SettingsApp.setDimmer(this.dataset.fixtureid, document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value, document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)
+            }
+        });
+        $('button[name="allDimmersBtn"]').on('click', async function (ele) {
+            let highValue = this.dataset.value;
+            $('button[name="allDimmersBtn"]').prop('disabled', true);
+
+            $('input[name="dimmerRangeNum"]').each(function (index, ele) {
+                let fixtureId = ele.dataset.fixtureid;
+                let type = ele.dataset.type;
+
+                if (type == "int") {
+                    document.getElementById(`${fixtureId}_dimmerVal`).value = highValue;
+                    document.getElementById(`${fixtureId}_dimmer`).value = highValue;
+                }
+                if (type == "dec") {
+                    document.getElementById(`${fixtureId}_dimmerValLow`).value = 0;
+                    document.getElementById(`${fixtureId}_dimmerValHigh`).value = highValue;
+                    document.getElementById(`${fixtureId}_dimmer_low`).value = 0;
+                    document.getElementById(`${fixtureId}_dimmer_high`).value = highValue;
+                }
+
+                let event = new Event('change');
+                ele.dispatchEvent(event);
+
+            }).promise().done(function () {
+                $('button[name="allDimmersBtn"]').prop('disabled', false);
+            });
+
+
+            // let stage = await maestro.SettingsApp.getActiveStage();
+            // let fixtures = stage.fixture.filter(fixture => fixture.enabled == true);
+            // let lowValue = 0;
+            // let highValue = this.dataset.value;
+            // let promises = [];
+
+            // for (let fixture of fixtures) {
+            //     let index = 0;
+            //     for (let attr of fixture.attribute) {
+            //         let send = false;
+            //         if (attr.type == "DIMMER") {
+            //             attr.range = maestro.SettingsApp.calculateRange({ highValue: highValue, lowValue: lowValue });
+            //             send = true;
+            //         }
+            //         if (attr.type == "MASTER_DIMMER") {
+            //             attr.staticValue.value = highValue;
+            //             send = true;
+            //         }
+
+            //         if (send) {
+            //             promises.push(new Promise((resolve, reject) => {
+            //                 try {
+            //                     maestro.SettingsApp.putAttribute(fixture.id, index, { attribute: attr }).then(() => {
+            //                         resolve();
+            //                     });
+            //                 } catch (e) {
+            //                     reject(e)
+            //                 }
+            //             }));
+            //         }
+            //         index++;
+            //     }
+            // }
+            // await Promise.all(promises).then(() => {
+            //     //document.location.reload();
+            // });
+        });
+    };
+    setDimmer = async (fixtureId, valueHigh, valueLow = null) => {
+        let stage = await this.getActiveStage();
+        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+
+        for (let fixture of fixtures) {
+            let index = 0;
+            for (let attr of fixture.attribute) {
+                if (attr.type == "DIMMER") {
+                    attr.range = this.calculateRange({ highValue: valueHigh, lowValue: valueLow });
+                    this.putAttribute(fixture.id, index, { attribute: attr });
+                }
+                if (attr.type == "MASTER_DIMMER") {
+                    attr.staticValue.value = valueHigh;
+                    this.putAttribute(fixture.id, index, { attribute: attr });
+                }
+                index++;
+            }
+        }
+
     }
 };
-maestro.SettingsApp = new SettingsApp(document.currentScript.src, true);
+maestro.SettingsApp = new SettingsApp(document.currentScript.src);
 maestro.SettingsApp.init();
