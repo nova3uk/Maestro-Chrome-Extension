@@ -717,19 +717,21 @@ class SettingsApp extends Globals {
                     return alert('Macro name already exists');
                 }
                 macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
-                maestro.SettingsApp.saveLocalSetting("macros", macros);
-                document.location.reload();
+                maestro.SettingsApp.saveLocalSetting("macros", macros).then(async () => {
+                    await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-macros");
+                    document.location.reload();
+                });
             });
         });
     };
     changeStrobeParam = async (id, channelId, type) => {
         if (channelId) {
+
             let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + channelId + '_' + id).value, 0, 255);
             let newShutterValue = this.safeMinMax(document.getElementById('shutter_val_' + channelId + '_' + id).value, 0, 255);
 
             let strobeParams = await this.getLocalSetting("strobe_" + id);
             if (strobeParams) {
-                let updated = false;
                 const channel = strobeParams.find(channel => channel.channelId === channelId);
                 if (channel) {
                     channel.strobe = newStrobeValue;
@@ -1279,7 +1281,7 @@ class SettingsApp extends Globals {
                 let cue = cues.find(cue => cue.uuid == uuid);
                 await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, false, false);
             }
-            $(this).blur(); 
+            $(this).blur();
         });
         $('select[name="endCueList"]').on('change', async function (btn) {
             if (this.value == "") {
@@ -1293,19 +1295,8 @@ class SettingsApp extends Globals {
                 let cue = cues.find(cue => cue.uuid == uuid);
                 await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, true, false);
             }
-            $(this).blur(); 
+            $(this).blur();
         });
-
-        // $('span[name="remove_cue"]').on('click', async function (btn) {
-        //     let row = document.querySelector(`[data-id="${this.dataset.macroname}"][data-stageid="${this.dataset.stageid}"]`);
-        //     if (row.classList.contains('macro-active')) return;
-
-        //     if (confirm('Are you sure you want to remove the Cue from this Macro?')) {
-        //         await maestro.SettingsApp.removeCueFromMacro(this.dataset.macroname, this.dataset.stageid);
-        //         await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
-        //         document.location.reload();
-        //     }
-        // });
     };
     stageTable = () => {
         let stages = this.stage;
@@ -1531,7 +1522,7 @@ class SettingsApp extends Globals {
 
             maestro.SettingsApp.saveLocalSetting("macros", macros);
             await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
-            if(reload) document.location.reload();
+            if (reload) document.location.reload();
         }
     }
     getCues = async (forceRefresh = false) => {
