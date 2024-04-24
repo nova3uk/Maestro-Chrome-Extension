@@ -13,7 +13,7 @@
 
 <body>
     <div class="container">
-        <h1 class="my-2">Maestro Extension - Setup</h1>
+        <h1 class=" my-2">Maestro Extension - Setup</h1>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="simple-tab-0" data-bs-toggle="tab" href="#tabpanel-info" role="tab"
@@ -97,10 +97,13 @@
             <div class="tab-pane active collapse" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
                 <h5>Connecting to the MaestroDMX</h5>
                 The plugin will work when your MaestroDMX is running and available on the network.<br>
-                It can work with http://maestro.local or http://10.0.0.200 or http://192.168.37.1 which are the deafult
-                address and ips of the MaestroDMX. By deafult it's looking for maestro.local which should work in most
+                It can work with http://maestro.local or http://10.0.0.200 or http://192.168.37.1 which are the
+                deafult
+                address and ips of the MaestroDMX. By deafult it's looking for maestro.local which should work in
+                most
                 cases<br><br>
-                If you are using a different IP, you may need to modify your hosts file to point to the correct IP.<br>
+                If you are using a different IP, you may need to modify your hosts file to point to the correct
+                IP.<br>
                 Instructions on how to modify the hosts file can be found, for example at
                 <a href="https://docs.rackspace.com/docs/modify-your-hosts-file" target="_blank">How to Edit
                     Hosts File</a><br>
@@ -116,18 +119,23 @@
                 <ol>
                     <li>For your convenience, before you start modifying, take a backup of your Stage, from the
                         MaestroDMX control panel,
-                        from this extension, you can take a backup of all the fixture settings and macros via the Backup
+                        from this extension, you can take a backup of all the fixture settings and macros via the
+                        Backup
                         & Restore tab.</li>
-                    <li>You can set toggles via thethe <a id="controlPageLink" target="_blank">Control Page</a> Page on
+                    <li>You can set toggles via thethe <a id="controlPageLink" target="_blank">Control Page</a> Page
+                        on
                         the Stages
-                        tab. You can also set Pan/Tilt positions via the Pan/Tilt Finder, on the Fixtures Tab below.<br>
-                        If your fixture(s) have Gobo or Prism, you can disable or enable all of them using the Fixture
+                        tab. You can also set Pan/Tilt positions via the Pan/Tilt Finder, on the Fixtures Tab
+                        below.<br>
+                        If your fixture(s) have Gobo or Prism, you can disable or enable all of them using the
+                        Fixture
                         Toggles tab below.
                     </li>
                     <li>Set all the toggles the way you want them, for each fixture you want to include in the
                         Macro.
                     </li>
-                    <li>Come back to this page and select the fixtures on the Fixtures tab below you want to include in
+                    <li>Come back to this page and select the fixtures on the Fixtures tab below you want to include
+                        in
                         your Macro.</li>
                     <li>Click "Add Macro" to create it.</li>
                     <li>Once you have created the macros you can at any time click Restore below to restore all
@@ -139,7 +147,8 @@
                     <li>Use it to set the toggles to the stored state.</li>
                     <li>Clear the Macro to revert all toggles to the previous state.</li>
                     <li>Macros are specific to the currently active Stage.</li>
-                    <li>Remember - the Macro applies ALL modified current settings, so if you have modified the Control
+                    <li>Remember - the Macro applies ALL modified current settings, so if you have modified the
+                        Control
                         page, the
                         Pan/Tilt or used a Fixture Toggle below it will be recorded to the macro!</li>
                 </ol>
@@ -152,7 +161,8 @@
             <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
                 <h5>Enable Strobe Triggering</h5>
                 <div>
-                    If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or Shutter
+                    If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or
+                    Shutter
                     channel,
                     you can set specific parameters in the Fixtures tab below to to fix it.
                     <br>
@@ -161,19 +171,22 @@
                             Set "Shutter Open" value, representing the normal open state for the Shutter or Strobe
                         </li>
                         <li>
-                            Set "Strobe" value, corresponding to the strobe function of the fixture. You can fine-tune
+                            Set "Strobe" value, corresponding to the strobe function of the fixture. You can
+                            fine-tune
                             the Strobe value according to the DMX values specified in the fixture's manual, enabling
                             adjustment for strobe speed.
                         </li>
                         <li>
-                            If your fixture has multiple Strobe or Shutter channels, you can set some or all of them in
+                            If your fixture has multiple Strobe or Shutter channels, you can set some or all of them
+                            in
                             the Fixtures tab (For example, the Gigbar Move ILS has more than 10!).<br>
                             Refer to your fixtures DMX Table in the manual to determine the correct Open and Strobe
                             values for each channel.
                         </li>
                     </ol>
                     Once the parameters are set correctly, when you use the "Strobe" button on the footer, or in the
-                    Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values or
+                    Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values
+                    or
                     refreshing the main MaestroDMX page to ensure you have the latest config.
                 </div>
             </div>
@@ -184,7 +197,8 @@
                     store it locally.<br>
                     You can download the Config which *includes* the Fixture Backup and all settings in this
                     page.<br><br>
-                    If you want backup of the settings, without the fixtures, you can download the Config file only via
+                    If you want backup of the settings, without the fixtures, you can download the Config file only
+                    via
                     the Download Config button.<br><br>
                     Restore Backup can be used to upload the earlier downloaded Backup or Config file.<br>
                     If you restore a config which contains a Fixture Backup, it will overwrite the current stage's
@@ -423,7 +437,8 @@
                         <i>You can create macros via the Fixtures Tab</i>
                     </p>
                     <p>
-                        See "Creating Macros" Section above for information on how to create a macro and how they work.
+                        See "Creating Macros" Section above for information on how to create a macro and how they
+                        work.
                     </p>
                     <p>
                         You can "apply" a cue when a macro is triggered or cleared (Start Cue or End Cue).<br>
@@ -447,15 +462,13 @@
                             <th data-field="length" width="50" data-width="50">#</th>
                             <th data-field="length">Fixtures Affected</th>
                             <th data-field="length">Cue Triggers</th>
-                            <th data-field="length">End Cue</th>
-                            <th width="100" data-width="100"></th>
-                            <th width="100" data-width="100"></th>
-                            <th width="100" data-width="100"></th>
+                            <th width="100" data-width="100">Trigger</th>
+                            <th width="100" data-width="100">Clear</th>
+                            <th width="100" data-width="100">Delete</th>
                         </tr>
                         <tr>
-                            <td colspan="5">No macros defined yet.</td>
+                            <td colspan="7">No macros defined yet.</td>
                         </tr>
-
                     </thead>
                 </table>
             </div>
@@ -474,6 +487,9 @@
                             <th data-field="strobe" width="50" data-width="50">Strobe</th>
                             <th data-field="ignore"></th>
                             <th data-field="select"></th>
+                        </tr>
+                        <tr>
+                            <td colspan="10">No fixtures defined yet.</td>
                         </tr>
                     </thead>
                 </table>
@@ -508,13 +524,18 @@
                 <table id="cues" class="table my-1">
                     <thead class="table-light">
                         <tr>
-                            <th data-field="cueName" data-sortable="false" width="400" data-width="400">Cue Name</th>
-                            <th data-field="groupModes" data-sortable="false" width="300" data-width="300">Group Modes
+                            <th data-field="cueName" data-sortable="false" width="400" data-width="400">Cue Name
+                            </th>
+                            <th data-field="groupModes" data-sortable="false" width="300" data-width="300">Group
+                                Modes
                             </th>
                             <th data-field="status" data-sortable="false" width="100" data-width="100">Status</th>
-                            <th data-field="macros" data-sortable="false">Macro on Start</th>
-                            <th data-field="macros" data-sortable="false">Macro on End</th>
+                            <th data-field="macrostart" data-sortable="false">Macro on Start</th>
+                            <th data-field="macrosend" data-sortable="false">Macro on End</th>
                             <th data-field="applyCue" data-sortable="false" width="100" data-width="100">Apply Cue</th>
+                        </tr>
+                        <tr>
+                            <td colspan="6">No cues defined yet.</td>
                         </tr>
                     </thead>
                 </table>
@@ -525,12 +546,15 @@
                 <h2 class="mt-3"></h2>
                 <div>
                     <p class="h6">Toggle Fixture Settings</p>
-                    The MaestroDMX Interface requires you to switch all toggles one by one, these fixture toggles help
+                    The MaestroDMX Interface requires you to switch all toggles one by one, these fixture toggles
+                    help
                     to automate the process.<br>
-                    If you label a Gobo or Prism as any of [Open, No Gobo/No Prism, Gobo Off/Prism Off, Gobo Open/Prism
+                    If you label a Gobo or Prism as any of [Open, No Gobo/No Prism, Gobo Off/Prism Off, Gobo
+                    Open/Prism
                     Open, None] the toggle will
                     disable all Gobos/Prisms except those.<br><br>
-                    <i></i>Please note: If these toggles are active when you create a Macro, they will be saved to the
+                    <i></i>Please note: If these toggles are active when you create a Macro, they will be saved to
+                    the
                     Macro.</i><br>
                 </div>
                 <div class="text-danger my-1">

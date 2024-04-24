@@ -502,7 +502,12 @@ class SettingsApp extends Globals {
                 const runningMacroIds = Object.keys(keys).filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
                 if (runningMacroIds.length > 0) {
+                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                    deleteButton.disabled = false;
+                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+                    applyButton.disabled = false;
                     this.hideLoader();
+
                     return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
                 }
             }
@@ -514,6 +519,12 @@ class SettingsApp extends Globals {
 
                 let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
                 if (diff.length == 0) {
+                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                    deleteButton.disabled = false;
+                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+                    applyButton.disabled = false;
+                    this.hideLoader();
+
                     return alert('Macro is the same as the currently running Profile, and would have no effect.')
                 }
 
@@ -965,7 +976,7 @@ class SettingsApp extends Globals {
                         return {
                             css: {
                                 'background-color': '#66ffcc',
-                                'cursor': 'pointer'
+                                'cursor': 'pointer',
                             }
                         }
                     } else {
@@ -1191,7 +1202,6 @@ class SettingsApp extends Globals {
             columns: [
                 {
                     field: 'name',
-                    title: 'Macro Name',
                     align: 'left',
                     valign: 'middle',
                     clickToSelect: false,
@@ -1241,32 +1251,29 @@ class SettingsApp extends Globals {
                 },
                 {
                     field: 'button_apply',
-                    title: '',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return `<button class="btn btn-danger" name="btn_apply" data-id="${row.name}" data-stageid="${row.stageId}">Apply</button>`;
+                        return `<button class="btn btn-danger" name="btn_apply" data-id="${row.name}" data-stageid="${row.stageId}"><img src="/src/img/play.svg" width="30" height="30"></button>`;
                     }
                 },
                 {
                     field: 'button_clear',
-                    title: '',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return `<button class="btn btn-success" name="btn_clr" data-id="${row.name}" data-stageid="${row.stageId}" disabled>Clear</button>`;
+                        return `<button class="btn btn-success" name="btn_clr" data-id="${row.name}" data-stageid="${row.stageId}" disabled><img src="/src/img/stop-fill.svg" width="30" height="30"></button>`;
                     }
                 },
                 {
                     field: 'button_delete',
-                    title: '',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return `<button class="btn btn-warning" name="btn_delete" data-id="${row.name}" data-stageid="${row.stageId}">Delete</button>`;
+                        return `<button class="btn btn-warning" name="btn_delete" data-id="${row.name}" data-stageid="${row.stageId}"><img src="/src/img/trash.svg" width="30" height="30"></button>`;
                     }
                 }],
             rowAttributes: function (row, index) {
