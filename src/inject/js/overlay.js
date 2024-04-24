@@ -188,6 +188,8 @@ class OverlayApp extends Globals {
 
         switch (iconName.toLowerCase()) {
             case 'blackout':
+                svg.style.position = 'relative';
+                svg.style.top = '3px';
                 svg.setAttribute('viewBox', '0 0 16 16');
                 path.setAttribute('d', 'M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z');
                 svg.appendChild(path);
@@ -255,7 +257,7 @@ class OverlayApp extends Globals {
             console.log('Checkbox clicked:', item, status);
     };
     createCheckboxes = () => {
-        this.injectCSS('div#menu-[role=presentation] {height: calc(100vh - 150px); top:-100px;};#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1180px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1021px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 862px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 703px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 544px) {#div_maestro_ext_effect {display: none !important;}}');
+        this.injectCSS('div#menu-[role=presentation] {height: calc(100vh - 150px); top:-100px;};#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1200px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1041px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 882px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 723px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 524px) {#div_maestro_ext_effect {display: none !important;}}');
 
         // Create the checkboxes
         this.blackoutCheckbox = this.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {
@@ -351,12 +353,15 @@ class OverlayApp extends Globals {
                 lightning = document.getElementById('effectsActiveIcon');
             }
 
+            lightning.innerHTML = '';
+
             if ((autoFogEnabled && (autoFogOnActivityPeak || autoFogOnTimer)) || autoEffectsEnabled || autoStrobeEnabled) {
-                if (lightning.innerHTML === '') {
-                    lightning.innerHTML = '<span class="tooltip" data-toggle="tooltip" data-placement="top" title="Auto programs active"><svg width="26" height="26" title="Auto programs active" stroke="currentColor" style="animation: 0.525s ease-in-out 0s infinite normal none running strobeAnimation;" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z"></path></svg></span>';
+                if (autoEffectsEnabled || autoStrobeEnabled) {
+                    lightning.innerHTML = '<span class="tooltip" data-toggle="tooltip" data-placement="top" title="Auto programs active"><svg width="26" height="26" title="Auto programs active" stroke="currentColor" xstyle="animation: 0.525s ease-in-out 0s infinite normal none running strobeAnimation;" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z"></path></svg></span>';
                 }
-            } else {
-                lightning.innerHTML = '';
+                if (autoFogEnabled && (autoFogOnActivityPeak || autoFogOnTimer)) {
+                    lightning.innerHTML += '<span class="tooltip ms-2" data-toggle="tooltip" data-placement="top" title="Auto Fog active"><svg width="26" height="26" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 2a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m2 2a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M13.405 4.027a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 10H13a3 3 0 0 0 .405-5.973M8.5 1a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1 0 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4 4 0 0 1 8.5 1"></path></svg></span>';
+                }
             }
         } catch (e) {
             if (this.logging)
@@ -370,7 +375,7 @@ class OverlayApp extends Globals {
             this.cornerText.style.bottom = '10px';
             this.cornerText.style.left = '10px';
             this.cornerText.style.color = '#f4f5f5';
-            this.cornerText.style.width = '320px';
+            this.cornerText.style.width = '340px';
             this.cornerText.style.height = '30px';
             this.cornerText.style.zIndex = '100001';
             this.cornerText.style.display = 'flex';
