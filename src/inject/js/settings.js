@@ -82,6 +82,12 @@ class SettingsApp extends Globals {
             return false;
         }
     };
+    cleanupStorage = async () => {
+        //remove macros for non existing fixtures
+
+        //remove running macros for non existing fixtures
+
+    };
     sendReloadStage = async () => {
         let tabId = await this.getLocalSetting("activeTab");
         if (tabId) {
