@@ -736,6 +736,11 @@ class SettingsApp extends Globals {
             let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + channelId + '_' + id).value, 0, 255);
             let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + channelId + '_' + id).value, 0, 255);
 
+            if (newStrobeValue == 0 && newShutterValue == 0) {
+                newShutterValue = "";
+                newStrobeValue = "";
+            }
+
             let strobeParams = await this.getLocalSetting("strobe_" + id);
             if (strobeParams) {
                 const channel = strobeParams.find(channel => channel.channelId === channelId);
