@@ -1304,7 +1304,7 @@ class SettingsApp extends Globals {
         });
         $('select[name="endCueList"]').on('change', async function (btn) {
             if (this.value == "") {
-                await maestro.SettingsApp.removeCueFromMacro(this.dataset.macroname, this.dataset.stageid, true);
+                await maestro.SettingsApp.removeCueFromMacro(this.dataset.id, this.dataset.stageid, true);
             } else {
                 let cues = await maestro.SettingsApp.getCues(true);
                 let uuid = document.querySelector(`select[name="endCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
