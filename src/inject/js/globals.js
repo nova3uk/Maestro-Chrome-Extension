@@ -309,7 +309,7 @@ class Globals {
             }
         }
 
-        this.brightness = await this.getUrl(`${maestro.App.maestroUrl}api/${this.apiVersion}/brightness`);
+        this.brightness = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/brightness`);
         this.brightnessUpdate = Date.now();
         return this.brightness;
     };

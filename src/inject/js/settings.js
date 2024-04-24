@@ -36,8 +36,12 @@ class SettingsApp extends Globals {
             this.hideLoader();
         });
 
-        setInterval(() => {
+        setInterval(async () => {
             this.watchForStageChange();
+            await this.getBrightness().then(() => {
+                let val = Math.floor(this.brightness.value * 255);
+                document.getElementById('master_dimmer').value = val;
+            });
         }, 60000);
 
         setTimeout(() => {
@@ -1920,7 +1924,6 @@ class SettingsApp extends Globals {
                     }
 
                 }
-
                 maestro.Globals.debounce(maestro.SettingsApp.setDimmer(this.dataset.fixtureid, document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value, document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value), 100);
             }
 
@@ -1949,8 +1952,6 @@ class SettingsApp extends Globals {
                         document.getElementById(`${this.dataset.fixtureid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                     }
                 }
-
-                //maestro.SettingsApp.setDimmer(this.dataset.fixtureid, document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value, document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)
             }
         });
         $('button[name="allDimmersBtn"]').on('click', async function (ele) {
@@ -1978,45 +1979,39 @@ class SettingsApp extends Globals {
             }).promise().done(function () {
                 $('button[name="allDimmersBtn"]').prop('disabled', false);
             });
-
-
-            // let stage = await maestro.SettingsApp.getActiveStage();
-            // let fixtures = stage.fixture.filter(fixture => fixture.enabled == true);
-            // let lowValue = 0;
-            // let highValue = this.dataset.value;
-            // let promises = [];
-
-            // for (let fixture of fixtures) {
-            //     let index = 0;
-            //     for (let attr of fixture.attribute) {
-            //         let send = false;
-            //         if (attr.type == "DIMMER") {
-            //             attr.range = maestro.SettingsApp.calculateRange({ highValue: highValue, lowValue: lowValue });
-            //             send = true;
-            //         }
-            //         if (attr.type == "MASTER_DIMMER") {
-            //             attr.staticValue.value = highValue;
-            //             send = true;
-            //         }
-
-            //         if (send) {
-            //             promises.push(new Promise((resolve, reject) => {
-            //                 try {
-            //                     maestro.SettingsApp.putAttribute(fixture.id, index, { attribute: attr }).then(() => {
-            //                         resolve();
-            //                     });
-            //                 } catch (e) {
-            //                     reject(e)
-            //                 }
-            //             }));
-            //         }
-            //         index++;
-            //     }
-            // }
-            // await Promise.all(promises).then(() => {
-            //     //document.location.reload();
-            // });
         });
+
+        await this.getBrightness().then(() => {
+            let val = Math.floor(this.brightness.value * 255);
+            document.getElementById('master_dimmer').value = val;
+        });
+
+
+        document.getElementById('master_dimmer').addEventListener('change', function (ele) {
+            maestro.SettingsApp.setMasterDimmer(this.value);
+        });
+    };
+    setMasterDimmer = async (value) => {
+        let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/brightness`;
+
+        value = value / 255;
+
+        let options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: value })
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            return true
+        } catch (error) {
+            if (this.logging)
+                console.error('Fatal error updating master dimmer:', error);
+        }
     };
     setDimmer = async (fixtureId, valueHigh, valueLow = null) => {
         let stage = await this.getActiveStage();

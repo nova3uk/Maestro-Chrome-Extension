@@ -11,6 +11,19 @@ chrome.runtime.onMessage.addListener(function (
 });
 chrome.runtime.onMessageExternal.addListener(
     async function (request, sender, sendResponse) {
+        if (request.getEnvironment) {
+            return new Promise((resolve, reject) => {
+
+                chrome.management.get(chrome.runtime.id, function (app_info) {
+                    if (app_info.installType == "development") {
+                        resolve(sendResponse(true));
+                    }
+                    else {
+                        resolve(sendResponse(false));
+                    }
+                });
+            });
+        }
         if (request.ping) {
             return new Promise((resolve, reject) => {
                 chrome.storage.local.set({ activeTab: sender.tab.id }).then(() => {
