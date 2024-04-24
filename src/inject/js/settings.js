@@ -821,7 +821,11 @@ class SettingsApp extends Globals {
                 if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore" || $element == "colorWheel")
                     return false;
 
-                document.getElementById('cb_' + row.id).checked = !document.getElementById('cb_' + row.id).checked;
+                let checkbox = document.getElementById('cb_' + row.id);
+                checkbox.checked = !document.getElementById('cb_' + row.id).checked;
+
+                let event = new Event('change');
+                checkbox.dispatchEvent(event);
             },
             data: tData,
             columns: [
@@ -960,7 +964,8 @@ class SettingsApp extends Globals {
                     if (row.active) {
                         return {
                             css: {
-                                'background-color': '#66ffcc'
+                                'background-color': '#66ffcc',
+                                'cursor': 'pointer'
                             }
                         }
                     } else {
@@ -985,6 +990,19 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.saveLocalSetting("fixture_ignore_" + $(this).data('id'), { ignore: true })
             } else {
                 maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
+            }
+        });
+
+        $('input[name="fixture_cbx"]').on('change', function (btn) {
+            let checkbox = document.getElementById(this.id);
+            let row = document.querySelector(`table[id='fixtures'] tr[data-id="${checkbox.value}"]`);
+            let tds = row.getElementsByTagName('td');
+            for (let td of tds) {
+                if (checkbox.checked) {
+                    td.style.backgroundColor = '#faf6ac';
+                } else {
+                    td.style.backgroundColor = '#66ffcc';
+                }
             }
         });
         $('input[name="open_val"]').on('change', function (btn) {
