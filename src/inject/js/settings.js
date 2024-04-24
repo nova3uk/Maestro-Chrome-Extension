@@ -83,10 +83,19 @@ class SettingsApp extends Globals {
         }
     };
     cleanupStorage = async () => {
-        //remove macros for non existing fixtures
+        this.retrieveAllKeys().then(keys => {
+            let strobeParams = [];
+            for (let key in keys) {
+                if (key.includes("strobe_")) {
+                    strobeParams.push({ key: key, value: keys[key] });
+                }
+            }
 
-        //remove running macros for non existing fixtures
-
+            strobeParams.forEach(async (param) => {
+                let fixtureId = param.key.split('_')[1];
+                let stageId = param.value[0].stageId;
+            });
+        });
     };
     sendReloadStage = async () => {
         let tabId = await this.getLocalSetting("activeTab");
@@ -490,7 +499,7 @@ class SettingsApp extends Globals {
 
             if (macros) {
                 const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
-                const runningMacroIds = keys.filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
+                const runningMacroIds = Object.keys(keys).filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
                 if (runningMacroIds.length > 0) {
                     this.hideLoader();
@@ -500,9 +509,6 @@ class SettingsApp extends Globals {
 
             for (let fixture of macros[0].macro.fixtures) {
                 let currentProfile = await this.getFixture(fixture.id);
-                //let currentProfile = this.activeStage.fixture.find(f => f.id == fixture.id);
-
-                this.activeStage.fixture
 
                 if (!currentProfile) continue;
 
@@ -747,6 +753,7 @@ class SettingsApp extends Globals {
                 if (channel) {
                     channel.strobe = newStrobeValue;
                     channel.shutter = newShutterValue;
+                    channel.stageId = stageId;
                 } else {
                     strobeParams.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
                 }
@@ -761,7 +768,6 @@ class SettingsApp extends Globals {
             let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + id).value, 0, 255);
             this.saveLocalSetting("strobe_" + id, { type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
         }
-
     };
 
     fixtureTable = async (activeStage, activeFixtureGroups) => {

@@ -376,7 +376,7 @@ class Globals {
     retrieveAllKeys = async () => {
         return new Promise((resolve, reject) => {
             chrome.storage.local.get(null, function (items) {
-                resolve(Object.keys(items));
+                resolve(items);
             });
         });
     };
