@@ -730,11 +730,11 @@ class SettingsApp extends Globals {
             });
         });
     };
-    changeStrobeParam = async (id, channelId, type) => {
+    changeStrobeParam = async (id, channelId, type, stageId = null) => {
         if (channelId) {
 
             let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + channelId + '_' + id).value, 0, 255);
-            let newShutterValue = this.safeMinMax(document.getElementById('shutter_val_' + channelId + '_' + id).value, 0, 255);
+            let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + channelId + '_' + id).value, 0, 255);
 
             let strobeParams = await this.getLocalSetting("strobe_" + id);
             if (strobeParams) {
@@ -743,18 +743,18 @@ class SettingsApp extends Globals {
                     channel.strobe = newStrobeValue;
                     channel.shutter = newShutterValue;
                 } else {
-                    strobeParams.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue });
+                    strobeParams.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
                 }
                 await this.saveLocalSetting("strobe_" + id, strobeParams);
             } else {
                 let channel = [];
-                channel.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue });
+                channel.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
                 await this.saveLocalSetting("strobe_" + id, channel);
             }
         } else {
             let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + id).value, 0, 255);
-            let newShutterValue = this.safeMinMax(document.getElementById('shutter_val_' + id).value, 0, 255);
-            this.saveLocalSetting("strobe_" + id, { type: type, strobe: newStrobeValue, shutter: newShutterValue });
+            let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + id).value, 0, 255);
+            this.saveLocalSetting("strobe_" + id, { type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
         }
 
     };
@@ -783,6 +783,7 @@ class SettingsApp extends Globals {
 
                     tData.push({
                         id: fixture.id,
+                        stageId: activeStage.id,
                         name: fixture.name,
                         fixtureGroup: this.groups.find(ele => ele.id == fixture.fixtureGroupId).name,
                         fixturePosition: i,
@@ -852,7 +853,8 @@ class SettingsApp extends Globals {
                             if (row.channels.length > 1) {
                                 return `<span class="text-capitalize">Multiple</span>`;
                             } else {
-                                // return `<span class="text-capitalize">${row.hasShutterOrStrobe.type.charAt(0).toUpperCase() + row.hasShutterOrStrobe.type.slice(1).toLowerCase()}</span>`;
+                                if (row.channels.length == 1)
+                                    return `<span class="text-capitalize">${row.channels[0].channel.type.charAt(0).toUpperCase() + row.channels[0].channel.type.slice(1).toLowerCase()}</span>`;
                             }
                         }
                     }
@@ -875,7 +877,7 @@ class SettingsApp extends Globals {
                             if (row.shutterParams)
                                 values = row.shutterParams.find(ele => ele.channelId == channel.index);
                             response += `<label style="font-size:10px;position:relative;top:-10px;" for="strobe_val_${channel.index}_${row.id}">Ch ${channel.index + 1}</label><br>`;
-                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="shutter_val" data-id="${row.id}" data-type="${channel.channel.type}" data-channelid="${channel.index}" id="shutter_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.shutter : ""}">`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="open_val" data-id="${row.id}" data-type="${channel.channel.type}" data-stageid="${row.stageId}" data-channelid="${channel.index}" id="open_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.shutter : ""}">`;
                         }
                         return response;
                     }
@@ -899,7 +901,7 @@ class SettingsApp extends Globals {
                                 values = row.shutterParams.find(ele => ele.channelId == channel.index);
 
                             response += `<label style="font-size:10px;position:relative;top:-10px;" for="strobe_val_${channel.index}_${row.id}">Ch ${channel.index + 1}</label><br>`;
-                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="shutter_strobe" data-id="${row.id}" data-type="${channel.channel.type}"data-channelid="${channel.index}" id="strobe_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.strobe : ""}">`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="shutter_strobe" data-id="${row.id}" data-type="${channel.channel.type}" data-stageid="${row.stageId}" data-channelid="${channel.index}" id="strobe_val_${channel.index}_${row.id}" min="0" max="255" value="${values ? values.strobe : ""}">`;
                         }
                         return response;
 
@@ -974,11 +976,11 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.deleteLocalSetting("fixture_ignore_" + $(this).data('id'))
             }
         });
-        $('input[name="shutter_val"]').on('change', function (btn) {
-            maestro.SettingsApp.changeStrobeParam(this.dataset.id, this.dataset.channelid, this.dataset.type);
+        $('input[name="open_val"]').on('change', function (btn) {
+            maestro.SettingsApp.changeStrobeParam(this.dataset.id, this.dataset.channelid, this.dataset.type, this.dataset.stageid);
         });
         $('input[name="shutter_strobe"]').on('change', function (btn) {
-            maestro.SettingsApp.changeStrobeParam(this.dataset.id, this.dataset.channelid, this.dataset.type);
+            maestro.SettingsApp.changeStrobeParam(this.dataset.id, this.dataset.channelid, this.dataset.type, this.dataset.stageid);
         });
         $('.panOrTilt').on('click', function (btn) {
             maestro.SettingsApp.panOrTiltOpen(this);
