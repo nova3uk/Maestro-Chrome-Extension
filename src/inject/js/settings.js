@@ -1624,15 +1624,16 @@ class SettingsApp extends Globals {
                     let attributeTypes = fixture.attribute.map(attr => attr.type);
                     let goboState = await this.getLocalSetting("gobo_state_" + fixtureId);
                     let prismState = await this.getLocalSetting("prism_state_" + fixtureId);
-
-                    tData.push({
-                        id: fixture.id,
-                        name: fixture.name,
-                        active: fixture.enabled,
-                        attributes: attributeTypes,
-                        goboState: goboState,
-                        prismState: prismState
-                    });
+                    if (attributeTypes.includes('GOBO') || attributeTypes.includes('PRISM')) {
+                        tData.push({
+                            id: fixture.id,
+                            name: fixture.name,
+                            active: fixture.enabled,
+                            attributes: attributeTypes,
+                            goboState: goboState,
+                            prismState: prismState
+                        });
+                    }
                 }
             }
         }
