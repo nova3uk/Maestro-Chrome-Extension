@@ -495,10 +495,13 @@ class SettingsApp extends Globals {
             deleteButton.disabled = true;
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
             applyButton.disabled = true;
+            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
 
             var promiseArray = [];
             var keys = await this.retrieveAllKeys()
             this.currentCue = await this.getShowState();
+            var ignoredFixtures = [];
+
 
             let macros = await this.loadMacros();
             macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
@@ -508,9 +511,7 @@ class SettingsApp extends Globals {
                 const runningMacroIds = Object.keys(keys).filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
 
                 if (runningMacroIds.length > 0) {
-                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
                     deleteButton.disabled = false;
-                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
                     applyButton.disabled = false;
                     this.hideLoader();
 
@@ -525,7 +526,8 @@ class SettingsApp extends Globals {
 
                 let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
                 if (diff.length == 0) {
-                   continue;
+                    ignoredFixtures.push({ fixtureId: fixture.id, name: fixture.name });
+                    continue;
                 }
 
                 //save original profile prior to modification
@@ -544,7 +546,20 @@ class SettingsApp extends Globals {
                 });
             }
 
-            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+            if (ignoredFixtures.length > 0) {
+                if (ignoredFixtures.length == macros[0].macro.fixtures.length) {
+                    deleteButton.disabled = false;
+                    applyButton.disabled = false;
+                    this.hideLoader();
+
+                    alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
+                    return;
+                }
+
+                let ignoredFixtureNames = ignoredFixtures.map(fixture => fixture.name).join('\n');
+                alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
+            }
+
             clearButton.disabled = false;
             document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
 
