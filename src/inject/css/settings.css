@@ -2,7 +2,8 @@
     background-color: #fccaca;
 }
 .nav-tabs .nav-item .nav-link {
-    background-color: #0080FF;
+    /* background-color: #0080FF; */
+    background-color: rgb(75, 175, 237);
     color: #FFF;
 }
   

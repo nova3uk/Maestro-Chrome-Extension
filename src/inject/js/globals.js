@@ -127,6 +127,17 @@ class Globals {
             return response;
         };
     };
+    createTableCell = (text, className = null, data = null, isHtmlContent = true, style = null, colspan = null) => {
+        let cell = document.createElement("td");
+
+        isHtmlContent ? cell.innerHTML = text : cell.textContent = text;
+        className ? cell.className = className : null;
+        data ? cell.dataset = data : null;
+        style ? cell.style = style : null;
+        colspan ? cell.colSpan = colspan : null;
+
+        return cell;
+    }
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     loadScript = (scriptUrl, params = null) => {
         const script = document.createElement('script');
@@ -197,6 +208,18 @@ class Globals {
             }, wait);
         };
     };
+    leftMouseClick = (evt) => {
+        if ("button" in evt) {
+            return evt.button == 0;
+        }
+        var button = evt.which || evt.button;
+        return button == 0;
+    };
+    getUuid = () => {
+        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+            (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+        );;
+    }
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     isNumeric = (value) => {
         return !isNaN(parseFloat(value)) && isFinite(value);

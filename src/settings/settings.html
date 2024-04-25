@@ -16,13 +16,13 @@
         style="background-color: #081728 !important;font-family:Roboto, Helvetica, Arial, sans-serif;">
         <div class="container">
             <h2 class="text-light">
-                <img src="\src\page_action\maestro-logo-full.png" width="160">
-                <span class="ms-2" style="position:relative;bottom:-5px;">Chrome Extension</span>
+                <!-- <img src="\src\page_action\maestro-logo-full.png" width="160"> -->
+                <span class="ms-2" style="position:relative;bottom:-5px;">Maestro Chrome Extension</span>
             </h2>
         </div>
     </nav>
     <div class="container mt-3">
-
+        <!-- Upper Navigation Menu -->
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="simple-tab-0" data-bs-toggle="tab" href="#tabpanel-info" role="tab"
@@ -101,7 +101,7 @@
                 </a>
             </li>
         </ul>
-
+        <!-- Info Panel -->
         <div class="tab-content pt-5">
             <div class="tab-pane active collapse" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
                 <h5>Connecting to the MaestroDMX</h5>
@@ -123,6 +123,7 @@
                     192.168.100.100</span>
                 <br>
             </div>
+            <!-- Macro Info Panel -->
             <div class="tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-0a">
                 <h5>Creating Macros</h5>
                 <ol>
@@ -167,6 +168,7 @@
                     feature for your own security.
                 </p>
             </div>
+            <!-- Strobe Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
                 <h5>Enable Strobe Triggering</h5>
                 <div>
@@ -199,6 +201,7 @@
                     refreshing the main MaestroDMX page to ensure you have the latest config.
                 </div>
             </div>
+            <!-- Backup Panel -->
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
                 <h5>Backup & Restore</h5>
                 <p>
@@ -227,7 +230,7 @@
                     <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
                 </div>
             </div>
-
+            <!-- Fog Panel -->
             <div class="tab-pane" id="tabpanel-fog" role="tabpanel" aria-labelledby="simple-tab-2">
                 <h5>Autofog can be also switched on/off from the Icon Menu in the Chrome toolbar.</h5>
                 <p>
@@ -297,7 +300,7 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Strobe & Effect Panel -->
             <div class="tab-pane" id="tabpanel-strobe" role="tabpanel" aria-labelledby="simple-tab-3">
 
                 <h5>The Strobe and Effect can be triggered based on audio Activity Level.</h5>
@@ -364,7 +367,7 @@
 
 
         <div class="my-5"></div>
-
+        <!-- Lower Navigation Menu -->
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="simple-tab-4" data-bs-toggle="tab" href="#tabpanel-macros" role="tab"
@@ -443,6 +446,7 @@
 
         <div class="tab-content">
             <h2 class="mt-3"></h2>
+            <!-- Macro Controls -->
             <div class="tab-pane active" id="tabpanel-macros" role="tabpanel" aria-labelledby="simple-tab-4">
                 <div>
                     <p class="h6">
@@ -492,6 +496,7 @@
                     </thead>
                 </table>
             </div>
+            <!-- Fixture Controls -->
             <div class="tab-pane" id="tabpanel-fixtures" role="tabpanel" aria-labelledby="simple-tab-5">
                 <h2 class="mt-3"></h2>
                 <table id="fixtures" class="table" data-classes="table table-bordered my-1 table-primary">
@@ -517,7 +522,7 @@
                     <button id="addMacro" class="btn btn-primary">Add Macro</button>
                 </div>
             </div>
-
+            <!-- Stages -->
             <div class="tab-pane" id="tabpanel-stages" role="tabpanel" aria-labelledby="simple-tab-6">
                 <h2 class="mt-3"></h2>
 
@@ -532,7 +537,7 @@
                 </table>
                 <div class="my-5"></div>
             </div>
-
+            <!-- Cues Controls -->
             <div class="tab-pane" id="tabpanel-cues" role="tabpanel" aria-labelledby="simple-tab-7">
                 <h2 class="mt-3"></h2>
                 <div>
@@ -561,7 +566,7 @@
                 </table>
                 <div class="my-5"></div>
             </div>
-
+            <!-- Fixture Toggles Controls -->
             <div class="tab-pane" id="tabpanel-toggles" role="tabpanel" aria-labelledby="simple-tab-8">
                 <h2 class="mt-3"></h2>
                 <div>
@@ -600,14 +605,16 @@
                 </table>
                 <div class="my-5"></div>
             </div>
+            <!-- Dimmer Controls -->
             <div class="tab-pane" id="tabpanel-dimmers" role="tabpanel" aria-labelledby="simple-tab-9">
                 <h2 class="mt-3"></h2>
                 <div>
                     <p class="h6">Dimmers</p>
                     You can adjust the dimmer levels of all fixtures here.<br>
-                    You can also use the "Set All Dimmers" buttons to set all dimmers to a specific level at once.
+                    You can also use the "Set All Dimmers" buttons to set all dimmers to a specific level at once.<br>
+                    The master dimmer, is the Global Brightness control, the same as on the Show page of MaestroDMX.
                     <div class="my-3"></div>
-                    <div class="m-1 p-2 text-bg-light rounded-3">
+                    <div class="m-1 p-2 text-bg-dark rounded-3">
                         <label for="master_dimmer" class="form-label h6 float" style="margin-left:45%;">Master
                             Dimmer</label>
                         <input type="range" class="form-range" min="0" max="255" steps="1" id="master_dimmer">
@@ -666,24 +673,47 @@
                     <i>These switches are live edits, and will take effect immediately</i>
                 </div>
                 <h2 class="mt-1"></h2>
-                <table id="dimmers" class="table my-1" data-classes="table table-bordered my-1">
-                    <thead>
-                        <tr>
-                            <th data-field="name" data-sortable="false">
-                                Fixture Name
-                            </th>
-                            <th data-field="dimmerstype" data-sortable="false">
-                                Type
-                            </th>
-                            <th data-field="dimmers" data-sortable="false">
-                                Group
-                            </th>
-                            <th data-field="dimmers" data-sortable="false" data-width="700">
-                                Dimmers
-                            </th>
-                        </tr>
-                    </thead>
-                </table>
+                <div class="bootstrap-table bootstrap5">
+                    <div class="fixed-table-toolbar"></div>
+                    <div class="fixed-table-container" style="padding-bottom: 0px;">
+                        <div class="fixed-table-header" style="display: none;">
+                            <table></table>
+                        </div>
+                        <div class="fixed-table-body">
+                            <table id="dimmers" class="table table-bordered my-1 table-primary">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th data-field="name" data-sortable="false">
+                                            <div class="th-inner">
+                                                Fixture Name
+                                            </div>
+                                            <div class="fht-cell"></div>
+                                        </th>
+                                        <th data-field="dimmerstype" data-sortable="false">
+                                            <div class="th-inner">
+                                                Type
+                                            </div>
+                                        </th>
+                                        <!-- <th data-field=" dimmers" data-sortable="false">
+                                            <div class="th-inner">
+                                                Group
+                                            </div>
+                                            <div class="fht-cell"></div>
+                                        </th> -->
+                                        <th data-field="dimmers" data-sortable="false" data-width="700">
+                                            <div class="th-inner">
+                                                Dimmers
+                                            </div>
+                                            <div class="fht-cell"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="fixed-table-footer"></div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
                 <div class="my-5"></div>
             </div>
         </div>
