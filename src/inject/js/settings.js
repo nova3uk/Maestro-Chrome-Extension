@@ -525,13 +525,7 @@ class SettingsApp extends Globals {
 
                 let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
                 if (diff.length == 0) {
-                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
-                    deleteButton.disabled = false;
-                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
-                    applyButton.disabled = false;
-                    this.hideLoader();
-
-                    return alert('Macro is the same as the currently running Profile, and would have no effect.')
+                   continue;
                 }
 
                 //save original profile prior to modification
