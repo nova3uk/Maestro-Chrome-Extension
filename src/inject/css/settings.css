@@ -38,7 +38,55 @@ table.table-bordered>tbody>tr>td {
 }
 custom-range {
     background: gray;
-  }
-  table.bg-green>tbody>tr>td {
-    background-color: #66ffcc;
-  }
+}
+
+table.bg-red>tbody>tr>td {
+    background-color: red;
+}
+
+table.bg-green>tbody>tr>td {
+    background-color: green;
+}
+
+table.bg-blue>tbody>tr>td {
+    background-color: blue;
+}
+table.bg-white>tbody>tr>td {
+    background-color: white;
+}
+table.bg-amber>tbody>tr>td {
+    background-color: #FFBF00;
+}
+table.bg-orange>tbody>tr>td {
+    background-color: orange;
+}
+
+table.bg-yellow>tbody>tr>td {
+    background-color: yellow;
+}
+
+table.bg-white>tbody>tr>td {
+    background-color: white;
+}
+table.bg-cool_white>tbody>tr>td {
+    background-color: white;
+}
+table.bg-warm_white>tbody>tr>td {
+    background-color: white;
+}   
+table.bg-uv>tbody>tr>td {
+    background-color: #7b6d8d;
+}
+table.bg-purple>tbody>tr>td {
+    background-color: purple;
+}
+table.bg-cyan>tbody>tr>td {
+    background-color: cyan;
+}
+
+table.bg-magenta>tbody>tr>td {
+    background-color: magenta;
+}
+table.bg-lightgrey>tbody>tr>td {
+    background-color: rgb(245, 240, 245);
+}

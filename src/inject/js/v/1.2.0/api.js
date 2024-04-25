@@ -1,4 +1,5 @@
-; (async () => {
+; "use strict";
+(async () => {
     maestro.Globals.manualOverride = async (mode, onOrOff) => {
         let url = `api/${maestro.App.apiVersion}/global/manual_override`;
         let method = onOrOff == true ? 'PUT' : 'DELETE';
@@ -8,7 +9,7 @@
         if (this.strobeAt100Percent) {
             dimmer = 1;
         } else {
-            if(mode == "STROBE_ON"){
+            if (mode == "STROBE_ON") {
                 let brightness = await maestro.Globals.getBrightness();
                 dimmer = brightness.value;
             }

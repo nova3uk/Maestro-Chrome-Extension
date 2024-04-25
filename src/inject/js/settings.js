@@ -1,3 +1,4 @@
+"use strict";
 var maestro = maestro || {};
 class SettingsApp extends Globals {
     constructor(scriptSource, loggingOn = false) {
@@ -24,6 +25,7 @@ class SettingsApp extends Globals {
         this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
         this.dimmersTable(this.activeStage, this.activeStageFixtureGroups);
+        //this.rgbControlsTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoFog();
         this.bindAutoEffects();
@@ -1784,6 +1786,316 @@ class SettingsApp extends Globals {
         }
         this.hideLoader();
     };
+    rgbTypes = {
+        'RED': 'red',
+        'GREEN': 'green',
+        'BLUE': 'blue',
+        'AMBER': 'orange',
+        'WARM_WHITE': 'yellow',
+        'COOL_WHITE': 'white',
+        'UV': 'purple',
+        'CYAN': 'cyan',
+        'MAGENTA': 'magenta',
+        'YELLOW': 'yellow',
+        'RED_FINE': 'red',
+        'GREEN_FINE': 'green',
+        'BLUE_FINE': 'blue',
+        'AMBER_FINE': 'orange',
+        'WARM_WHITE_FINE': 'yellow',
+        'COOL_WHITE_FINE': 'white',
+        'UV_FINE': 'purple',
+        'CYAN_FINE': 'cyan',
+        'MAGENTA_FINE': 'magenta',
+        'YELLOW_FINE': 'yellow'
+    };
+
+
+    rgbControlsTable = async (activeStage, activeFixtureGroups) => {
+        var tData = [];
+
+        for (let group of activeFixtureGroups) {
+            if (group.fixtureId) {
+                for (let fixtureId of group.fixtureId) {
+                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    let index = 0;
+
+                    for (let attribute of fixture.attribute) {
+                        if (Object.keys(this.rgbTypes).includes(attribute.type)) {
+                            if (!tData.some(data => data.id === fixture.id)) {
+                                tData.push({ id: fixtureId, name: fixture.name, group: group.name, active: fixture.enabled, type: attribute.type });
+                                let c = tData.find(data => data.id === fixture.id);
+                                if (!attribute.range) {
+                                    attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
+                                }
+
+                                if (!c.channels) {
+                                    c.channels = [];
+                                }
+                                c.channels.push({
+                                    channel: index,
+                                    params: {
+                                        attributes: attribute,
+                                        channel: index
+                                    }
+                                });
+                            } else {
+                                let c = tData.find(data => data.id === fixture.id);
+                                if (!c.channels) {
+                                    c.channels = [];
+                                }
+                                c.channels.push({
+                                    channel: index,
+                                    params: {
+                                        attributes: attribute,
+                                        channel: index
+                                    }
+                                });
+                            }
+                        }
+                        index++;
+                    }
+                }
+            }
+        }
+        //table builder
+        let table = document.getElementById('rgbcontrolls');
+        let tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        let groupName;
+
+        let rowIndex = 0;
+        for (let data of tData) {
+            if (rowIndex == 0) {
+                groupName = data.group;
+                // append Group Header
+                let groupHeader = document.createElement('tr');
+
+                let header = this.createTableCell(`<h5 class="fst-italic">${data.group} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
+                groupHeader.appendChild(header);
+                tbody.appendChild(groupHeader);
+            } else {
+                if (groupName != data.group) {
+                    //group changed
+                    groupName = data.group;
+                    // append Group Header
+                    let row = document.createElement('tr');
+
+                    let header = this.createTableCell(`<h5 class="fst-italic">${data.group} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
+                    row.appendChild(header);
+                    tbody.appendChild(row);
+                }
+            }
+
+
+            let fixtureNameRow = document.createElement('tr');
+            fixtureNameRow.style.backgroundColor = '#66ffcc';
+            fixtureNameRow.dataset.id = data.id;
+
+            let fixtureNameCell = this.createTableCell(`<span style="font-size: 20px;text-wrap:nowrap;width:40px;">${data.name}</span><span name="expandTable" class="float-end" role="button" data-id="${data.id}" id="expand_${data.id}"><img src="/src/img/chevron-expand.svg" width="40" height="40"></span>`, "bg-warning", null, true, `background-color:;text-align: center; vertical-align: middle;`, 5);
+            fixtureNameRow.appendChild(fixtureNameCell)
+            tbody.appendChild(fixtureNameRow);
+
+            let togglesRow = document.createElement('tr');
+            togglesRow.style.backgroundColor = '#66ffcc';
+            togglesRow.dataset.id = data.id;
+            togglesRow.dataset.type = "channelRow";
+            togglesRow.dataset.name = "channelRow_" + data.id;
+            togglesRow.style.visibility = "";
+
+            let types = [];
+            for (let channel of data.channels) {
+                if (channel.params.attributes.type !== null && !types.includes(channel.params.attributes.type)) {
+                    types.push(channel.params.attributes.type);
+                }
+            }
+
+            let toggles = "";
+
+            for (let key in this.rgbTypes) {
+                if (types.includes(key))
+                    toggles += `<button class="btn my-1" name="colorToggleBtn" style="width:160px;background-color: ${this.rgbTypes[key]};" data-color="${key}" data-id="${data.id}" data-state="on"><img src="/src/img/lightbulb.svg" style="position:relative;top:-2px;">&nbsp;<span style="color: darkgrey">${key}</span></button>&nbsp;`;
+            }
+
+            let masterTogglesRow = document.createElement('tr');
+            let togglesCell = this.createTableCell(`<div>${toggles}</div>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
+            masterTogglesRow.appendChild(togglesCell)
+            tbody.appendChild(masterTogglesRow);
+
+            for (let channel of data.channels) {
+                let channelRow = document.createElement('tr');
+                channelRow.style.backgroundColor = '#66ffcc';
+                channelRow.dataset.id = data.id;
+                channelRow.dataset.type = "channelRow";
+                channelRow.dataset.name = "channelRow_" + data.id;
+                channelRow.style.visibility = "";
+
+                let cell = this.createTableCell(`<span>${channel.params.attributes.name}</span><br><span style="font-size:10px;">${channel.params.attributes.type}<br>Channel: ${channel.channel + 1}</span>`, null, null, true, `background-color: #66ffcc;text-align: center; vertical-align: middle;`);
+                channelRow.appendChild(cell);
+
+                let response = "";
+                response += `<table class="table table-borderless bg-lightgrey">`;
+                response += `<thead>`;
+                response += `</thead>`;
+                response += `<tbody>`;
+                response += `<tr>`;
+                response += `   <td width="15%" style="text-align:right">`;
+                response += `       <input type="number" name="rgbRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${channel.channel}_ValLow" data-fixtureid="${data.id}" data-type="dec" data-val="Low" data-group="${data.group}" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.lowValue)}">`;
+                response += `   </td>`;
+                response += `   <td width="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="rgbRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="Low" data-channel="${channel.channel}" data-group="${data.group}" data-fixtureid="${data.id}" id="${data.id}_${channel.channel}_low"  value="${Math.floor(255 * channel.params.attributes.range.lowValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `</tr>`;
+                response += `<tr>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `   <td with="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="rgbRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="High" data-group="${data.group}" data-fixtureid="${data.id}" id="${data.id}_${channel.channel}_high" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.highValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%" style="text-align:left">`;
+                response += `       <input type="number" name="rgbRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${channel.channel}_ValHigh" data-fixtureid="${data.id}" data-type="dec" data-val="High" data-channel="${channel.channel}" data-group="${data.group}" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.highValue)}">`;
+                response += `    </td>`;
+                response += `</tr>`;
+                response += `</tbody>`;
+                response += `</table>`;
+
+                let cell2 = this.createTableCell(response, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+                channelRow.appendChild(cell2);
+
+                tbody.appendChild(channelRow);
+            }
+
+
+            rowIndex++;
+        }
+        $('input[name="rgbRangeNum"]').on('change', function (ele) {
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "Low") {
+                    //cannot be higher than the high values minimum current value
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "High") {
+                    //cannot be lower than the low values maximum current value
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                //maestro.SettingsApp.putAttribute(this.dataset.fixtureid, this.dataset.channel, { attribute: { range: { lowValue: this.value / 255, highValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value / 255 } } });
+                let range = maestro.SettingsApp.calculateRange({ lowValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value, highValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value });
+
+                maestro.SettingsApp.putAttribute(this.dataset.fixtureid, this.dataset.channel, {
+                    attribute: { range: range }
+                });
+            }
+        });
+
+        $('input[name="rgbRange"]').on('input', function (ele) {
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "Low") {
+                    //cannot be higher than the high values minimum current value
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "High") {
+                    //cannot be lower than the low values maximum current value
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value, 0, 255);
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+            }
+        });
+        $('input[name="rgbRange"]').on('mouseup', function (ele) {
+            if (!maestro.SettingsApp.leftMouseClick(ele)) return;
+
+            let type = this.dataset.type;
+            let fixtureId = this.dataset.fixtureid;
+            let val = this.dataset.val;
+            let channel = this.dataset.channel;
+
+            if (type == "int") {
+                let input = document.getElementById(`${fixtureId}_${channel}_Val`);
+                let event = new Event('change');
+                input.dispatchEvent(event);
+            }
+            if (type == "dec") {
+                let input = document.getElementById(`${fixtureId}_${channel}_Val${val}`);
+                let event = new Event('change');
+                input.dispatchEvent(event);
+            }
+
+        });
+        $('button[name="colorToggleBtn"]').on('click', async function (btn) {
+            let fixtureId = this.dataset.id;
+            let color = this.dataset.color;
+            let stage = await maestro.SettingsApp.getActiveStage();
+            let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+            let state = this.dataset.state;
+
+            state == 'on' ? state = 'off' : state = 'on';
+            this.dataset.state = state;
+
+            let highValue = state == 'on' ? 255 : 0;
+
+            if (state == 'on')
+                this.querySelector('img').src = `/src/img/lightbulb.svg`
+            if (state == 'off')
+                this.querySelector('img').src = `/src/img/lightbulb-off.svg`
+
+            for (let fixture of fixtures) {
+                let index = 0;
+                for (let attr of fixture.attribute) {
+                    if (attr.type == color) {
+                        let range = maestro.SettingsApp.calculateRange({ lowValue: 0, highValue: highValue });
+                        maestro.SettingsApp.putAttribute(fixture.id, index, { attribute: { range: range } });
+                    }
+                    index++;
+                }
+            }
+        });
+        $('span[name="expandTable"]').on('click', function (ele) {
+            const fixtureId = this.dataset.id;
+            const state = this.dataset.state;
+
+            if (fixtureId == "expandall") {
+                const channelRow = document.querySelectorAll(`[data-type='channelRow']`);
+                channelRow.forEach(function (row) {
+                    row.style.visibility = state === 'open' ? 'collapse' : '';
+                })
+            } else {
+                const channelRow = document.querySelectorAll(`[data-name='channelRow_${fixtureId}']`);
+                channelRow.forEach(function (row) {
+                    row.style.visibility = state === 'open' ? 'collapse' : '';
+                })
+            }
+            if (this.dataset.state == "closed") {
+                this.dataset.state = "open";
+                this.querySelector('img').src = "/src/img/chevron-contract.svg";
+            } else {
+                this.dataset.state = "closed";
+                this.querySelector('img').src = "/src/img/chevron-expand.svg";
+            }
+        });
+
+
+        //console.log(tData);
+
+    };
     dimmersTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
 
@@ -1829,14 +2141,14 @@ class SettingsApp extends Globals {
                 groupName = data.groupName;
                 // append Group Header
                 let groupHeader = document.createElement('tr');
-                groupHeader.style.backgroundColor = '#66ffcc';
+                groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
 
-                let header = this.createTableCell(`<h5>${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
                 groupHeader.appendChild(header);
                 tbody.appendChild(groupHeader);
 
                 let groupDimmer = document.createElement('tr');
-                groupDimmer.style.backgroundColor = '#66ffcc';
+                groupDimmer.style.backgroundColor = 'rgb(245, 240, 245)';
 
                 let dimmer = `<div class="m-1 p-1">`
                 dimmer += `<input type="range" name="groupDimmer" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_dimmer_${groupName}" value="0">`
@@ -1852,15 +2164,15 @@ class SettingsApp extends Globals {
                     groupName = data.groupName;
                     // append Group Header
                     let groupHeader = document.createElement('tr');
-                    groupHeader.style.backgroundColor = '#66ffcc';
+                    groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
                     let row = document.createElement('tr');
 
-                    let header = this.createTableCell(`<h5>${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                    let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
                     row.appendChild(header);
                     tbody.appendChild(row);
 
                     let groupDimmer = document.createElement('tr');
-                    groupDimmer.style.backgroundColor = '#66ffcc';
+                    groupDimmer.style.backgroundColor = 'rgb(245, 240, 245)';
 
                     let dimmer = `<div class="m-1 p-1">`
                     dimmer += `<input type="range" name="groupDimmer" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_dimmer_${groupName}" value="0">`
@@ -1872,23 +2184,23 @@ class SettingsApp extends Globals {
                 }
             }
 
+
             let row = document.createElement('tr');
             row.style.backgroundColor = '#66ffcc';
             row.dataset.id = data.id;
 
-            let cell1 = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: #66ffcc; text-align: left; vertical-align: middle; `);
+            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: #66ffcc; text-align: left; vertical-align: middle; `);
+            row.appendChild(fixtureNameCelll);
 
-            row.appendChild(cell1);
-
-            let cell3 = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
-            row.appendChild(cell3);
+            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+            row.appendChild(channelCell);
 
             let response = "";
 
             if (data.active == true) {
 
                 if (data.attributes.staticValue) {
-                    response += `<table class="table table-borderless bg-green">`;
+                    response += `<table class="table table-borderless bg-lightgrey">`;
                     response += `<tr>`;
                     response += `   <td width="15%">`;
                     response += `   </td>`;
@@ -1902,7 +2214,7 @@ class SettingsApp extends Globals {
                     response += `</table>`;
                 }
                 if (data.attributes.range) {
-                    response += `<table class="table table-borderless bg-green">`;
+                    response += `<table class="table table-borderless bg-lightgrey">`;
                     response += `<tr>`;
                     response += `   <td width="15%" style="text-align:right">`;
                     response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerValLow" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}">`;
@@ -1926,8 +2238,8 @@ class SettingsApp extends Globals {
                     response += `</table>`;
                 }
             }
-            let cell4 = this.createTableCell(response, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
-            row.appendChild(cell4);
+            let dimmersCell = this.createTableCell(response, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+            row.appendChild(dimmersCell);
 
             tbody.appendChild(row);
 
@@ -1936,13 +2248,11 @@ class SettingsApp extends Globals {
 
         $('input[name="dimmerRangeNum"]').on('change', function (ele) {
             if (this.dataset.type == "int") {
-                //cannot be higher than the high values minimum current value
                 document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                 maestro.Globals.debounce(maestro.SettingsApp.setDimmer(this.dataset.fixtureid, this.dataset.channel, maestro.SettingsApp.safeMinMax(this.value, 0, 255)), 100);
             }
             if (this.dataset.type == "dec") {
-                if (this.dataset.val == "low") {
-                    //cannot be higher than the high values minimum current value
+                if (this.dataset.val == "Low") {
                     if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value)) {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
@@ -1950,9 +2260,9 @@ class SettingsApp extends Globals {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                     }
                 }
-                if (this.dataset.val == "high") {
-                    //cannot be lower than the low values maximum current value
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value)) {
+                if (this.dataset.val == "High") {
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
                     } else {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
@@ -1968,19 +2278,17 @@ class SettingsApp extends Globals {
                 document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerVal`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             }
             if (this.dataset.type == "dec") {
-                if (this.dataset.val == "low") {
-                    //cannot be higher than the high values minimum current value
+                if (this.dataset.val == "Low") {
                     if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value, 0, 255);
                     } else {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                     }
                 }
-                if (this.dataset.val == "high") {
-                    //cannot be lower than the low values maximum current value
+                if (this.dataset.val == "High") {
                     if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_dimmer_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value, 0, 255);
                     } else {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
@@ -2092,7 +2400,6 @@ class SettingsApp extends Globals {
                 let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                 let channels = fixture.attribute.filter(channel => channel.type === "DIMMER" || channel.type === "MASTER_DIMMER")
                     .map((channel) => ({ index: fixture.attribute.indexOf(channel), channel }));
-                console.log(channels);
             }
         });
     };

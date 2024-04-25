@@ -1,3 +1,4 @@
+"use strict";
 var maestro = maestro || {};
 class Globals {
     constructor(scriptSource, debugFetch = false) {
@@ -127,7 +128,7 @@ class Globals {
             return response;
         };
     };
-    createTableCell = (text, className = null, data = null, isHtmlContent = true, style = null, colspan = null) => {
+    createTableCell = (text, className = null, data = null, isHtmlContent = true, style = null, colspan = null, rowspan = null) => {
         let cell = document.createElement("td");
 
         isHtmlContent ? cell.innerHTML = text : cell.textContent = text;
@@ -135,8 +136,14 @@ class Globals {
         data ? cell.dataset = data : null;
         style ? cell.style = style : null;
         colspan ? cell.colSpan = colspan : null;
+        rowspan ? cell.rowSpan = rowspan : null;
 
         return cell;
+    }
+    getContrastColor = (color) => {
+        // Calculate the contrast ratio between the color and white
+        const luminance = (0.299 * parseInt(color.substr(1, 2), 16) + 0.587 * parseInt(color.substr(3, 2), 16) + 0.114 * parseInt(color.substr(5, 2), 16)) / 255;
+        return luminance > 0.5 ? '#000000' : '#ffffff';
     }
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     loadScript = (scriptUrl, params = null) => {
