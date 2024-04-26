@@ -61,6 +61,19 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
+                <a class="nav-link" id="simple-tab-11" data-bs-toggle="tab" href="#tabpanel-automacro" role="tab"
+                    aria-controls="tabpanel-automacro" aria-selected="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-gear" viewBox="0 0 16 16">
+                        <path
+                            d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                        <path
+                            d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+                    </svg>
+                    Auto Macros
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
                 <a class="nav-link" id="simple-tab-2" data-bs-toggle="tab" href="#tabpanel-fog" role="tab"
                     aria-controls="tabpanel-fog" aria-selected="false">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -167,6 +180,68 @@
                     this
                     feature for your own security.
                 </p>
+            </div>
+            <!-- AutoMacro Triggering Panel -->
+            <div class="tab-pane collapse" id="tabpanel-automacro" role="tabpanel" aria-labelledby="simple-tab-0b">
+                <h5>Enable Macro Triggering</h5>
+
+                <div class="text-danger my-1 d-flex justify-content-center p-3">
+                    <svg style="position: relative;top:5px;" class="mx-2" xmlns="http://www.w3.org/2000/svg" width="34"
+                        height="34" fill="currentColor" class="bi bi-exclamation-octagon-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+
+                    <span class="h2">EXPERIMENTAL FUNCTIONALITY</span>
+                </div>
+
+                <div>
+                    You can trigger a macros activation or deactivation, based on the Activity Level of the music.<br>
+                    <br>
+                    <ol>
+                        <li>
+                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
+                            ON.
+                        </li>
+                        <li>
+                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
+                            OFF.
+                        </li>
+                        <li>
+                            Once the trigger is activated it will remain active until you disable it!
+                        </li>
+                        <li>
+                            If you configure ON/OFF parameters for multiple Macros, which affect the same fixtures, then
+                            the first macro will win. (Higher in the list of macros will take precedence)
+                        </li>
+                        <li>
+                            A macro will never trigger more often than once per minute, regardless of how active the
+                            audio is.<br>
+                            If you configure your levels well then you can tune the frequency of all the
+                            triggers.
+                        </li>
+                        <li>
+                            <b>Unlike other triggers, the Macro trigger will only work if this settings page is
+                                open!</b>
+                        </li>
+                    </ol>
+                </div>
+                <div class="mx-3">
+                    <div class="row">
+                        <div class="form-check form-switch col-auto">
+                            <input class="form-check-input" type="checkbox" id="autoMacrosEnabled">
+                            <label class="form-check-label" for="autoMacrosEnabled">Enabled</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-danger my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-exclamation-octagon-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    <i>These switches are live edits, and will take effect immediately</i>
+                </div>
             </div>
             <!-- Strobe Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
@@ -499,8 +574,9 @@
                             <th data-field="length" width="50" data-width="50">#</th>
                             <th data-field="length">Fixtures Affected</th>
                             <th data-field="length">Cue Triggers</th>
+                            <th data-field="length">Activity Triggers</th>
                             <th width="100" data-width="100">Trigger</th>
-                            <th width="100" data-width="100">Clear</th>
+                            <th width="100" data-width="100">Stop</th>
                             <th width="100" data-width="100">Delete</th>
                         </tr>
                         <tr>

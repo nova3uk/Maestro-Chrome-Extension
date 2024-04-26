@@ -436,6 +436,8 @@ class OverlayApp extends Globals {
             let data = JSON.parse(event.data);
             if (data.type == "AUDIO_LEVEL_NOTIFICATION") {
                 this.audioLevelMeter(data.msg);
+
+                chrome.runtime.sendMessage(this.ExtensionId, { audioLevel: data.msg });
             }
         };
     }

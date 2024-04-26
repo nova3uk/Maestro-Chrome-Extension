@@ -11,6 +11,9 @@ class SettingsApp extends Globals {
     activeStageId;
     ignoredFixtures = [];
     holdFire = false;
+    autoMacrosTimer = null;
+    storageWatcher = null;
+    autoMacrosRunning = [];
 
     init = async () => {
         this.logging = await this.getSetting("loggingToggle");
@@ -27,9 +30,11 @@ class SettingsApp extends Globals {
         this.dimmersTable(this.activeStage, this.activeStageFixtureGroups);
         //this.rgbControlsTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
+        this.bindAutoMacros();
         this.bindAutoFog();
         this.bindAutoEffects();
         this.tabObserver();
+        this.autoMacrosWatcher();
 
         await this.loadMacros(async (macros) => {
             if (macros) {
@@ -54,7 +59,91 @@ class SettingsApp extends Globals {
             });
         }, 1000);
     };
+
+    audioLevelHdlr = async (audioLevel) => {
+        this.logging = true;
+
+        let soundLevel = Math.floor(((audioLevel.inputLevel + 37) / 37) * 100);
+        let activityLevel = Math.floor((audioLevel.activityLevel * 100));
+
+        if (soundLevel < 5) soundLevel = 0;
+        if (activityLevel < 5) activityLevel = 0;
+
+        let macros = await this.loadMacros();
+        macros = macros.filter(macro => macro.macro.stageId == this.stageId);
+        macros = macros.filter(macro => macro.macro.activityLevelOn !== null || macro.macro.activityLevelOff !== null);
+
+        for (let macro of macros) {
+            if (macro.macro.activityLevelOn) {
+                if (macro.macro.activityLevelOn !== null && activityLevel >= macro.macro.activityLevelOn) {
+
+                    if (this.autoMacrosRunning.includes(macro.macro.name)) return;
+
+                    //1 minute debounce
+                    if (macro.macro.autoMacroLastRun + 60000 > Date.now()) return;
+
+                    this.autoMacrosRunning.push(macro.macro.name);
+                    let stageId = macro.macro.stageId;
+
+                    await maestro.SettingsApp.loadMacros().then(macros => {
+                        for (let m of macros) {
+                            if (m.macro.name == macro.macro.name && m.macro.stageId == stageId) {
+                                m.macro.autoMacroLastRun = Date.now();
+                                m.macro.autoMacroRunning = true;
+                            }
+                        }
+                        maestro.SettingsApp.saveLocalSetting("macros", macros);
+                    });
+
+                    const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macro.macro.name + '"]');
+                    deleteButton.disabled = true;
+                    const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macro.macro.name + '"]');
+                    applyButton.disabled = true;
+                    const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]');
+                    clearButton.disabled = true;
+
+                    await maestro.SettingsApp.applyMacro(macro.macro.name, maestro.SettingsApp.activeStageId, false);
+
+                    if (this.logging)
+                        console.log('AutoMacro Applying Macro:', macro.macro.name)
+                }
+            }
+            if (macro.macro.activityLevelOff) {
+                if (macro.macro.activityLevelOff !== null & macro.macro.activityLevelOff >= activityLevel) {
+                    if (this.autoMacrosRunning.includes(macro.macro.name)) {
+                        this.autoMacrosRunning = this.autoMacrosRunning.filter(name => name !== macro.macro.name);
+                        document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
+
+                        await maestro.SettingsApp.loadMacros().then(macros => {
+                            for (let m of macros) {
+                                if (m.macro.name == macro.macro.name && m.macro.stageId == maestro.SettingsApp.activeStageId) {
+                                    m.macro.autoMacroRunning = false;
+                                }
+                            }
+                            maestro.SettingsApp.saveLocalSetting("macros", macros);
+                        });
+                        if (this.logging)
+                            console.log('AutoMacro Reverting Macro:', macro.macro.name)
+                    }
+                }
+            }
+        };
+    };
+    autoMacrosWatcher = () => {
+        this.autoMacrosTimer = setInterval(async () => {
+            this.getLocalSetting("autoMacrosEnabled").then(async (autoMacrosEnabled) => {
+                if (autoMacrosEnabled) {
+                    if (!maestro.SettingsApp.storageWatcher)
+                        maestro.SettingsApp.storageWatcher = setInterval(async () => {
+                            let audioLevel = await this.getLocalSetting("audioLevel");
+                            maestro.SettingsApp.debounce(maestro.SettingsApp.audioLevelHdlr(audioLevel), 1000);
+                        });
+                }
+            });
+        }, 3000);
+    }
     showLoader = () => {
+        return;
         document.body.style.overflow = "hidden";
         document.getElementById('modalLoading').style.display = "block";
     };
@@ -310,6 +399,15 @@ class SettingsApp extends Globals {
 
         return alert('All fixtures have been restored to the backup state');
     };
+    bindAutoMacros = async () => {
+        let autoMacrosEnabled = await this.getLocalSetting("autoMacrosEnabled");
+        document.getElementById('autoMacrosEnabled').checked = autoMacrosEnabled;
+
+        document.getElementById('autoMacrosEnabled').addEventListener('change', async () => {
+            let autoMacrosEnabled = document.getElementById('autoMacrosEnabled').checked;
+            await this.saveLocalSetting("autoMacrosEnabled", autoMacrosEnabled);
+        });
+    };
     bindAutoEffects = async () => {
         let autoEffectsEnabled = await this.getLocalSetting("autoEffectsEnabled");
         let autoEffectsOnActivityPeakPercent = await this.getLocalSetting("autoEffectsOnActivityPeakPercent");
@@ -490,9 +588,9 @@ class SettingsApp extends Globals {
             return macros;
         });
     };
-    applyMacro = async (macroName, stageId) => {
+    applyMacro = async (macroName, stageId, showLoader = true) => {
         try {
-            this.showLoader();
+            if (showLoader) this.showLoader();
             const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
             deleteButton.disabled = true;
             const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
@@ -517,7 +615,11 @@ class SettingsApp extends Globals {
                     applyButton.disabled = false;
                     this.hideLoader();
 
-                    return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
+                    if (showLoader == true) {
+                        return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
+                    } else {
+                        return false;
+                    }
                 }
             }
 
@@ -554,12 +656,18 @@ class SettingsApp extends Globals {
                     applyButton.disabled = false;
                     this.hideLoader();
 
-                    alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
-                    return;
+                    if (showLoader == true)
+                        alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
+
+                    return false;
                 }
 
-                let ignoredFixtureNames = ignoredFixtures.map(fixture => fixture.name).join('\n');
-                alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
+                if (showLoader == true) {
+                    let ignoredFixtureNames = ignoredFixtures.map(fixture => fixture.name).join('\n');
+
+                    if (showLoader == true)
+                        alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
+                }
             }
 
             clearButton.disabled = false;
@@ -583,9 +691,9 @@ class SettingsApp extends Globals {
             alert(this.fatalErrorMsg);
         }
     }
-    revertMacro = async (macroName, stageId) => {
+    revertMacro = async (macroName, stageId, showLoader = true) => {
         try {
-            this.showLoader();
+            if (showLoader) this.showLoader();
             const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
             clearButton.disabled = true;
 
@@ -1196,6 +1304,8 @@ class SettingsApp extends Globals {
                 macro: macro,
                 stageId: macro.macro.stageId,
                 name: macro.macro.name,
+                activityLevelOn: macro.macro.activityLevelOn,
+                activityLevelOff: macro.macro.activityLevelOff,
                 length: fixtures.length,
                 fixtureName: fixtures.map(fixture => fixture.name),
                 cueId: macro.macro.cueId,
@@ -1247,14 +1357,14 @@ class SettingsApp extends Globals {
                     formatter: function (value, row, index) {
                         if (!cues) return;
 
-                        let select = `<select name="startCueList" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        let select = `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
                         select += '<option value="">-- Start Cue --</option>';
                         for (let cue of row.cues) {
                             select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueId == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
                         }
                         select += '</select><br>';
 
-                        select += `<select name="endCueList" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        select += `<select name="endCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Stop" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
                         select += '<option value="">-- End Cue --</option>';
                         for (let cue of row.cues) {
                             select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueIdEnd == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
@@ -1264,6 +1374,19 @@ class SettingsApp extends Globals {
                         return select;
                         // if (row.cueId)
                         //     return `<span class="badge text-bg-warning" name="remove_cue" role="button" style="position:relative; top:-0px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Cue Trigger" data-macroName="${row.name}" data-stageId="${row.stageId}">${row.cueName}&nbsp;<img src="/src/img/x.svg" width="20" height="20"></span>`;
+                    }
+                },
+                {
+                    field: 'activityTrigger',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        let response = "";
+                        response += `<label style="font-size:10px;font-weight:bold;position:relative;top:-7px;">On Level</label><br><input type="number" name="activityLevel" data-type="on" data-id="${row.name}" data-stageid="${row.stageId}" class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the audio Activity Level at which the trigger will come on. Leave blank to disable!" style="position:relative;top:-7px;width: 50px;" min="50" max="99" value="${row.activityLevelOn}"><br>`;
+                        response += `<label style="font-size:10px;font-weight:bold;position:relative;top:-7px;">Off Level</label><br><input type="number" name="activityLevel" data-type="off" data-id="${row.name}" data-stageid="${row.stageId}" class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the audio Activity Level at which the trigger will switch off. Leave blank to disable!" style="position:relative;top:-7px;width: 50px;" min="10" max="99" value="${row.activityLevelOff}"><br>`;
+
+                        return response;
                     }
                 },
                 {
@@ -1299,6 +1422,28 @@ class SettingsApp extends Globals {
                     'data-stageid': row.stageId,
                 }
             }
+        });
+        $('input[name="activityLevel"]').on('change', function (btn) {
+            var macro = this.dataset.id;
+            var level = this.value;
+            var stageId = this.dataset.stageid;
+
+            if (level == "") {
+                level = null;
+            }
+            maestro.SettingsApp.loadMacros().then(macros => {
+                for (let m of macros) {
+                    if (m.macro.name == macro && m.macro.stageId == stageId) {
+                        if (this.dataset.type == "on")
+                            m.macro.activityLevelOn = this.value;
+                    }
+                    if (m.macro.name == macro && m.macro.stageId == stageId) {
+                        if (this.dataset.type == "off")
+                            m.macro.activityLevelOff = this.value;
+                    }
+                }
+                maestro.SettingsApp.saveLocalSetting("macros", macros);
+            });
         });
         $('span[name="editMacroName"]').on('click', function (btn) {
             var macro = this.dataset.name

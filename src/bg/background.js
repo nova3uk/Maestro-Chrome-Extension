@@ -24,6 +24,9 @@ chrome.runtime.onMessageExternal.addListener(
                 });
             });
         }
+        if (request.audioLevel) {
+            chrome.storage.local.set({ audioLevel: request.audioLevel });
+        }
         if (request.ping) {
             return new Promise((resolve, reject) => {
                 chrome.storage.local.set({ activeTab: sender.tab.id }).then(() => {
