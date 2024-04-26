@@ -13,7 +13,6 @@ class SettingsApp extends Globals {
     holdFire = false;
     autoMacrosTimer = null;
     storageWatcher = null;
-    autoMacrosRunning = [];
 
     init = async () => {
         this.logging = await this.getSetting("loggingToggle");
@@ -77,14 +76,10 @@ class SettingsApp extends Globals {
             if (macro.macro.activityLevelOn) {
                 if (macro.macro.activityLevelOn !== null && activityLevel >= macro.macro.activityLevelOn) {
 
-                    if (this.autoMacrosRunning.includes(macro.macro.name)) return;
-
                     //1 minute debounce
                     if (macro.macro.autoMacroLastRun + 60000 > Date.now()) return;
 
-                    this.autoMacrosRunning.push(macro.macro.name);
                     let stageId = macro.macro.stageId;
-
                     await maestro.SettingsApp.loadMacros().then(macros => {
                         for (let m of macros) {
                             if (m.macro.name == macro.macro.name && m.macro.stageId == stageId) {
@@ -110,21 +105,22 @@ class SettingsApp extends Globals {
             }
             if (macro.macro.activityLevelOff) {
                 if (macro.macro.activityLevelOff !== null & macro.macro.activityLevelOff >= activityLevel) {
-                    if (this.autoMacrosRunning.includes(macro.macro.name)) {
-                        this.autoMacrosRunning = this.autoMacrosRunning.filter(name => name !== macro.macro.name);
-                        document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
+                    await maestro.SettingsApp.loadMacros().then(macros => {
+                        for (let m of macros) {
+                            if (m.macro.name == macro.macro.name && m.macro.stageId == maestro.SettingsApp.stageId) {
+                                if (m.macro.autoMacroRunning == true) {
+                                    document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
 
-                        await maestro.SettingsApp.loadMacros().then(macros => {
-                            for (let m of macros) {
-                                if (m.macro.name == macro.macro.name && m.macro.stageId == maestro.SettingsApp.activeStageId) {
                                     m.macro.autoMacroRunning = false;
+                                    maestro.SettingsApp.saveLocalSetting("macros", macros);
+
+                                    if (this.logging)
+                                        console.log('AutoMacro Reverting Macro:', macro.macro.name)
                                 }
+
                             }
-                            maestro.SettingsApp.saveLocalSetting("macros", macros);
-                        });
-                        if (this.logging)
-                            console.log('AutoMacro Reverting Macro:', macro.macro.name)
-                    }
+                        }
+                    });
                 }
             }
         };
@@ -136,11 +132,14 @@ class SettingsApp extends Globals {
                     if (!maestro.SettingsApp.storageWatcher)
                         maestro.SettingsApp.storageWatcher = setInterval(async () => {
                             let audioLevel = await this.getLocalSetting("audioLevel");
-                            maestro.SettingsApp.debounce(maestro.SettingsApp.audioLevelHdlr(audioLevel), 1000);
-                        });
+                            maestro.SettingsApp.audioLevelHdlr(audioLevel)
+                        }, 1000);
+                } else {
+                    clearInterval(maestro.SettingsApp.storageWatcher);
+                    maestro.SettingsApp.storageWatcher = null;
                 }
             });
-        }, 3000);
+        }, 10000);
     }
     showLoader = () => {
         return;
