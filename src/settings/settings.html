@@ -184,17 +184,6 @@
             <!-- AutoMacro Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-automacro" role="tabpanel" aria-labelledby="simple-tab-0b">
                 <h5>Enable Macro Triggering</h5>
-
-                <div class="text-danger my-1 d-flex justify-content-center p-3">
-                    <svg style="position: relative;top:5px;" class="mx-2" xmlns="http://www.w3.org/2000/svg" width="34"
-                        height="34" fill="currentColor" class="bi bi-exclamation-octagon-fill" viewBox="0 0 16 16">
-                        <path
-                            d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                    </svg>
-
-                    <span class="h2">EXPERIMENTAL FUNCTIONALITY</span>
-                </div>
-
                 <div>
                     You can trigger a macros activation or deactivation, based on the Activity Level of the music.<br>
                     <br>
@@ -208,17 +197,14 @@
                             OFF.
                         </li>
                         <li>
-                            Once the trigger is activated it will remain active until you disable it!
-                        </li>
-                        <li>
                             If you configure ON/OFF parameters for multiple Macros, which affect the same fixtures, then
                             the first macro will win. (Higher in the list of macros will take precedence)
                         </li>
                         <li>
-                            A macro will never trigger more often than once per minute, regardless of how active the
-                            audio is.<br>
-                            If you configure your levels well then you can tune the frequency of all the
-                            triggers.
+                            Adjust the Minimum Interval, to prevent the macro from being triggered too often.
+                        </li>
+                        <li>
+                            Adjust the Minimum Run Time, to prevent the macro from being stopped too quickly.
                         </li>
                         <li>
                             <b>Unlike other triggers, the Macro trigger will only work if this settings page is
@@ -231,6 +217,16 @@
                         <div class="form-check form-switch col-auto">
                             <input class="form-check-input" type="checkbox" id="autoMacrosEnabled">
                             <label class="form-check-label" for="autoMacrosEnabled">Enabled</label>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            Minimum Interval(mins) <input type="number" min="1" max="30" style="width:70px;"
+                                class="form-control" id="autoMacroInterval">
+                        </div>
+                        <div class="col-auto">
+                            Minimum Run Time(secs) <input type="number" min="1" max="600" style="width:70px;"
+                                class="form-control" id="autoMacroRunTime">
                         </div>
                     </div>
                 </div>
@@ -572,9 +568,28 @@
                         <tr>
                             <th data-field="name" width="200" data-width="200">Macro Name</th>
                             <th data-field="length" width="50" data-width="50">#</th>
-                            <th data-field="length">Fixtures Affected</th>
-                            <th data-field="length">Cue Triggers</th>
-                            <th data-field="length">Activity Triggers</th>
+                            <th data-field="fixtures">Fixtures Affected</th>
+                            <th data-field="cue">Cue Triggers</th>
+                            <th data-field="activityTriggerHigh">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-volume-up" viewBox="0 0 16 16">
+                                    <path
+                                        d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z" />
+                                    <path
+                                        d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z" />
+                                    <path
+                                        d="M10.025 8a4.5 4.5 0 0 1-1.318 3.182L8 10.475A3.5 3.5 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.5 4.5 0 0 1 10.025 8M7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11" />
+                                </svg>
+                                On
+                            </th>
+                            <th data-field="activityTriggerLow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-volume-down" viewBox="0 0 16 16">
+                                    <path
+                                        d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12zM6.312 6.39 8 5.04v5.92L6.312 9.61A.5.5 0 0 0 6 9.5H4v-3h2a.5.5 0 0 0 .312-.11M12.025 8a4.5 4.5 0 0 1-1.318 3.182L10 10.475A3.5 3.5 0 0 0 11.025 8 3.5 3.5 0 0 0 10 5.525l.707-.707A4.5 4.5 0 0 1 12.025 8" />
+                                </svg>
+                                Off
+                            </th>
                             <th width="100" data-width="100">Trigger</th>
                             <th width="100" data-width="100">Stop</th>
                             <th width="100" data-width="100">Delete</th>

@@ -156,6 +156,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
         chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
 
+        chrome.storage.local.set({ autoMacroInterval: 5 });
+        chrome.storage.local.set({ autoMacroRunTime: 30 });
+        chrome.storage.local.set({ autoMacroEnabled: false });
+
         let internalUrl = chrome.runtime.getURL("src/settings/settings.html?maestro_url=*%3A%2F%2Fmaestro.local%2F*");
         chrome.tabs.create({ url: internalUrl }, function (tab) { });
 
@@ -183,6 +187,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
                 chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
                 chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
+                break;
+            case "1.3.16":
+                chrome.storage.local.set({ autoMacroInterval: 5 });
+                chrome.storage.local.set({ autoMacroRunTime: 30 });
+                chrome.storage.local.set({ autoMacroEnabled: false });
                 break;
         }
         console.log(

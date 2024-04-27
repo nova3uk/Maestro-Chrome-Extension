@@ -54,6 +54,9 @@ class App extends Globals {
     activePeakEffectsLastExecution = null;
     activePeakFogLastExecution = null;
     activeFogOnTimerLastExecution = null;
+    autoEffectsOnPeakRunning = false;
+    autoFogOnPeakRunning = false;
+    autoStrobeOnPeakRunning = false;
 
     init = async () => {
         try {
@@ -415,6 +418,10 @@ class App extends Globals {
             return;
         }
 
+        if (this.autoStrobeOnPeakRunning) return;
+
+        this.autoStrobeOnPeakRunning = true;
+
         if (!Number(maestro.App.autoParams.autoStrobeOnActivityPeakPercent) > 0)
             maestro.App.autoParams.autoStrobeOnActivityPeakPercent = 95;
         if (!Number(maestro.App.autoParams.autoStrobeOnActivityPeakDuration) > 0)
@@ -426,13 +433,19 @@ class App extends Globals {
         if (!this.activePeakStrobeLastExecution)
             this.activePeakStrobeLastExecution = await maestro.Globals.getRemoteSetting("activePeakStrobeLastExecution") || 0;
 
-        if ((this.activePeakStrobeLastExecution + maestro.App.autoParams.activePeakStrobeMinimumDelay) > Date.now()) return;
+        if ((this.activePeakStrobeLastExecution + maestro.App.autoParams.activePeakStrobeMinimumDelay) > Date.now()) {
+            this.autoStrobeOnPeakRunning = false;
+            return;
+        }
 
         let autoStrobeOnActivityPeakPercent = maestro.App.autoParams.autoStrobeOnActivityPeakPercent;
         let autoStrobeOnActivityPeakDuration = (maestro.App.autoParams.autoStrobeOnActivityPeakDuration || 2) * 1000;
 
         if (level >= autoStrobeOnActivityPeakPercent) {
-            if (this.autoStrobeOnPeakTimer) return;
+            if (this.autoStrobeOnPeakTimer) {
+                this.autoStrobeOnPeakRunning = false;
+                return;
+            }
 
             //activate Strobe
             this.activePeakStrobeLastExecution = Date.now();
@@ -453,11 +466,15 @@ class App extends Globals {
             if (this.logging)
                 console.log('Auto Strobe Started!');
         }
+        this.autoStrobeOnPeakRunning = false;
     };
     autoEffectsOnPeak = async (level) => {
         if (!this.autoParams.autoEffectsEnabled) {
             return;
         }
+
+        if (this.autoEffectsOnPeakRunning) return;
+        this.autoEffectsOnPeakRunning = true;
 
         if (!Number(maestro.App.autoParams.autoEffectsOnActivityPeakPercent) > 0)
             this.autoParams.autoEffectsOnActivityPeakPercent = 95;
@@ -470,13 +487,19 @@ class App extends Globals {
         if (!this.activePeakEffectsLastExecution)
             this.activePeakEffectsLastExecution = await maestro.Globals.getRemoteSetting("activePeakEffectsLastExecution") || 0;
 
-        if ((this.activePeakEffectsLastExecution + this.autoParams.activePeakEffectsMinimumDelay) > Date.now()) return;
+        if ((this.activePeakEffectsLastExecution + this.autoParams.activePeakEffectsMinimumDelay) > Date.now()) {
+            this.autoEffectsOnPeakRunning = false;
+            return;
+        }
 
         let autoEffectsOnActivityPeakPercent = this.autoParams.autoEffectsOnActivityPeakPercent;
         let autoEffectsOnActivityPeakDuration = this.autoParams.autoEffectsOnActivityPeakDuration * 1000;
 
         if (level >= autoEffectsOnActivityPeakPercent) {
-            if (this.autoEffectsOnPeakTimer) return;
+            if (this.autoEffectsOnPeakTimer) {
+                this.autoEffectsOnPeakRunning = false;
+                return;
+            }
 
             //activate Effect
             this.activePeakEffectsLastExecution = Date.now();
@@ -496,6 +519,7 @@ class App extends Globals {
             if (this.logging)
                 console.log('Auto Effects Started!');
         }
+        this.autoEffectsOnPeakRunning = false;
     };
     autoFogOnTimer = () => {
         if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnTimer) {
@@ -544,7 +568,7 @@ class App extends Globals {
                 if (!this.activeFogOnTimerLastExecution)
                     this.activeFogOnTimerLastExecution = await maestro.Globals.getRemoteSetting("activeFogOnTimerLastExecution") || 0;
 
-                if ((this.activePeakFogLastExecution + this.autoFogInterval) > Date.now()) return;
+                if ((this.activePeakFogLastExecution + this.autoFogInterval) > Date.now()) { return; }
                 if ((this.activeFogOnTimerLastExecution + this.autoFogInterval) > Date.now()) return;
 
                 this.activeFogOnTimerLastExecution = Date.now();
@@ -571,11 +595,16 @@ class App extends Globals {
                 console.error('Fatal error starting auto fog timer:', e);
         }
     };
+
     autoFogOnPeak = async (level) => {
 
         if (!this.autoParams.autoFogEnabled || !this.autoParams.autoFogOnActivityPeak) {
             return;
         }
+
+        if (this.autoFogOnPeakRunning) return;
+        this.autoFogOnPeakRunning = true;
+
         try {
             //local settings
             if (!Number(this.autoParams.autoFogOnActivityPeakPercent) > 0)
@@ -591,14 +620,23 @@ class App extends Globals {
             if (!this.activeFogOnTimerLastExecution)
                 this.activeFogOnTimerLastExecution = await maestro.Globals.getRemoteSetting("activeFogOnTimerLastExecution") || 0;
 
-            if ((this.activePeakFogLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) return;
-            if ((this.activeFogOnTimerLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) return;
+            if ((this.activePeakFogLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) {
+                this.autoFogOnPeakRunning = false;
+                return
+            };
+            if ((this.activeFogOnTimerLastExecution + this.autoParams.activePeakFogMinimumDelay) > Date.now()) {
+                this.autoFogOnPeakRunning = false;
+                return;
+            }
 
             let autoFogOnActivityPeakPercent = this.autoParams.autoFogOnActivityPeakPercent;
             let autoFogOnActivityPeakDuration = this.autoParams.autoFogOnActivityPeakDuration * 1000;
 
             if (level >= autoFogOnActivityPeakPercent) {
-                if (this.autoFogOnPeakTimer) return;
+                if (this.autoFogOnPeakTimer) {
+                    this.autoFogOnPeakRunning = false;
+                    return;
+                }
 
                 //activate fog
                 this.activePeakFogLastExecution = Date.now();
@@ -622,7 +660,10 @@ class App extends Globals {
         } catch (e) {
             if (this.logging)
                 console.error('Fatal error starting auto fog on peak:', e);
+
+            this.autoFogOnPeakRunning = false;
         }
+        this.autoFogOnPeakRunning = false;
     }
 };
 
