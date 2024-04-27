@@ -80,6 +80,7 @@
         "src/img/volume-up.svg",
         "src/img/volume-down.svg",
         "src/img/volume-mute.svg",
+        "src/img/zoom-in.svg",
         "src/external/jquery.min.js",
         "src/external/bootstrap-table.min.js",
         "src/external/bootstrap-table.min.css",

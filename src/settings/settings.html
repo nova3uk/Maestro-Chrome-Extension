@@ -478,16 +478,18 @@
                 </a>
             </li>
             <!-- <li class="nav-item" role="presentation">
-                <a class="nav-link" id="simple-tab-10" data-bs-toggle="tab" href="#tabpanel-rgbcontrols" role="tab"
-                    aria-controls="tabpanel-rgbcontrols" aria-selected="false">
+                <a class="nav-link" id="simple-tab-10" data-bs-toggle="tab" href="#tabpanel-focus" role="tab"
+                    aria-controls="tabpanel-dimmers" aria-selected="false">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                        class="bi bi-palette" viewBox="0 0 16 16">
+                        class="bi bi-zoom-in" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0" />
                         <path
-                            d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                        <path
-                            d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7" />
+                            d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z" />
+                        <path fill-rule="evenodd"
+                            d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5" />
                     </svg>
-                    RGB Controls
+                    Focus Controls
                 </a>
             </li> -->
             <li class="nav-item" role="presentation">
@@ -814,22 +816,8 @@
                 <div class="clearfix"></div>
                 <div class="my-5"></div>
             </div>
-            <!-- RGB Controls -->
-            <!-- <div class="tab-pane" id="tabpanel-rgbcontrols" role="tabpanel" aria-labelledby="simple-tab-10">
-                <h2 class="mt-3"></h2>
-                <div>
-                    <p class="h6">Color Controls</p>
-                    <div class="my-3"></div>
-                    <br>
-                </div>
-                <div class="text-danger my-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-exclamation-octagon-fill" viewBox="0 0 16 16">
-                        <path
-                            d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                    </svg>
-                    <i>These switches are live edits, and will take effect immediately</i>
-                </div>
+            <!-- Focus Controls -->
+            <!-- <!-- <div class="tab-pane" id="tabpanel-focus" role="tabpanel" aria-labelledby="simple-tab-9">
                 <h2 class="mt-1"></h2>
                 <div class="bootstrap-table bootstrap5">
                     <div class="fixed-table-toolbar"></div>
@@ -838,20 +826,25 @@
                             <table></table>
                         </div>
                         <div class="fixed-table-body">
-                            <table id="rgbcontrolls" class="table table-bordered my-1 table-primary">
+                            <table id="focus" class="table table-bordered my-1 xtable-secondary">
                                 <thead class="table-light">
                                     <tr>
-                                        <th data-field="name" data-sortable="false" style="width:50px !important">
+                                        <th data-field="name" data-sortable="false">
                                             <div class="th-inner">
                                                 Fixture Name
                                             </div>
                                             <div class="fht-cell"></div>
                                         </th>
-                                        <th width="">
-                                            <div class="th-inner h5">Channel</div>
+                                        <th data-field="focusType" data-sortable="false">
+                                            <div class="th-inner">
+                                                Type
+                                            </div>
                                         </th>
-                                        <th>
-                                            <div class="th-inner h5">Control</div>
+                                        <th data-field="focus" data-sortable="false" data-width="700">
+                                            <div class="th-inner">
+                                                Focus
+                                            </div>
+                                            <div class="fht-cell"></div>
                                         </th>
                                     </tr>
                                 </thead>

@@ -28,7 +28,7 @@ class SettingsApp extends Globals {
         this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
         this.dimmerTable(this.activeStage, this.activeStageFixtureGroups);
-        //this.rgbControlsTable(this.activeStage, this.activeStageFixtureGroups);
+        //this.focusTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoMacros();
         this.bindAutoFog();
@@ -2320,6 +2320,38 @@ class SettingsApp extends Globals {
         }
         return values.reduce((a, b) => a + b, 0) / values.length;
 
+    };
+    focusTable = async (activeStage, activeFixtureGroups) => {
+        debugger
+        var tData = [];
+
+        for (let group of activeFixtureGroups) {
+            if (group.fixtureId) {
+                for (let fixtureId of group.fixtureId) {
+                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+                    let index = 0;
+                    for (let attribute of fixture.attribute) {
+                        if (attribute.name.toUpperCase() == "FOCUS") {
+                            if (!attribute.range && attribute.type == "FOCUS") {
+                                attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
+                            }
+                            tData.push(
+                                {
+                                    id: fixture.id,
+                                    uuid: maestro.SettingsApp.getUuid(),
+                                    active: fixture.enabled,
+                                    name: fixture.name,
+                                    attributes: attribute,
+                                    channel: index,
+                                    type: attribute.type,
+                                    groupName: group.name
+                                });
+                        }
+                        index++;
+                    }
+                }
+            }
+        }
     };
     dimmerTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
