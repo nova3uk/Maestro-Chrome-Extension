@@ -13,6 +13,7 @@ class SettingsApp extends Globals {
     holdFire = false;
     autoMacrosTimer = null;
     storageWatcher = null;
+    autoMacroRoutineRunning = false;
 
     init = async () => {
         this.logging = await this.getSetting("loggingToggle");
@@ -62,50 +63,55 @@ class SettingsApp extends Globals {
     audioLevelHdlr = async (audioLevel) => {
         this.logging = true;
 
-        let soundLevel = Math.floor(((audioLevel.inputLevel + 37) / 37) * 100);
-        let activityLevel = Math.floor((audioLevel.activityLevel * 100));
+        try {
+            let soundLevel = Math.floor(((audioLevel.inputLevel + 37) / 37) * 100);
+            let activityLevel = Math.floor((audioLevel.activityLevel * 100));
 
-        if (soundLevel < 5) soundLevel = 0;
-        if (activityLevel < 5) activityLevel = 0;
+            if (soundLevel < 5) soundLevel = 0;
+            if (activityLevel < 5) activityLevel = 0;
 
-        let macros = await this.loadMacros();
-        macros = macros.filter(macro => macro.macro.stageId == this.stageId);
-        macros = macros.filter(macro => macro.macro.activityLevelOn !== null || macro.macro.activityLevelOff !== null);
+            let macros = await this.loadMacros();
+            macros = macros.filter(macro => macro.macro.stageId == this.stageId);
+            macros = macros.filter(macro => macro.macro.activityLevelOn !== null || macro.macro.activityLevelOff !== null);
 
-        for (let macro of macros) {
-            if (macro.macro.activityLevelOn && (macro.macro.macroRunning == false || !macro.macro.macroRunning)) {
-                if (macro.macro.activityLevelOn !== null && activityLevel >= macro.macro.activityLevelOn) {
+            for (let macro of macros) {
+                if (macro.macro.activityLevelOn && (macro.macro.macroRunning == false || !macro.macro.macroRunning)) {
+                    if (macro.macro.activityLevelOn !== null && activityLevel >= macro.macro.activityLevelOn) {
 
-                    //1 minute debounce
-                    let autoMacroInterval = await this.getLocalSetting("autoMacroInterval");
-                    autoMacroInterval = maestro.SettingsApp.safeMinMax(autoMacroInterval, 1, 30) * 60000;
-                    if (macro.macro.autoMacroLastRun + autoMacroInterval > Date.now()) return;
+                        //1 minute debounce
+                        let autoMacroInterval = await this.getLocalSetting("autoMacroInterval");
+                        autoMacroInterval = maestro.SettingsApp.safeMinMax(autoMacroInterval, 1, 30) * 60000;
+                        if (macro.macro.autoMacroLastRun + autoMacroInterval > Date.now()) return;
 
-                    await maestro.SettingsApp.applyMacro(macro.macro.name, maestro.SettingsApp.activeStageId, false);
-
-                    if (this.logging)
-                        console.log('AutoMacro Applying Macro:', macro.macro.name)
-                }
-            }
-            if (macro.macro.activityLevelOff) {
-                //30 second debounce
-                let autoMacroRunTime = await this.getLocalSetting("autoMacroRunTime");
-                autoMacroRunTime = maestro.SettingsApp.safeMinMax(autoMacroRunTime, 1, 600) * 1000;
-                if (macro.macro.autoMacroLastRun + autoMacroRunTime > Date.now()) return;
-
-                if (macro.macro.activityLevelOff !== null & macro.macro.activityLevelOff >= activityLevel) {
-                    if (macro.macro.macroRunning == true) {
-                        document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
+                        await maestro.SettingsApp.applyMacro(macro.macro.name, maestro.SettingsApp.activeStageId, false);
 
                         if (this.logging)
-                            console.log('AutoMacro Reverting Macro:', macro.macro.name)
+                            console.log('AutoMacro Applying Macro:', macro.macro.name)
                     }
                 }
-            }
+                if (macro.macro.activityLevelOff) {
+                    //30 second debounce
+                    let autoMacroRunTime = await this.getLocalSetting("autoMacroRunTime");
+                    autoMacroRunTime = maestro.SettingsApp.safeMinMax(autoMacroRunTime, 1, 600) * 1000;
+                    if (macro.macro.autoMacroLastRun + autoMacroRunTime > Date.now()) return;
+
+                    if (macro.macro.activityLevelOff !== null & macro.macro.activityLevelOff >= activityLevel) {
+                        if (macro.macro.macroRunning == true) {
+                            document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
+
+                            if (this.logging)
+                                console.log('AutoMacro Reverting Macro:', macro.macro.name)
+                        }
+                    }
+                }
+            };
+        } catch (e) {
+            if (this.logging)
+                console.error('Error handling audio level:', e);
+        } finally {
+            this.autoMacroRoutineRunning = false;
         };
-        this.autoMacroRoutineRunning = false;
     };
-    autoMacroRoutineRunning = false;
     autoMacrosWatcher = () => {
         this.autoMacrosTimer = setInterval(async () => {
             this.getLocalSetting("autoMacrosEnabled").then(async (autoMacrosEnabled) => {
@@ -700,10 +706,9 @@ class SettingsApp extends Globals {
             if (this.logging)
                 console.error('Error applying Macro:', e);
 
-            this.hideLoader();
-
-
             alert(this.fatalErrorMsg);
+        } finally {
+            this.hideLoader();
         }
     }
     revertMacro = async (macroName, stageId, showLoader = true) => {
@@ -767,17 +772,14 @@ class SettingsApp extends Globals {
                         document.querySelector(`span[name="macroLastStopTime"][data-id="${macroName}"][data-stageid="${stageId}"]`).innerHTML = maestro.SettingsApp.formatDate(new Date(m.macro.autoMacroLastStopped + 1000), true);
                     }
                 });
-
-                this.hideLoader();
-            } else {
-                this.hideLoader();
             }
         } catch (e) {
             if (this.logging)
                 console.error('Error reverting Macro:', e);
 
-            this.hideLoader();
             alert(this.fatalErrorMsg);
+        } finally {
+            this.hideLoader();
         }
     };
     deleteMacro = async (macroName, stageId) => {
@@ -1346,13 +1348,21 @@ class SettingsApp extends Globals {
                 {
                     field: 'name',
                     align: 'left',
-                    valign: 'middle',
+                    valign: 'top',
+                    cellStyle: function (value, row, index, field) {
+                        return {
+                            css: {
+                                'position': 'relative'
+                            }
+                        };
+                    },
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         let response = "";
-                        response = `<span style="display:inline-block;width: 150px;overflow-wrap: break-word;">${row.name}</span><span name="editMacroName" role="button" class="cursor-pointer ms-1" style="position:relative;bottom:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span><br>`;
-                        response += `<span style="font-size:10px;">Last Started: <span name="macroLastRunTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastRun == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastRun + 1000), true)}</span></span><br>`;
-                        response += `<span style="font-size:10px;">Last Stopped: <span name="macroLastStopTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastStopped == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastStopped + 1000), true)}</span></span>`;
+                        response = `<span name="editMacroName" role="button" class="cursor-pointer me-1" style="position:absolute;top:5px;right:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span>`
+                        response += `<span style="display:inline-block;width: 150px;overflow-wrap: break-word;">${row.name}</span><br>`;
+                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:12px;">Last Start: <span name="macroLastRunTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastRun == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastRun + 1000), true)}</span></span>`;
+                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:0px;">Last Stop: <span name="macroLastStopTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastStopped == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastStopped + 1000), true)}</span></span>`;
                         return response;
                     }
                 },
