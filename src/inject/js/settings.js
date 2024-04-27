@@ -27,7 +27,7 @@ class SettingsApp extends Globals {
         this.bindMacroBtn();
         this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
-        this.dimmersTable(this.activeStage, this.activeStageFixtureGroups);
+        this.dimmerTable(this.activeStage, this.activeStageFixtureGroups);
         //this.rgbControlsTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoMacros();
@@ -1469,15 +1469,22 @@ class SettingsApp extends Globals {
             if (level == "") {
                 level = null;
             }
+
+            if (Number(this.value) < Number(this.min)) {
+                this.value = this.min;
+            }
+            if (Number(this.value) > Number(this.max)) {
+                this.value = this.max;
+            }
+
+
             maestro.SettingsApp.loadMacros().then(macros => {
                 for (let m of macros) {
                     if (m.macro.name == macro && m.macro.stageId == stageId) {
                         if (this.dataset.type == "on")
-                            m.macro.activityLevelOn = this.value;
-                    }
-                    if (m.macro.name == macro && m.macro.stageId == stageId) {
+                            m.macro.activityLevelOn = (this.value > 100 ? 100 : this.value);
                         if (this.dataset.type == "off")
-                            m.macro.activityLevelOff = this.value;
+                            m.macro.activityLevelOff = (this.value > 100 ? 100 : this.value);
                     }
                 }
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
@@ -2314,7 +2321,7 @@ class SettingsApp extends Globals {
         return values.reduce((a, b) => a + b, 0) / values.length;
 
     };
-    dimmersTable = async (activeStage, activeFixtureGroups) => {
+    dimmerTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
 
         for (let group of activeFixtureGroups) {
@@ -2373,7 +2380,7 @@ class SettingsApp extends Globals {
                 dimmer += `<input type="range" name="groupDimmer" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_dimmer_${groupName}" value="${avgHighValue}">`
                 dimmer += `</div>`
 
-                let dimmerCell = this.createTableCell(dimmer, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                let dimmerCell = this.createTableCell(dimmer, "dimmerRow", null, true, `text-align: center; vertical-align: middle;`, 4);
                 groupDimmer.appendChild(dimmerCell);
                 tbody.appendChild(groupDimmer);
 
@@ -2398,7 +2405,7 @@ class SettingsApp extends Globals {
                     dimmer += `<input type="range" name="groupDimmer" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_dimmer_${groupName}" value="${avgHighValue}">`
                     dimmer += `</div>`
 
-                    let dimmerCell = this.createTableCell(dimmer, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                    let dimmerCell = this.createTableCell(dimmer, "dimmerRow", null, true, `text-align: center; vertical-align: middle;`, 4);
                     groupDimmer.appendChild(dimmerCell);
                     tbody.appendChild(groupDimmer);
                 }
