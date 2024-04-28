@@ -2,6 +2,22 @@ html {
     overflow-x: hidden;
     margin-right: calc(-1 * (100vw - 100%));
   }
+body{
+    background-color: rgb(199, 198, 198);
+}   
+.tab-content .tab-pane {
+    background-color: rgb(199, 198, 198) !important;
+}
+.nav-tabs .nav-link{
+    border: 0px;
+    margin-right: 2px;
+}
+.table>thead>tr>th{
+    background-color: rgb(222, 222, 222) !important;
+}
+.table>tbody>tr>td{
+    background-color: rgb(222, 222, 222) !important;
+}
 .macro-active td{
     background-color: lightgreen !important;
 }
