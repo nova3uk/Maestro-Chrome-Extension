@@ -1128,14 +1128,14 @@ class SettingsApp extends Globals {
                     if (row.active) {
                         return {
                             css: {
-                                'background-color': '#66ffcc',
+                                'background-color': 'rgb(191, 186, 255)',
                                 'cursor': 'pointer',
                             }
                         }
                     } else {
                         return {
                             css: {
-                                'background-color': '#ffcce0'
+                                'background-color': '#d1d1d1'
                             }
                         }
 
@@ -1165,7 +1165,7 @@ class SettingsApp extends Globals {
                 if (checkbox.checked) {
                     td.style.backgroundColor = '#faf6ac';
                 } else {
-                    td.style.backgroundColor = '#66ffcc';
+                    td.style.backgroundColor = 'rgb(191, 186, 255)';
                 }
             }
         });
@@ -1352,7 +1352,8 @@ class SettingsApp extends Globals {
                     cellStyle: function (value, row, index, field) {
                         return {
                             css: {
-                                'position': 'relative'
+                                'position': 'relative',
+                                'background-color': 'rgb(191, 186, 255)'
                             }
                         };
                     },
@@ -1458,6 +1459,13 @@ class SettingsApp extends Globals {
                 return {
                     'data-id': row.name,
                     'data-stageid': row.stageId,
+                }
+            },
+            rowStyle: function (row, index) {
+                return {
+                    css: {
+                        'background-color': 'rgb(191, 186, 255)'
+                    }
                 }
             }
         });
@@ -1603,7 +1611,7 @@ class SettingsApp extends Globals {
                 if (row.active) {
                     return {
                         css: {
-                            'background-color': '#66ffcc'
+                            'background-color': 'rgb(191, 186, 255)'
                         }
                     }
                 } else {
@@ -1724,7 +1732,7 @@ class SettingsApp extends Globals {
                     if (row.active) {
                         return {
                             css: {
-                                'background-color': '#66ffcc'
+                                'background-color': 'rgb(191, 186, 255)'
                             }
                         }
                     } else {
@@ -1953,13 +1961,13 @@ class SettingsApp extends Globals {
                 if (row.active) {
                     return {
                         css: {
-                            'background-color': '#66ffcc'
+                            'background-color': 'rgb(191, 186, 255)'
                         }
                     }
                 } else {
                     return {
                         css: {
-                            'background-color': '#ffcce0'
+                            'background-color': '#d1d1d1'
                         }
                     }
 
@@ -2182,7 +2190,7 @@ class SettingsApp extends Globals {
 
 
             let fixtureNameRow = document.createElement('tr');
-            fixtureNameRow.style.backgroundColor = '#66ffcc';
+            fixtureNameRow.style.backgroundColor = 'rgb(191, 186, 255)';
             fixtureNameRow.dataset.id = data.id;
 
             let fixtureNameCell = this.createTableCell(`<span style="font-size: 20px;text-wrap:nowrap;width:40px;">${data.name}</span><span name="expandTable" class="float-end" role="button" data-id="${data.id}" id="expand_${data.id}"><img src="/src/img/chevron-expand.svg" width="40" height="40"></span>`, "bg-warning", null, true, `background-color:;text-align: center; vertical-align: middle;`, 5);
@@ -2190,7 +2198,7 @@ class SettingsApp extends Globals {
             tbody.appendChild(fixtureNameRow);
 
             let togglesRow = document.createElement('tr');
-            togglesRow.style.backgroundColor = '#66ffcc';
+            togglesRow.style.backgroundColor = 'rgb(191, 186, 255)';
             togglesRow.dataset.id = data.id;
             togglesRow.dataset.type = "channelRow";
             togglesRow.dataset.name = "channelRow_" + data.id;
@@ -2217,13 +2225,13 @@ class SettingsApp extends Globals {
 
             for (let channel of data.channels) {
                 let channelRow = document.createElement('tr');
-                channelRow.style.backgroundColor = '#66ffcc';
+                channelRow.style.backgroundColor = 'rgb(191, 186, 255)';
                 channelRow.dataset.id = data.id;
                 channelRow.dataset.type = "channelRow";
                 channelRow.dataset.name = "channelRow_" + data.id;
                 channelRow.style.visibility = "";
 
-                let cell = this.createTableCell(`<span>${channel.params.attributes.name}</span><br><span style="font-size:10px;">${channel.params.attributes.type}<br>Channel: ${channel.channel + 1}</span>`, null, null, true, `background-color: #66ffcc;text-align: center; vertical-align: middle;`);
+                let cell = this.createTableCell(`<span>${channel.params.attributes.name}</span><br><span style="font-size:10px;">${channel.params.attributes.type}<br>Channel: ${channel.channel + 1}</span>`, null, null, true, `background-color: rgb(191, 186, 255);text-align: center; vertical-align: middle;`);
                 channelRow.appendChild(cell);
 
                 let response = "";
@@ -2254,7 +2262,7 @@ class SettingsApp extends Globals {
                 response += `</tbody>`;
                 response += `</table>`;
 
-                let cell2 = this.createTableCell(response, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+                let cell2 = this.createTableCell(response, null, null, true, `background-color: rgb(191, 186, 255); text-align: center; vertical-align: middle;`);
                 channelRow.appendChild(cell2);
 
                 tbody.appendChild(channelRow);
@@ -2511,13 +2519,13 @@ class SettingsApp extends Globals {
                 }
             }
             let row = document.createElement('tr');
-            row.style.backgroundColor = '#66ffcc';
+            row.style.backgroundColor = 'rgb(191, 186, 255)';
             row.dataset.id = data.id;
 
-            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: left; vertical-align: middle; `);
+            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'}; text-align: left; vertical-align: middle; `);
             row.appendChild(fixtureNameCelll);
 
-            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: center; vertical-align: middle;`);
+            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'}; text-align: center; vertical-align: middle;`);
             row.appendChild(channelCell);
 
             let response = "";
@@ -2560,7 +2568,7 @@ class SettingsApp extends Globals {
                 response += `</tr>`;
                 response += `</table>`;
             }
-            let focusCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: center; vertical-align: middle;`);
+            let focusCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'};; text-align: center; vertical-align: middle;`);
             row.appendChild(focusCell);
 
             tbody.appendChild(row);
@@ -2767,13 +2775,13 @@ class SettingsApp extends Globals {
 
 
             let row = document.createElement('tr');
-            row.style.backgroundColor = '#66ffcc';
+            row.style.backgroundColor = 'rgb(191, 186, 255)';
             row.dataset.id = data.id;
 
-            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: left; vertical-align: middle; `);
+            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'};; text-align: left; vertical-align: middle; `);
             row.appendChild(fixtureNameCelll);
 
-            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: center; vertical-align: middle;`);
+            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'};; text-align: center; vertical-align: middle;`);
             row.appendChild(channelCell);
 
             let response = "";
@@ -2817,7 +2825,7 @@ class SettingsApp extends Globals {
                 response += `</tr>`;
                 response += `</table>`;
             }
-            let dimmersCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: center; vertical-align: middle;`);
+            let dimmersCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? 'rgb(191, 186, 255)' : '#d1d1d1'}; text-align: center; vertical-align: middle;`);
             row.appendChild(dimmersCell);
 
             tbody.appendChild(row);
