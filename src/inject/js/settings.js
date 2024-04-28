@@ -16,7 +16,10 @@ class SettingsApp extends Globals {
     autoMacroRoutineRunning = false;
 
     init = async () => {
+        this.version = await this.getLocalSetting("version");
         this.logging = await this.getSetting("loggingToggle");
+
+        document.getElementById('versionNumber').innerText = `v${this.version}`
 
         await this.getStages();
         this.activeStageId = this.stageId;
@@ -612,7 +615,7 @@ class SettingsApp extends Globals {
             let macros = await this.loadMacros();
             macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
 
-            if ((macros[0].macro.macroRunning && macro.macro.macroRunning == true)) {
+            if ((macros[0].macro.macroRunning && macros[0].macro.macroRunning == true)) {
                 //already running
                 return;
             }

@@ -129,6 +129,9 @@ chrome.runtime.onMessageExternal.addListener(
 //onUpdate or Install
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
+        var thisVersion = chrome.runtime.getManifest().version;
+        chrome.storage.local.set({ version: thisVersion });
+
         //sync settings
         chrome.storage.sync.set({ enabledToggle: true });
         chrome.storage.sync.set({ loggingToggle: false });
@@ -165,6 +168,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
     } else if (details.reason == "update") {
         var thisVersion = chrome.runtime.getManifest().version;
+        chrome.storage.local.set({ version: thisVersion });
         switch (thisVersion) {
             case "1.3.2":
                 chrome.storage.sync.set({ autoFogToggle: false });

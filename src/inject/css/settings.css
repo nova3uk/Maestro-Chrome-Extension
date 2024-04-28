@@ -3,11 +3,23 @@ html {
     margin-right: calc(-1 * (100vw - 100%));
   }
 .macro-active td{
-    background-color: lightgreen;
+    background-color: lightgreen !important;
+}
+.help-icon {
+    color: lightgray;
+    text-decoration: none;
+}
+.fb-icon {
+    color: lightgray;
+    text-decoration: none;
+}
+.messenger-icon {
+    color: lightgray;
+    text-decoration: none;
 }
 .nav-tabs .nav-item .upper-panel {
     /* background-color: #0080FF; */
-    background-color: rgb(75, 175, 237);
+    background-color: #133964;
     color: #FFF;
 }
 .nav-tabs .nav-item .lower-panel {
@@ -22,7 +34,7 @@ html {
 }
 .nav-tabs .nav-item .upper-panel.active {
     color: #fff;
-    background-color: #0091ff;
+    background-color: rgb(43, 108, 182);
 }
 
 .tab-content {
