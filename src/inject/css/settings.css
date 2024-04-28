@@ -13,10 +13,10 @@ body{
     margin-right: 2px;
 }
 .table>thead>tr>th{
-    background-color: rgb(222, 222, 222) !important;
+    background-color: rgb(222, 222, 222);
 }
 .table>tbody>tr>td{
-    background-color: rgb(222, 222, 222) !important;
+    background-color: rgb(222, 222, 222);
 }
 .macro-active td{
     background-color: lightgreen !important;
