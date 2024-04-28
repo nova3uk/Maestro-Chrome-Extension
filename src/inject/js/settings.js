@@ -28,7 +28,7 @@ class SettingsApp extends Globals {
         this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
         this.dimmerTable(this.activeStage, this.activeStageFixtureGroups);
-        //this.focusTable(this.activeStage, this.activeStageFixtureGroups);
+        this.focusTable(this.activeStage, this.activeStageFixtureGroups);
         this.loadBackupRestoreBtns();
         this.bindAutoMacros();
         this.bindAutoFog();
@@ -1839,7 +1839,8 @@ class SettingsApp extends Globals {
                             id: fixture.id,
                             name: fixture.name,
                             active: fixture.enabled,
-                            attributes: attributeTypes,
+                            attributeList: attributeTypes,
+                            attributes: fixture.attribute,
                             goboState: goboState,
                             prismState: prismState
                         });
@@ -1858,6 +1859,55 @@ class SettingsApp extends Globals {
                     }
                 },
                 {
+                    field: 'switches',
+                    formatter: function (value, row, index) {
+                        let response = "";
+
+                        if (row.attributeList.includes('GOBO')) {
+                            let i = 0;
+                            for (let attr of row.attributes) {
+                                if (attr.type == 'GOBO') {
+                                    let x = 0;
+
+                                    response += `<span style="display:inline-block;"><h6>${attr.name}</h6></span></br>`
+                                    for (let setting of attr.goboSetting.steps) {
+                                        response += `<span class="me-2 mb-2 p-2" style="display:inline-block;">`
+                                        response += `<span class="form-check form-switch">`
+                                        response += `    <input name="goboSwitch" class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="gobo_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <label class="form-check-label" for="gobo_${row.id}_${i}_${x}">${setting.name}</label>`
+                                        response += `</span>`
+                                        response += `</span>`
+                                        x++;
+                                    }
+                                    response += `</br>`;
+                                }
+                                i++;
+                            }
+                        }
+                        if (row.attributeList.includes('PRISM')) {
+                            let i = 0;
+                            for (let attr of row.attributes) {
+                                if (attr.type == 'PRISM') {
+                                    let x = 0;
+                                    response += `<span style="display:inline-block;"><h6>${attr.name}</h6></span></br>`
+                                    for (let setting of attr.prismSetting.steps) {
+                                        response += `<span class="me-2 mb-2 p-2" style="display:inline-block;zwidth:120px;zheight:50px;">`
+                                        response += `<span class="form-check form-switch">`
+                                        response += `    <input name="prismSwitch" class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="prism_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <label class="form-check-label" for="prism_${row.id}_${i}_${x}">${setting.name}</label>`
+                                        response += `</span>`
+                                        response += `</span>`
+                                        x++;
+                                    }
+
+                                }
+                                i++;
+                            }
+                        }
+                        return response;
+                    }
+                },
+                {
                     field: 'toggles',
                     align: 'center',
                     valign: 'middle',
@@ -1866,7 +1916,7 @@ class SettingsApp extends Globals {
                         if (row.active == false) return;
                         let btns = "";
                         let btnState = false;
-                        if (row.attributes.includes('GOBO')) {
+                        if (row.attributeList.includes('GOBO')) {
                             if (row.goboState) {
                                 btnState = row.goboState.gobo;
                             } else {
@@ -1877,7 +1927,7 @@ class SettingsApp extends Globals {
                             btns += `<button class="btn btn-success my-1 mr-2" style="width:120px;" name="btn_enable_gobos" data-id="${row.id}"${btnState == true ? ' disabled' : ''}>Gobos On</button>&nbsp;`;
                             btns += `</div><br>`;
                         }
-                        if (row.attributes.includes('PRISM')) {
+                        if (row.attributeList.includes('PRISM')) {
                             if (row.prismState) {
                                 btnState = row.prismState.prism;
                             } else {
@@ -1916,23 +1966,59 @@ class SettingsApp extends Globals {
                 }
             }
         });
+        $('input[name="goboSwitch"]').on('change', async function (btn) {
+            let index = this.dataset.index;
+            let channel = this.dataset.channel;
+            let fixtureId = this.dataset.fixtureid;
+            let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == fixtureId);
+            let attr = fixture.attribute[channel];
+            let setting = attr.goboSetting.steps[index];
+            setting.enabled = this.checked;
+            maestro.SettingsApp.putAttribute(fixture.id, channel, { attribute: attr });
+        });
+        $('input[name="prismSwitch"]').on('change', async function (btn) {
+            let index = this.dataset.index;
+            let channel = this.dataset.channel;
+            let fixtureId = this.dataset.fixtureid;
+            let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == fixtureId);
+            let attr = fixture.attribute[channel];
+            let setting = attr.prismSetting.steps[index];
+            setting.enabled = this.checked;
+            maestro.SettingsApp.putAttribute(fixture.id, channel, { attribute: attr });
+        });
         $('button[name="btn_disable_gobos"]').on('click', async function (btn) {
             btn.currentTarget.disabled = true;
             $('button[name="btn_enable_gobos"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            $('input[name="goboSwitch"][data-fixtureid="' + this.dataset.id + '"]').each(function () {
+                let name = this.dataset.name;
+                if (name.toLowerCase() == "open" || name.toLowerCase() == "no gobo" || name.toLowerCase() == "gobo off" || name.toLowerCase() == "gobo open" || name.toLowerCase() == "none") {
+                    return;
+                }
+                this.checked = false;
+            });
             await maestro.SettingsApp.switchGobos(this.dataset.id, false);
         });
         $('button[name="btn_enable_gobos"]').on('click', async function (btn) {
             btn.currentTarget.disabled = true;
             $('button[name="btn_disable_gobos"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            $('input[name="goboSwitch"][data-fixtureid="' + this.dataset.id + '"]').prop('checked', true);
             await maestro.SettingsApp.switchGobos(this.dataset.id);
         });
         $('button[name="btn_disable_prism"]').on('click', async function (btn) {
             btn.currentTarget.disabled = true;
             $('button[name="btn_enable_prism"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
+            $('input[name="prismSwitch"][data-fixtureid="' + this.dataset.id + '"]').each(function () {
+                let name = this.dataset.name;
+                if (name.toLowerCase() == "open" || name.toLowerCase() == "no prism" || name.toLowerCase() == "prism off" || name.toLowerCase() == "prism open" || name.toLowerCase() == "none") {
+                    return;
+                }
+                this.checked = false;
+            });
             await maestro.SettingsApp.switchPrisms(this.dataset.id, false);
         });
         $('button[name="btn_enable_prism"]').on('click', async function (btn) {
             btn.currentTarget.disabled = true;
+            $('input[name="prismSwitch"][data-fixtureid="' + this.dataset.id + '"]').prop('checked', true);
             $('button[name="btn_disable_prism"][data-id="' + this.dataset.id + '"]').prop('disabled', false);
             await maestro.SettingsApp.switchPrisms(this.dataset.id);
 
@@ -2321,8 +2407,24 @@ class SettingsApp extends Globals {
         return values.reduce((a, b) => a + b, 0) / values.length;
 
     };
+    getGroupAvgFocus = (activeStage, fixtureGroup, currGroupName) => {
+        let values = [];
+        let group = fixtureGroup.find(ele => ele.name == currGroupName);
+        for (let fixtureId of group.fixtureId) {
+            let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+            for (let attr of fixture.attribute) {
+                if (attr.type == "STATIC" && (attr.name.toUpperCase() == "FOCUS" || attr.name.toUpperCase().indexOf("FOCUS") !== -1)) {
+                    values.push(attr.staticValue.value);
+                }
+                if (attr.type == "ZOOM") {
+                    values.push(Math.floor(255 * attr.range.highValue));
+                }
+            }
+        }
+        return values.reduce((a, b) => a + b, 0) / values.length;
+
+    };
     focusTable = async (activeStage, activeFixtureGroups) => {
-        debugger
         var tData = [];
 
         for (let group of activeFixtureGroups) {
@@ -2331,10 +2433,10 @@ class SettingsApp extends Globals {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                     let index = 0;
                     for (let attribute of fixture.attribute) {
-                        if (attribute.name.toUpperCase() == "FOCUS") {
-                            if (!attribute.range && attribute.type == "FOCUS") {
-                                attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
-                            }
+                        if (!attribute.range && attribute.type == "ZOOM") {
+                            attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
+                        }
+                        if (attribute.type == "ZOOM" || attribute.name.toUpperCase() == "FOCUS" || attribute.name.toUpperCase().indexOf("FOCUS") !== -1) {
                             tData.push(
                                 {
                                     id: fixture.id,
@@ -2352,6 +2454,226 @@ class SettingsApp extends Globals {
                 }
             }
         }
+
+        //table builder
+        let table = document.getElementById('focus');
+        let tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        let groupName;
+
+        let rowIndex = 0;
+        for (let data of tData) {
+            if (rowIndex == 0) {
+                let avgHighValue = this.getGroupAvgFocus(activeStage, activeFixtureGroups, data.groupName);
+                groupName = data.groupName;
+                // append Group Header
+                let groupHeader = document.createElement('tr');
+                groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
+
+                let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                groupHeader.appendChild(header);
+                tbody.appendChild(groupHeader);
+
+                let groupFocus = document.createElement('tr');
+                groupFocus.style.backgroundColor = 'rgb(245, 240, 245)';
+
+                let focus = `<div class="m-1 p-1">`
+                focus += `<input type="range" name="groupFocus" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_focus_${groupName}" value="${avgHighValue}">`
+                focus += `</div>`
+
+                let focusCell = this.createTableCell(focus, "focusRow", null, true, `text-align: center; vertical-align: middle;`, 4);
+                groupFocus.appendChild(focusCell);
+                tbody.appendChild(groupFocus);
+            } else {
+                if (groupName != data.groupName) {
+                    let avgHighValue = this.getGroupAvgFocus(activeStage, activeFixtureGroups, data.groupName);
+                    //group changed
+                    groupName = data.groupName;
+                    // append Group Header
+                    let groupHeader = document.createElement('tr');
+                    groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
+                    let row = document.createElement('tr');
+
+                    let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
+                    row.appendChild(header);
+                    tbody.appendChild(row);
+
+                    let groupFocus = document.createElement('tr');
+                    groupFocus.style.backgroundColor = 'rgb(245, 240, 245)';
+
+                    let focus = `<div class="m-1 p-1">`
+                    focus += `<input type="range" name="groupFocus" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_focus_${groupName}" value="${avgHighValue}">`
+                    focus += `</div>`
+
+                    let focusCell = this.createTableCell(focus, "focusRow", null, true, `text-align: center; vertical-align: middle;`, 4);
+                    groupFocus.appendChild(focusCell);
+                    tbody.appendChild(groupFocus);
+                }
+            }
+            let row = document.createElement('tr');
+            row.style.backgroundColor = '#66ffcc';
+            row.dataset.id = data.id;
+
+            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: left; vertical-align: middle; `);
+            row.appendChild(fixtureNameCelll);
+
+            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: center; vertical-align: middle;`);
+            row.appendChild(channelCell);
+
+            let response = "";
+
+            if (data.attributes.staticValue && !data.attributes.range) {
+                response += `<table class="table table-borderless bg-lightgrey">`;
+                response += `<tr>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `   <td width="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" ${data.active == false ? "disabled" : ""} name="focusRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="int" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_focus" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%" style="text-align:left">`;
+                response += `       <input type="number" name="focusRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_focusVal" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="int" data-group="${groupName}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}">`;
+                response += `   </td>`;
+                response += `</tr>`;
+                response += `</table>`;
+            }
+            if (data.attributes.range) {
+                response += `<table class="table table-borderless bg-lightgrey">`;
+                response += `<tr>`;
+                response += `   <td width="15%" style="text-align:right">`;
+                response += `       <input type="number" name="focusRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_focusValLow" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}">`;
+                response += `   </td>`;
+                response += `   <td width="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="focusRange" ${data.active == false ? "disabled" : ""} class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_focus_low" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `</tr>`;
+                response += `<tr>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `   <td with="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="focusRange" ${data.active == false ? "disabled" : ""} class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="High" data-group="${groupName}" data-fixtureid="${data.id}" data-uuid="${data.uuid}" id="${data.id}_${data.uuid}_focus_high" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%" style="text-align:left">`;
+                response += `       <input type="number" name="focusRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_focusValHigh" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="High" data-group="${groupName}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}">`;
+                response += `    </td>`;
+                response += `</tr>`;
+                response += `</table>`;
+            }
+            let focusCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: center; vertical-align: middle;`);
+            row.appendChild(focusCell);
+
+            tbody.appendChild(row);
+
+            rowIndex++;
+        };
+        $('input[name="focusRangeNum"]').on('change', function (ele) {
+            if (this.dataset.type == "int") {
+                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                maestro.Globals.debounce(maestro.SettingsApp.setFocus(this.dataset.fixtureid, this.dataset.channel, maestro.SettingsApp.safeMinMax(this.value, 0, 255)), 100);
+            }
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "Low") {
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "High") {
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+
+                }
+                maestro.Globals.debounce(maestro.SettingsApp.setFocus(this.dataset.fixtureid, this.dataset.channel, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value), 100);
+            }
+        })
+        $('input[name="focusRange"]').on('input', function (ele) {
+            if (this.dataset.type == "int") {
+                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusVal`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            }
+            if (this.dataset.type == "dec") {
+                if (this.dataset.val == "Low") {
+                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+                if (this.dataset.val == "High") {
+                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value)) {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
+                    } else {
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+
+                }
+            }
+        });
+        $('input[name="focusRange"]').on('mouseup', function (ele) {
+            if (!maestro.SettingsApp.leftMouseClick(ele)) return;
+
+            let type = this.dataset.type;
+            let fixtureId = this.dataset.fixtureid;
+            let uuid = this.dataset.uuid;
+            let val = this.dataset.val;
+
+            if (type == "int") {
+                let input = document.getElementById(`${fixtureId}_${uuid}_focusVal`);
+                let event = new Event('change');
+                input.dispatchEvent(event);
+            }
+            if (type == "dec") {
+                let input = document.getElementById(`${fixtureId}_${uuid}_focusVal${val}`);
+                let event = new Event('change');
+                input.dispatchEvent(event);
+            }
+        });
+        $('input[name="groupFocus"]').on('mouseup', function (ele) {
+            if (!maestro.SettingsApp.leftMouseClick(ele)) return;
+            let groupName = this.dataset.group;
+            $(`input[name="focusRangeNum"][data-group="${groupName}"]`).each(function (index, ele) {
+                if (ele.disabled) return;
+
+                let event = new Event('change');
+                this.dispatchEvent(event);
+            });
+
+        });
+        $('input[name="groupFocus"]').on('input', function (ele) {
+            let highValue = this.value;
+            let lowValue = 0;
+            let groupName = this.dataset.group;
+
+            $(`input[name="focusRangeNum"][data-group="${groupName}"]`).each(function (index, ele) {
+                let fixtureId = ele.dataset.fixtureid;
+                let type = ele.dataset.type;
+                let uuid = ele.dataset.uuid;
+
+                if (ele.disabled) return;
+
+                if (type == "int") {
+                    document.getElementById(`${fixtureId}_${uuid}_focusVal`).value = highValue;
+                    document.getElementById(`${fixtureId}_${uuid}_focus`).value = highValue;
+                }
+                if (type == "dec") {
+                    document.getElementById(`${fixtureId}_${uuid}_focusValLow`).value = lowValue;
+                    document.getElementById(`${fixtureId}_${uuid}_focusValHigh`).value = highValue;
+                    document.getElementById(`${fixtureId}_${uuid}_focus_low`).value = lowValue;
+                    document.getElementById(`${fixtureId}_${uuid}_focus_high`).value = highValue;
+                }
+
+            }).promise().done(function () {
+                $('button[name="allFocussBtn"]').prop('disabled', false);
+            });
+        });
     };
     dimmerTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
@@ -2448,56 +2770,54 @@ class SettingsApp extends Globals {
             row.style.backgroundColor = '#66ffcc';
             row.dataset.id = data.id;
 
-            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: #66ffcc; text-align: left; vertical-align: middle; `);
+            let fixtureNameCelll = this.createTableCell(`<b>${data.name}</b>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: left; vertical-align: middle; `);
             row.appendChild(fixtureNameCelll);
 
-            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+            let channelCell = this.createTableCell(`<span>${data.attributes.name}</span><br><span style="font-size:10px;">${data.attributes.type}<br>Channel: ${data.channel + 1}</span>`, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'};; text-align: center; vertical-align: middle;`);
             row.appendChild(channelCell);
 
             let response = "";
 
-            if (data.active == true) {
 
-                if (data.attributes.staticValue) {
-                    response += `<table class="table table-borderless bg-lightgrey">`;
-                    response += `<tr>`;
-                    response += `   <td width="15%">`;
-                    response += `   </td>`;
-                    response += `   <td width="70%">`;
-                    response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="int" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_dimmer" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}"><span class="me-2">255</span>`;
-                    response += `   </td>`;
-                    response += `   <td width="15%" style="text-align:left">`;
-                    response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerVal" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="int" data-group="${groupName}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}">`;
-                    response += `   </td>`;
-                    response += `</tr>`;
-                    response += `</table>`;
-                }
-                if (data.attributes.range) {
-                    response += `<table class="table table-borderless bg-lightgrey">`;
-                    response += `<tr>`;
-                    response += `   <td width="15%" style="text-align:right">`;
-                    response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerValLow" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}">`;
-                    response += `   </td>`;
-                    response += `   <td width="70%">`;
-                    response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_dimmer_low" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}"><span class="me-2">255</span>`;
-                    response += `   </td>`;
-                    response += `   <td width="15%">`;
-                    response += `   </td>`;
-                    response += `</tr>`;
-                    response += `<tr>`;
-                    response += `   <td width="15%">`;
-                    response += `   </td>`;
-                    response += `   <td with="70%">`;
-                    response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="High" data-group="${groupName}" data-fixtureid="${data.id}" data-uuid="${data.uuid}" id="${data.id}_${data.uuid}_dimmer_high" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}"><span class="me-2">255</span>`;
-                    response += `   </td>`;
-                    response += `   <td width="15%" style="text-align:left">`;
-                    response += `       <input type="number" name="dimmerRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerValHigh" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="High" data-group="${groupName}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}">`;
-                    response += `    </td>`;
-                    response += `</tr>`;
-                    response += `</table>`;
-                }
+            if (data.attributes.staticValue) {
+                response += `<table class="table table-borderless bg-lightgrey">`;
+                response += `<tr>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `   <td width="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" ${data.active == false ? "disabled" : ""} class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="int" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_dimmer" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%" style="text-align:left">`;
+                response += `       <input type="number" name="dimmerRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerVal" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="int" data-group="${groupName}" data-channel="${data.channel}" value="${data.attributes.staticValue.value}">`;
+                response += `   </td>`;
+                response += `</tr>`;
+                response += `</table>`;
             }
-            let dimmersCell = this.createTableCell(response, null, null, true, `background-color: #66ffcc; text-align: center; vertical-align: middle;`);
+            if (data.attributes.range) {
+                response += `<table class="table table-borderless bg-lightgrey">`;
+                response += `<tr>`;
+                response += `   <td width="15%" style="text-align:right">`;
+                response += `       <input type="number" name="dimmerRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerValLow" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}">`;
+                response += `   </td>`;
+                response += `   <td width="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" ${data.active == false ? "disabled" : ""} class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="Low" data-group="${groupName}" data-uuid="${data.uuid}" data-fixtureid="${data.id}" id="${data.id}_${data.uuid}_dimmer_low" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.lowValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `</tr>`;
+                response += `<tr>`;
+                response += `   <td width="15%">`;
+                response += `   </td>`;
+                response += `   <td with="70%">`;
+                response += `       <span class="me-2">0</span><input type="range" name="dimmerRange" ${data.active == false ? "disabled" : ""} class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="High" data-group="${groupName}" data-fixtureid="${data.id}" data-uuid="${data.uuid}" id="${data.id}_${data.uuid}_dimmer_high" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}"><span class="me-2">255</span>`;
+                response += `   </td>`;
+                response += `   <td width="15%" style="text-align:left">`;
+                response += `       <input type="number" name="dimmerRangeNum" ${data.active == false ? "disabled" : ""} min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${data.uuid}_dimmerValHigh" data-fixtureid="${data.id}" data-uuid="${data.uuid}" data-type="dec" data-val="High" data-group="${groupName}" data-channel="${data.channel}" value="${Math.floor(255 * data.attributes.range.highValue)}">`;
+                response += `    </td>`;
+                response += `</tr>`;
+                response += `</table>`;
+            }
+            let dimmersCell = this.createTableCell(response, null, null, true, `background-color: ${data.active == true ? '#66ffcc' : '#ffcce0'}; text-align: center; vertical-align: middle;`);
             row.appendChild(dimmersCell);
 
             tbody.appendChild(row);
@@ -2522,9 +2842,9 @@ class SettingsApp extends Globals {
                 if (this.dataset.val == "High") {
                     if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value)) {
                         document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
                     } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                     }
 
                 }
@@ -2580,6 +2900,7 @@ class SettingsApp extends Globals {
             if (!maestro.SettingsApp.leftMouseClick(ele)) return;
             let groupName = this.dataset.group;
             $(`input[name="dimmerRangeNum"][data-group="${groupName}"]`).each(function (index, ele) {
+                if (ele.disabled) return;
                 let event = new Event('change');
                 this.dispatchEvent(event);
             });
@@ -2594,6 +2915,8 @@ class SettingsApp extends Globals {
                 let fixtureId = ele.dataset.fixtureid;
                 let type = ele.dataset.type;
                 let uuid = ele.dataset.uuid;
+
+                if (ele.disabled) return;
 
                 if (type == "int") {
                     document.getElementById(`${fixtureId}_${uuid}_dimmerVal`).value = highValue;
@@ -2652,15 +2975,16 @@ class SettingsApp extends Globals {
         document.getElementById('master_dimmer').addEventListener('change', function (ele) {
             maestro.SettingsApp.setMasterDimmer(this.value);
         });
-        //group dimmers initial setting
-        $('input[name="groupDimmer"]').each(function (index, ele) {
-            let group = activeFixtureGroups.find(group => group.name == ele.dataset.group);
-            for (let fixtureId of group.fixtureId) {
-                let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
-                let channels = fixture.attribute.filter(channel => channel.type === "DIMMER" || channel.type === "MASTER_DIMMER")
-                    .map((channel) => ({ index: fixture.attribute.indexOf(channel), channel }));
-            }
-        });
+
+        // //group dimmers initial setting
+        // $('input[name="groupDimmer"]').each(function (index, ele) {
+        //     let group = activeFixtureGroups.find(group => group.name == ele.dataset.group);
+        //     for (let fixtureId of group.fixtureId) {
+        //         let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
+        //         let channels = fixture.attribute.filter(channel => channel.type === "DIMMER" || channel.type === "MASTER_DIMMER")
+        //             .map((channel) => ({ index: fixture.attribute.indexOf(channel), channel }));
+        //     }
+        // });
     };
     setMasterDimmer = async (value) => {
         let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/brightness`;
@@ -2708,6 +3032,29 @@ class SettingsApp extends Globals {
         }
 
     }
+    setFocus = async (fixtureId, channel, valueHigh, valueLow = null) => {
+        let stage = await this.getActiveStage();
+        let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
+
+        for (let fixture of fixtures) {
+            let index = 0;
+            for (let attr of fixture.attribute) {
+                if (attr.type == "STATIC" && (attr.name.toUpperCase() == "FOCUS" || attr.name.toUpperCase().indexOf("FOCUS") !== -1)) {
+                    if (index == channel) {
+                        attr.staticValue.value = valueHigh;
+                        this.putAttribute(fixture.id, index, { attribute: attr });
+                    }
+                }
+                if (attr.type == "ZOOM") {
+                    if (index == channel) {
+                        attr.range = this.calculateRange({ highValue: valueHigh, lowValue: valueLow });
+                        this.putAttribute(fixture.id, index, { attribute: attr });
+                    }
+                }
+                index++;
+            }
+        }
+    };
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src);
 maestro.SettingsApp.init();

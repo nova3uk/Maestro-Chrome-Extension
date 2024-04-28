@@ -477,7 +477,7 @@
                     Dimmer Controls
                 </a>
             </li>
-            <!-- <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
                 <a class="nav-link" id="simple-tab-10" data-bs-toggle="tab" href="#tabpanel-focus" role="tab"
                     aria-controls="tabpanel-dimmers" aria-selected="false">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -489,9 +489,9 @@
                         <path fill-rule="evenodd"
                             d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5" />
                     </svg>
-                    Focus Controls
+                    Focus & Zoom
                 </a>
-            </li> -->
+            </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles" role="tab"
                     aria-controls="tabpanel-toggles" aria-selected="false">
@@ -700,10 +700,13 @@
                 <table id="toggles" class="table my-1" data-classes="table table-bordered my-1 table-primary">
                     <thead class="table-light">
                         <tr>
-                            <th data-field="name" data-sortable="false" width="500" data-width="500">
+                            <th data-field="name" data-sortable="false" width="300" data-width="300">
                                 Fixture Name
                             </th>
-                            <th data-field="toggles" data-sortable="false">
+                            <th data-field="switches" data-sortable="false">
+                                Switches
+                            </th>
+                            <th data-field="toggles" data-sortable="false" width="200" data-width="300">
                                 Toggles
                             </th>
                         </tr>
@@ -817,8 +820,13 @@
                 <div class="my-5"></div>
             </div>
             <!-- Focus Controls -->
-            <!-- <!-- <div class="tab-pane" id="tabpanel-focus" role="tabpanel" aria-labelledby="simple-tab-9">
+            <div class="tab-pane" id="tabpanel-focus" role="tabpanel" aria-labelledby="simple-tab-9">
                 <h2 class="mt-1"></h2>
+                <p class="h6">Focus & Zoom</p>
+                You can adjust the focus or zoom channels of all fixtures here.<br>
+                MaestroDMX currently does not have a dedicated focus channel.<br>
+                These toggles require the Focus channel to be named "Focus" or include the word focus in the name.
+                <div class="my-3"></div>
                 <div class="bootstrap-table bootstrap5">
                     <div class="fixed-table-toolbar"></div>
                     <div class="fixed-table-container" style="padding-bottom: 0px;">
@@ -855,7 +863,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="my-5"></div>
-            </div> -->
+            </div>
         </div>
         <div class="my-5"></div>
         <!-- Modal Pan/Tilt Finder -->
