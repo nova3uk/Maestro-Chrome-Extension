@@ -17,7 +17,7 @@ html {
 }
 .nav-tabs .nav-item .lower-panel.active {
     /* background-color: #0080FF; */
-    background-color: rgb(166, 159, 255)
+    background-color: rgb(166, 159, 255);
     color: #FFF;
 }
 .nav-tabs .nav-item .upper-panel.active {
