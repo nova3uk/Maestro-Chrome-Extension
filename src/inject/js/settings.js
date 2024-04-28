@@ -58,7 +58,7 @@ class SettingsApp extends Globals {
 
         setTimeout(() => {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         }, 1000);
@@ -89,8 +89,6 @@ class SettingsApp extends Globals {
             for (let macro of macros) {
                 if (macro.macro.activityLevelOn && (macro.macro.macroRunning == false || !macro.macro.macroRunning)) {
                     if (macro.macro.activityLevelOn !== null && activityLevel >= macro.macro.activityLevelOn) {
-
-                        //1 minute debounce
                         let autoMacroInterval = await this.getLocalSetting("autoMacroInterval");
                         autoMacroInterval = maestro.SettingsApp.safeMinMax(autoMacroInterval, 1, 30) * 60000;
                         if (macro.macro.autoMacroLastRun + autoMacroInterval > Date.now()) return;
@@ -98,31 +96,30 @@ class SettingsApp extends Globals {
                         await maestro.SettingsApp.applyMacro(macro.macro.name, maestro.SettingsApp.activeStageId, false);
 
                         if (this.logging)
-                            console.log('AutoMacro Applying Macro:', macro.macro.name)
+                            console.log('AutoMacro Applying Macro:', macro.macro.name);
                     }
                 }
                 if (macro.macro.activityLevelOff) {
-                    //30 second debounce
                     let autoMacroRunTime = await this.getLocalSetting("autoMacroRunTime");
                     autoMacroRunTime = maestro.SettingsApp.safeMinMax(autoMacroRunTime, 1, 600) * 1000;
                     if (macro.macro.autoMacroLastRun + autoMacroRunTime > Date.now()) return;
 
                     if (macro.macro.activityLevelOff !== null & macro.macro.activityLevelOff >= activityLevel) {
                         if (macro.macro.macroRunning == true) {
-                            document.querySelector('button[name="btn_clr"][data-id="' + macro.macro.name + '"]').click();
+                            document.querySelector(`button[name="btn_clr"][data-id="${macro.macro.name}"]`).click();
 
                             if (this.logging)
-                                console.log('AutoMacro Reverting Macro:', macro.macro.name)
+                                console.log('AutoMacro Reverting Macro:', macro.macro.name);
                         }
                     }
                 }
-            };
+            }
         } catch (e) {
             if (this.logging)
                 console.error('Error handling audio level:', e);
         } finally {
             this.autoMacroRoutineRunning = false;
-        };
+        }
     };
     autoMacrosWatcher = () => {
         this.autoMacrosTimer = setInterval(async () => {
@@ -285,6 +282,10 @@ class SettingsApp extends Globals {
                     chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
                     chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
 
+                    chrome.storage.local.set({ autoMacroInterval: 5 });
+                    chrome.storage.local.set({ autoMacroRunTime: 30 });
+                    chrome.storage.local.set({ autoMacroEnabled: false });
+
                     document.location.reload();
                 });
             };
@@ -427,162 +428,138 @@ class SettingsApp extends Globals {
         });
     };
     bindAutoEffects = async () => {
-        let autoEffectsEnabled = await this.getLocalSetting("autoEffectsEnabled");
-        let autoEffectsOnActivityPeakPercent = await this.getLocalSetting("autoEffectsOnActivityPeakPercent");
-        let autoEffectsOnActivityPeakDuration = await this.getLocalSetting("autoEffectsOnActivityPeakDuration");
-        let autoEffectsOnActivityPeakInterval = await this.getLocalSetting("autoEffectsOnActivityPeakInterval");
+        const settings = [
+            { id: 'autoEffectsEnabled', key: 'autoEffectsEnabled', min: 80, max: 99 },
+            { id: 'autoEffectsOnActivityPeakPercent', key: 'autoEffectsOnActivityPeakPercent', min: 1, max: 30 },
+            { id: 'autoEffectsOnActivityPeakDuration', key: 'autoEffectsOnActivityPeakDuration', min: 1, max: 30 },
+            { id: 'autoEffectsOnActivityPeakInterval', key: 'autoEffectsOnActivityPeakInterval', min: 1, max: 30 },
+            { id: 'autoStrobeEnabled', key: 'autoStrobeEnabled', min: 80, max: 99 },
+            { id: 'autoStrobeOnActivityPeakPercent', key: 'autoStrobeOnActivityPeakPercent', min: 1, max: 30 },
+            { id: 'autoStrobeOnActivityPeakDuration', key: 'autoStrobeOnActivityPeakDuration', min: 1, max: 30 },
+            { id: 'autoStrobeOnActivityPeakInterval', key: 'autoStrobeOnActivityPeakInterval', min: 1, max: 30 }
+        ];
 
-        let autoStrobeEnabled = await this.getLocalSetting("autoStrobeEnabled");
-        let autoStrobeOnActivityPeakPercent = await this.getLocalSetting("autoStrobeOnActivityPeakPercent");
-        let autoStrobeOnActivityPeakDuration = await this.getLocalSetting("autoStrobeOnActivityPeakDuration");
-        let autoStrobeOnActivityPeakInterval = await this.getLocalSetting("autoStrobeOnActivityPeakInterval");
+        for (const setting of settings) {
+            const element = document.getElementById(setting.id);
+            let value = await this.getLocalSetting(setting.key);
+            element.checked = value;
+            element.disabled = !value;
 
-        document.getElementById('autoEffectsEnabled').checked = autoEffectsEnabled;
-        document.getElementById('autoEffectsOnActivityPeakPercent').value = autoEffectsOnActivityPeakPercent
-        document.getElementById('autoEffectsOnActivityPeakDuration').value = autoEffectsOnActivityPeakDuration
-        document.getElementById('autoEffectsOnActivityPeakInterval').value = autoEffectsOnActivityPeakInterval
-
-        document.getElementById('autoStrobeEnabled').checked = autoStrobeEnabled
-        document.getElementById('autoStrobeOnActivityPeakPercent').value = autoStrobeOnActivityPeakPercent
-        document.getElementById('autoStrobeOnActivityPeakDuration').value = autoStrobeOnActivityPeakDuration
-        document.getElementById('autoStrobeOnActivityPeakInterval').value = autoStrobeOnActivityPeakInterval
-
-        if (!autoEffectsEnabled) {
-            document.getElementById('autoEffectsOnActivityPeakPercent').disabled = !autoEffectsEnabled;
-            document.getElementById('autoEffectsOnActivityPeakDuration').disabled = !autoEffectsEnabled;
-            document.getElementById('autoEffectsOnActivityPeakInterval').disabled = !autoEffectsEnabled;
+            element.addEventListener('change', async () => {
+                value = element.checked;
+                element.disabled = !value;
+                await this.saveLocalSetting(setting.key, value);
+            });
+            element.addEventListener('change', async () => {
+                const newValue = this.safeMinMax(element.value, setting.min, setting.max);
+                await this.saveLocalSetting(setting.key, newValue);
+            });
         }
-        if (!autoStrobeEnabled) {
-            document.getElementById('autoStrobeOnActivityPeakPercent').disabled = !autoStrobeEnabled;
-            document.getElementById('autoStrobeOnActivityPeakDuration').disabled = !autoStrobeEnabled;
-            document.getElementById('autoStrobeOnActivityPeakInterval').disabled = !autoStrobeEnabled;
-        }
-
-        document.getElementById('autoEffectsEnabled').addEventListener('change', async () => {
-            let autoEffectsEnabled = document.getElementById('autoEffectsEnabled').checked;
-            document.getElementById('autoEffectsOnActivityPeakPercent').disabled = !autoEffectsEnabled;
-            document.getElementById('autoEffectsOnActivityPeakDuration').disabled = !autoEffectsEnabled;
-            document.getElementById('autoEffectsOnActivityPeakInterval').disabled = !autoEffectsEnabled;
-
-            await this.saveLocalSetting("autoEffectsEnabled", autoEffectsEnabled);
-        });
-        document.getElementById('autoEffectsOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoEffectsOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoEffectsOnActivityPeakPercent').value, 80, 99);
-            await this.saveLocalSetting("autoEffectsOnActivityPeakPercent", autoEffectsOnActivityPeakPercent);
-        });
-        document.getElementById('autoEffectsOnActivityPeakDuration').addEventListener('change', async () => {
-            let autoEffectsOnActivityPeakDuration = this.safeMinMax(document.getElementById('autoEffectsOnActivityPeakDuration').value, 1, 30);
-            await this.saveLocalSetting("autoEffectsOnActivityPeakDuration", autoEffectsOnActivityPeakDuration);
-        });
-        document.getElementById('autoEffectsOnActivityPeakInterval').addEventListener('change', async () => {
-            let autoEffectsOnActivityPeakInterval = this.safeMinMax(document.getElementById('autoEffectsOnActivityPeakInterval').value, 1, 30);
-            await this.saveLocalSetting("autoEffectsOnActivityPeakInterval", autoEffectsOnActivityPeakInterval);
-        });
-
-        document.getElementById('autoStrobeEnabled').addEventListener('change', async () => {
-            let autoStrobeEnabled = document.getElementById('autoStrobeEnabled').checked;
-            document.getElementById('autoStrobeOnActivityPeakPercent').disabled = !autoStrobeEnabled;
-            document.getElementById('autoStrobeOnActivityPeakDuration').disabled = !autoStrobeEnabled;
-            document.getElementById('autoStrobeOnActivityPeakInterval').disabled = !autoStrobeEnabled;
-
-            await this.saveLocalSetting("autoStrobeEnabled", autoStrobeEnabled);
-        });
-        document.getElementById('autoStrobeOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoStrobeOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoStrobeOnActivityPeakPercent').value, 80, 99);
-            await this.saveLocalSetting("autoStrobeOnActivityPeakPercent", autoStrobeOnActivityPeakPercent);
-        });
-        document.getElementById('autoStrobeOnActivityPeakDuration').addEventListener('change', async () => {
-            let autoStrobeOnActivityPeakDuration = this.safeMinMax(document.getElementById('autoStrobeOnActivityPeakDuration').value, 1, 30);
-            await this.saveLocalSetting("autoStrobeOnActivityPeakDuration", autoStrobeOnActivityPeakDuration);
-        });
-        document.getElementById('autoStrobeOnActivityPeakInterval').addEventListener('change', async () => {
-            let autoStrobeOnActivityPeakInterval = this.safeMinMax(document.getElementById('autoStrobeOnActivityPeakInterval').value, 1, 30);
-            await this.saveLocalSetting("autoStrobeOnActivityPeakInterval", autoStrobeOnActivityPeakInterval);
-        });
     };
     bindAutoFog = async () => {
-        let fogOn = await this.getSetting("autoFogToggle");
-        let autoFogOnTimer = await this.getLocalSetting("autoFogOnTimer");
-        let autoFogOnActivityPeak = await this.getLocalSetting("autoFogOnActivityPeak");
+        const getElement = (id) => document.getElementById(id);
+        const saveSetting = async (key, value) => await this.saveSetting(key, value);
+        const saveLocalSetting = async (key, value) => await this.saveLocalSetting(key, value);
+        const safeMinMax = (value, min, max) => Math.max(min, Math.min(max, value));
 
-        document.getElementById('autoFogEnabled').checked = fogOn;
-        document.getElementById('autoFogOnActivityPeak').checked = autoFogOnActivityPeak;
-        document.getElementById('autoFogOnActivityPeakPercent').value = await this.getLocalSetting("autoFogOnActivityPeakPercent");
-        document.getElementById('autoFogOnActivityPeakDuration').value = await this.getLocalSetting("autoFogOnActivityPeakDuration");
-        document.getElementById('autoFogOnActivityPeakInterval').value = await this.getLocalSetting("autoFogOnActivityPeakInterval");
-        document.getElementById('autoFogOnTimer').checked = autoFogOnTimer;
-        document.getElementById('fogTimer').value = await this.getLocalSetting("fogTimer");
-        document.getElementById('fogTimerDuration').value = await this.getLocalSetting("fogTimerDuration");
+        const fogOn = await this.getSetting("autoFogToggle");
+        const autoFogOnTimer = await this.getLocalSetting("autoFogOnTimer");
+        const autoFogOnActivityPeak = await this.getLocalSetting("autoFogOnActivityPeak");
 
-        if (!fogOn) {
-            document.getElementById('autoFogOnActivityPeak').disabled = !fogOn;
-            document.getElementById('autoFogOnTimer').disabled = !fogOn;
-            document.getElementById('fogTimer').disabled = !fogOn;
-            document.getElementById('fogTimerDuration').disabled = !fogOn;
-            document.getElementById('autoFogOnActivityPeakPercent').disabled = !fogOn;
-            document.getElementById('autoFogOnActivityPeakDuration').disabled = !fogOn;
-            document.getElementById('autoFogOnActivityPeakInterval').disabled = !fogOn;
-        } else {
-            document.getElementById('fogTimer').disabled = !autoFogOnTimer;
-            document.getElementById('fogTimerDuration').disabled = !autoFogOnTimer;
-            document.getElementById('autoFogOnActivityPeakPercent').disabled = !autoFogOnActivityPeak;
-            document.getElementById('autoFogOnActivityPeakDuration').disabled = !autoFogOnActivityPeak;
-            document.getElementById('autoFogOnActivityPeakInterval').disabled = !autoFogOnActivityPeak;
-        }
+        getElement('autoFogEnabled').checked = fogOn;
+        getElement('autoFogOnActivityPeak').checked = autoFogOnActivityPeak;
+        getElement('autoFogOnActivityPeakPercent').value = await this.getLocalSetting("autoFogOnActivityPeakPercent");
+        getElement('autoFogOnActivityPeakDuration').value = await this.getLocalSetting("autoFogOnActivityPeakDuration");
+        getElement('autoFogOnActivityPeakInterval').value = await this.getLocalSetting("autoFogOnActivityPeakInterval");
+        getElement('autoFogOnTimer').checked = autoFogOnTimer;
+        getElement('fogTimer').value = await this.getLocalSetting("fogTimer");
+        getElement('fogTimerDuration').value = await this.getLocalSetting("fogTimerDuration");
 
+        const disableElements = (elements, disable) => {
+            elements.forEach((element) => {
+                getElement(element).disabled = disable;
+            });
+        };
 
-        document.getElementById('autoFogEnabled').addEventListener('change', async () => {
-            let autoFogEnabled = document.getElementById('autoFogEnabled').checked;
-            let autoFogOnTimer = document.getElementById('autoFogOnTimer').checked;
-            let autoFogOnActivityPeak = document.getElementById('autoFogOnActivityPeak').checked;
+        const disableFogElements = (fogOn) => {
+            const fogElements = [
+                'autoFogOnActivityPeak',
+                'autoFogOnTimer',
+                'fogTimer',
+                'fogTimerDuration',
+                'autoFogOnActivityPeakPercent',
+                'autoFogOnActivityPeakDuration',
+                'autoFogOnActivityPeakInterval'
+            ];
 
-            await this.saveSetting("autoFogToggle", autoFogEnabled);
+            if (!fogOn) {
+                disableElements(fogElements, !fogOn);
+            } else {
+                disableElements(fogElements.slice(2), !fogOn);
+            }
+        };
 
-            document.getElementById('autoFogOnTimer').disabled = !autoFogEnabled;
-            document.getElementById('fogTimer').disabled = (autoFogEnabled == false ? true : !autoFogOnTimer);
-            document.getElementById('fogTimerDuration').disabled = (autoFogEnabled == false ? true : !autoFogOnTimer);
+        disableFogElements(fogOn);
 
-            document.getElementById('autoFogOnActivityPeak').disabled = !autoFogEnabled;
-            document.getElementById('autoFogOnActivityPeakPercent').disabled = (autoFogEnabled == false ? true : !autoFogOnActivityPeak);
-            document.getElementById('autoFogOnActivityPeakDuration').disabled = (autoFogEnabled == false ? true : !autoFogOnActivityPeak);
-            document.getElementById('autoFogOnActivityPeakInterval').disabled = (autoFogEnabled == false ? true : !autoFogOnActivityPeak);
+        getElement('autoFogEnabled').addEventListener('change', async () => {
+            const autoFogEnabled = getElement('autoFogEnabled').checked;
+            const autoFogOnTimer = getElement('autoFogOnTimer').checked;
+            const autoFogOnActivityPeak = getElement('autoFogOnActivityPeak').checked;
+
+            await saveSetting("autoFogToggle", autoFogEnabled);
+
+            getElement('autoFogOnTimer').disabled = !autoFogEnabled;
+            getElement('fogTimer').disabled = !autoFogEnabled || !autoFogOnTimer;
+            getElement('fogTimerDuration').disabled = !autoFogEnabled || !autoFogOnTimer;
+
+            getElement('autoFogOnActivityPeak').disabled = !autoFogEnabled;
+            getElement('autoFogOnActivityPeakPercent').disabled = !autoFogEnabled || !autoFogOnActivityPeak;
+            getElement('autoFogOnActivityPeakDuration').disabled = !autoFogEnabled || !autoFogOnActivityPeak;
+            getElement('autoFogOnActivityPeakInterval').disabled = !autoFogEnabled || !autoFogOnActivityPeak;
         });
-        document.getElementById('autoFogOnActivityPeak').addEventListener('change', async () => {
-            let autoFogOnActivityPeak = document.getElementById('autoFogOnActivityPeak').checked;
 
-            document.getElementById('autoFogOnActivityPeakPercent').disabled = !autoFogOnActivityPeak;
-            document.getElementById('autoFogOnActivityPeakDuration').disabled = !autoFogOnActivityPeak;
-            document.getElementById('autoFogOnActivityPeakInterval').disabled = !autoFogOnActivityPeak;
+        getElement('autoFogOnActivityPeak').addEventListener('change', async () => {
+            const autoFogOnActivityPeak = getElement('autoFogOnActivityPeak').checked;
 
-            await this.saveLocalSetting("autoFogOnActivityPeak", autoFogOnActivityPeak);
-        });
-        document.getElementById('autoFogOnTimer').addEventListener('change', async () => {
-            let autoFogOnTimer = document.getElementById('autoFogOnTimer').checked;
+            getElement('autoFogOnActivityPeakPercent').disabled = !autoFogOnActivityPeak;
+            getElement('autoFogOnActivityPeakDuration').disabled = !autoFogOnActivityPeak;
+            getElement('autoFogOnActivityPeakInterval').disabled = !autoFogOnActivityPeak;
 
-            document.getElementById('fogTimer').disabled = !autoFogOnTimer;
-            document.getElementById('fogTimerDuration').disabled = !autoFogOnTimer;
+            await saveLocalSetting("autoFogOnActivityPeak", autoFogOnActivityPeak);
+        });
 
-            await this.saveLocalSetting("autoFogOnTimer", autoFogOnTimer);
+        getElement('autoFogOnTimer').addEventListener('change', async () => {
+            const autoFogOnTimer = getElement('autoFogOnTimer').checked;
+
+            getElement('fogTimer').disabled = !autoFogOnTimer;
+            getElement('fogTimerDuration').disabled = !autoFogOnTimer;
+
+            await saveLocalSetting("autoFogOnTimer", autoFogOnTimer);
         });
-        document.getElementById('fogTimer').addEventListener('change', async () => {
-            let fogTimer = this.safeMinMax(document.getElementById('fogTimer').value, 1, 15);
-            await this.saveLocalSetting("fogTimer", fogTimer);
+
+        getElement('fogTimer').addEventListener('change', async () => {
+            const fogTimer = safeMinMax(getElement('fogTimer').value, 1, 15);
+            await saveLocalSetting("fogTimer", fogTimer);
         });
-        document.getElementById('fogTimerDuration').addEventListener('change', async () => {
-            let fogTimerDuration = this.safeMinMax(document.getElementById('fogTimerDuration').value, 1, 30);
-            await this.saveLocalSetting("fogTimerDuration", fogTimerDuration);
+
+        getElement('fogTimerDuration').addEventListener('change', async () => {
+            const fogTimerDuration = safeMinMax(getElement('fogTimerDuration').value, 1, 30);
+            await saveLocalSetting("fogTimerDuration", fogTimerDuration);
         });
-        document.getElementById('autoFogOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoFogOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoFogOnActivityPeakPercent').value, 80, 99);
-            await this.saveLocalSetting("autoFogOnActivityPeakPercent", autoFogOnActivityPeakPercent);
+
+        getElement('autoFogOnActivityPeakPercent').addEventListener('change', async () => {
+            const autoFogOnActivityPeakPercent = safeMinMax(getElement('autoFogOnActivityPeakPercent').value, 80, 99);
+            await saveLocalSetting("autoFogOnActivityPeakPercent", autoFogOnActivityPeakPercent);
         });
-        document.getElementById('autoFogOnActivityPeakDuration').addEventListener('change', async () => {
-            let autoFogOnActivityPeakDuration = this.safeMinMax(document.getElementById('autoFogOnActivityPeakDuration').value, 80, 99);
-            await this.saveLocalSetting("autoFogOnActivityPeakDuration", autoFogOnActivityPeakDuration);
+
+        getElement('autoFogOnActivityPeakDuration').addEventListener('change', async () => {
+            const autoFogOnActivityPeakDuration = safeMinMax(getElement('autoFogOnActivityPeakDuration').value, 80, 99);
+            await saveLocalSetting("autoFogOnActivityPeakDuration", autoFogOnActivityPeakDuration);
         });
-        document.getElementById('autoFogOnActivityPeakInterval').addEventListener('change', async () => {
-            let autoFogOnActivityPeakInterval = this.safeMinMax(document.getElementById('autoFogOnActivityPeakInterval').value, 1, 30);
-            await this.saveLocalSetting("autoFogOnActivityPeakInterval", autoFogOnActivityPeakInterval);
+
+        getElement('autoFogOnActivityPeakInterval').addEventListener('change', async () => {
+            const autoFogOnActivityPeakInterval = safeMinMax(getElement('autoFogOnActivityPeakInterval').value, 1, 30);
+            await saveLocalSetting("autoFogOnActivityPeakInterval", autoFogOnActivityPeakInterval);
         });
     }
     controlPageLink = function () {
@@ -608,36 +585,37 @@ class SettingsApp extends Globals {
     };
     applyMacro = async (macroName, stageId, showLoader = true) => {
         try {
-            if (showLoader) this.showLoader();
-            const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+            if (showLoader) {
+                this.showLoader();
+            }
+            const deleteButton = document.querySelector(`button[name="btn_delete"][data-id="${macroName}"]`);
+            const applyButton = document.querySelector(`button[name="btn_apply"][data-id="${macroName}"]`);
+            const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macroName}"]`);
+
             deleteButton.disabled = true;
-            const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
             applyButton.disabled = true;
-            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
 
-            var promiseArray = [];
-            var keys = await this.retrieveAllKeys()
+            const keys = await this.retrieveAllKeys();
             this.currentCue = await this.getShowState();
-            var ignoredFixtures = [];
-
+            const ignoredFixtures = [];
 
             let macros = await this.loadMacros();
-            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
+            macros = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
 
-            if ((macros[0].macro.macroRunning && macros[0].macro.macroRunning == true)) {
-                //already running
+            if (macros[0]?.macro.macroRunning) {
                 return;
             }
+
             if (macros) {
                 const pendingMacroIds = macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id));
-                const runningMacroIds = Object.keys(keys).filter(key => pendingMacroIds.some(id => key == (`macro_active_${id}`)));
+                const runningMacroIds = Object.keys(keys).filter(key => pendingMacroIds.some(id => key === `macro_active_${id}`));
 
                 if (runningMacroIds.length > 0) {
                     deleteButton.disabled = false;
                     applyButton.disabled = false;
                     this.hideLoader();
 
-                    if (showLoader == true) {
+                    if (showLoader) {
                         return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
                     } else {
                         return false;
@@ -645,55 +623,44 @@ class SettingsApp extends Globals {
                 }
             }
 
-            for (let fixture of macros[0].macro.fixtures) {
+            for (let fixture of macros[0]?.macro.fixtures || []) {
                 let currentProfile = await this.getFixture(fixture.id);
 
-                if (!currentProfile) continue;
+                if (!currentProfile) {
+                    continue;
+                }
 
                 let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
-                if (diff.length == 0) {
+                if (diff.length === 0) {
                     ignoredFixtures.push({ fixtureId: fixture.id, name: fixture.name });
                     continue;
                 }
 
-                //save original profile prior to modification
-                promiseArray.push(new Promise((resolve, reject) => {
-                    try {
-                        this.processAttributeChanges(diff, fixture.id, fixture, currentProfile).then(() => {
-                            resolve();
-                        });
-                    } catch (e) {
-                        reject(e)
-                    }
-                }));
-
-                await Promise.all(promiseArray).then(() => {
-                    this.storeFixtureProfile(macroName, currentProfile);
-                });
+                await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
+                this.storeFixtureProfile(macroName, currentProfile);
             }
 
             if (ignoredFixtures.length > 0) {
-                if (ignoredFixtures.length == macros[0].macro.fixtures.length) {
+                if (ignoredFixtures.length === macros[0]?.macro.fixtures.length) {
                     deleteButton.disabled = false;
                     applyButton.disabled = false;
                     this.hideLoader();
 
-                    if (showLoader == true)
+                    if (showLoader) {
                         alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
+                    }
 
                     return false;
                 }
 
-                if (showLoader == true) {
+                if (showLoader) {
                     let ignoredFixtureNames = ignoredFixtures.map(fixture => fixture.name).join('\n');
-
-                    if (showLoader == true)
-                        alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
+                    alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
                 }
             }
 
             await maestro.SettingsApp.loadMacros().then(macros => {
-                let m = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == stageId)
+                let m = macros.find(macro => macro.macro.name === macroName && macro.macro.stageId === stageId)
                 if (m) {
                     m.macro.autoMacroLastRun = Date.now();
                     m.macro.macroRunning = true;
@@ -706,7 +673,7 @@ class SettingsApp extends Globals {
             clearButton.disabled = false;
             document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.add('macro-active');
 
-            if (macros[0].macro.cueId) {
+            if (macros[0]?.macro.cueId) {
                 await this.getCues().then(async (cues) => {
                     let cueIndex = cues.findIndex(cue => cue.uuid === macros[0].macro.cueId);
                     await this.startCue(cueIndex);
@@ -715,8 +682,9 @@ class SettingsApp extends Globals {
 
             this.hideLoader();
         } catch (e) {
-            if (this.logging)
+            if (this.logging) {
                 console.error('Error applying Macro:', e);
+            }
 
             alert(this.fatalErrorMsg);
         } finally {
@@ -725,69 +693,81 @@ class SettingsApp extends Globals {
     }
     revertMacro = async (macroName, stageId, showLoader = true) => {
         try {
-            if (showLoader) this.showLoader();
-            const clearButton = document.querySelector('button[name="btn_clr"][data-id="' + macroName + '"]');
+            if (showLoader) {
+                this.showLoader();
+            }
+            const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macroName}"]`);
             clearButton.disabled = true;
 
             this.currentCue = await this.getShowState();
-            var macros = await this.loadMacros();
-            macros = macros.filter(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
-            var promiseArray = [];
+            const macros = await this.loadMacros();
+            const filteredMacros = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
 
-            if (macros) {
-                var fixtures = macros[0].macro.fixtures;
+            if (filteredMacros.length > 0) {
+                const fixtures = filteredMacros[0].macro.fixtures;
+                const promiseArray = [];
 
-                for (let fixture of fixtures) {
-                    let originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
+                for (const fixture of fixtures) {
+                    const originalProfile = await maestro.SettingsApp.retrieveFixtureProfile(fixture.id);
 
                     if (originalProfile) {
-                        //get diff between original and current profile
-                        let diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
-                        promiseArray.push(new Promise((resolve, reject) => {
-                            try {
-                                maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture).then(() => {
-                                    resolve();
-                                });
-                            } catch (e) {
-                                reject(e)
-                            }
-                        }))
+                        const diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
+                        promiseArray.push(
+                            new Promise((resolve, reject) => {
+                                try {
+                                    maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture)
+                                        .then(() => {
+                                            resolve();
+                                        })
+                                        .catch(e => {
+                                            reject(e);
+                                        });
+                                } catch (e) {
+                                    reject(e);
+                                }
+                            })
+                        );
                     } else {
                         maestro.SettingsApp.deleteFixtureProfile(fixture.id);
                     }
-
-                    await Promise.all(promiseArray).then(() => {
-                        maestro.SettingsApp.deleteFixtureProfile(fixture.id);
-                    });
                 }
-                const applyButton = document.querySelector('button[name="btn_apply"][data-id="' + macroName + '"]');
+
+                await Promise.all(promiseArray);
+
+                for (const fixture of fixtures) {
+                    maestro.SettingsApp.deleteFixtureProfile(fixture.id);
+                }
+
+                const applyButton = document.querySelector(`button[name="btn_apply"][data-id="${macroName}"]`);
                 applyButton.disabled = false;
-                const deleteButton = document.querySelector('button[name="btn_delete"][data-id="' + macroName + '"]');
+                const deleteButton = document.querySelector(`button[name="btn_delete"][data-id="${macroName}"]`);
                 deleteButton.disabled = false;
 
-                document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`).classList.remove('macro-active');
+                const macroElement = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
+                macroElement.classList.remove('macro-active');
 
-                if (macros[0].macro.cueIdEnd) {
-                    await this.getCues().then(async (cues) => {
-                        let cueIndex = cues.findIndex(cue => cue.uuid === macros[0].macro.cueIdEnd);
-                        await this.startCue(cueIndex);
-                    })
+                if (filteredMacros[0].macro.cueIdEnd) {
+                    const cues = await this.getCues();
+                    const cueIndex = cues.findIndex(cue => cue.uuid === filteredMacros[0].macro.cueIdEnd);
+                    await this.startCue(cueIndex);
                 }
 
                 await maestro.SettingsApp.loadMacros().then(macros => {
-                    let m = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == stageId)
+                    const m = macros.find(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
                     if (m) {
                         m.macro.autoMacroLastStopped = Date.now();
                         m.macro.macroRunning = false;
                         maestro.SettingsApp.saveLocalSetting("macros", macros);
 
-                        document.querySelector(`span[name="macroLastStopTime"][data-id="${macroName}"][data-stageid="${stageId}"]`).innerHTML = maestro.SettingsApp.formatDate(new Date(m.macro.autoMacroLastStopped + 1000), true);
+                        const macroLastStopTimeElement = document.querySelector(`span[name="macroLastStopTime"][data-id="${macroName}"][data-stageid="${stageId}"]`);
+                        macroLastStopTimeElement.innerHTML = maestro.SettingsApp.formatDate(new Date(m.macro.autoMacroLastStopped + 1000), true);
                     }
                 });
             }
         } catch (e) {
-            if (this.logging)
+            if (this.logging) {
                 console.error('Error reverting Macro:', e);
+            }
 
             alert(this.fatalErrorMsg);
         } finally {
@@ -880,9 +860,10 @@ class SettingsApp extends Globals {
         );
     }
     bindMacroBtn = async () => {
-        document.getElementById('addMacro').addEventListener('click', async () => {
+        const addMacroBtn = document.getElementById('addMacro');
+        addMacroBtn.addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('input[name="fixture_cbx"]:checked');
-            if (checkboxes.length == 0) {
+            if (checkboxes.length === 0) {
                 return alert('Please select at least one fixture');
             }
             const values = Array.from(checkboxes).map(checkbox => checkbox.value);
@@ -892,38 +873,32 @@ class SettingsApp extends Globals {
             let macroFixtures = maestro.SettingsApp.activeStage.fixture.filter(fixture => values.includes(fixture.id.toString()));
 
             var macroName = prompt('Enter a name for the macro', 'Macro Name');
-            if (macroName == null || macroName == "") {
+            if (!macroName) {
                 return;
             }
 
-            await maestro.SettingsApp.getLocalSetting("macros").then(macros => {
-                if (!macros) {
-                    macros = [];
-                }
-                let macroExists = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == this.stageId);
-                if (macroExists) {
-                    return alert('Macro name already exists');
-                }
-                macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
-                maestro.SettingsApp.saveLocalSetting("macros", macros).then(async () => {
-                    await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-macros");
-                    document.location.reload();
-                });
-            });
+            const macros = await maestro.SettingsApp.getLocalSetting("macros") || [];
+            const macroExists = macros.find(macro => macro.macro.name === macroName && macro.macro.stageId === this.stageId);
+            if (macroExists) {
+                return alert('Macro name already exists');
+            }
+
+            macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
+            await maestro.SettingsApp.saveLocalSetting("macros", macros);
+            await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-macros");
+            document.location.reload();
         });
     };
     changeStrobeParam = async (id, channelId, type, stageId = null) => {
+        let newStrobeValue, newShutterValue;
         if (channelId) {
-
-            let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + channelId + '_' + id).value, 0, 255);
-            let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + channelId + '_' + id).value, 0, 255);
-
-            if (newStrobeValue == 0 && newShutterValue == 0) {
+            newStrobeValue = this.safeMinMax(document.getElementById(`strobe_val_${channelId}_${id}`).value, 0, 255);
+            newShutterValue = this.safeMinMax(document.getElementById(`open_val_${channelId}_${id}`).value, 0, 255);
+            if (newStrobeValue === 0 && newShutterValue === 0) {
                 newShutterValue = "";
                 newStrobeValue = "";
             }
-
-            let strobeParams = await this.getLocalSetting("strobe_" + id);
+            let strobeParams = await this.getLocalSetting(`strobe_${id}`);
             if (strobeParams) {
                 const channel = strobeParams.find(channel => channel.channelId === channelId);
                 if (channel) {
@@ -931,21 +906,19 @@ class SettingsApp extends Globals {
                     channel.shutter = newShutterValue;
                     channel.stageId = stageId;
                 } else {
-                    strobeParams.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
+                    strobeParams.push({ channelId, type, strobe: newStrobeValue, shutter: newShutterValue, stageId });
                 }
-                await this.saveLocalSetting("strobe_" + id, strobeParams);
+                await this.saveLocalSetting(`strobe_${id}`, strobeParams);
             } else {
-                let channel = [];
-                channel.push({ channelId, type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
-                await this.saveLocalSetting("strobe_" + id, channel);
+                let channel = [{ channelId, type, strobe: newStrobeValue, shutter: newShutterValue, stageId }];
+                await this.saveLocalSetting(`strobe_${id}`, channel);
             }
         } else {
-            let newStrobeValue = this.safeMinMax(document.getElementById('strobe_val_' + id).value, 0, 255);
-            let newShutterValue = this.safeMinMax(document.getElementById('open_val_' + id).value, 0, 255);
-            this.saveLocalSetting("strobe_" + id, { type: type, strobe: newStrobeValue, shutter: newShutterValue, stageId: stageId });
+            newStrobeValue = this.safeMinMax(document.getElementById(`strobe_val_${id}`).value, 0, 255);
+            newShutterValue = this.safeMinMax(document.getElementById(`open_val_${id}`).value, 0, 255);
+            this.saveLocalSetting(`strobe_${id}`, { type, strobe: newStrobeValue, shutter: newShutterValue, stageId });
         }
     };
-
     fixtureTable = async (activeStage, activeFixtureGroups) => {
         var tData = [];
         for (let group of activeFixtureGroups) {
@@ -1296,22 +1269,25 @@ class SettingsApp extends Globals {
         }
     };
     setPanTilt = async (id) => {
-        this.saveLocalSetting("panTilt_" + id, { pan: this.safeMinMax(document.getElementById('panRange').value, 0, 255), tilt: this.safeMinMax(document.getElementById('tiltRange').value, 0, 255) });
+        const panRangeValue = document.getElementById('panRange').value;
+        const tiltRangeValue = document.getElementById('tiltRange').value;
+        const panValue = this.safeMinMax(panRangeValue, 0, 255);
+        const tiltValue = this.safeMinMax(tiltRangeValue, 0, 255);
 
-        let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
-        let ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
+        this.saveLocalSetting("panTilt_" + id, { pan: panValue, tilt: tiltValue });
+
+        const fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+        const ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
         if (ignoreFixtures) return;
 
-        let fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
-        let fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
+        const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
+        const fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
 
-        let panValue = this.safeMinMax(document.getElementById('panRange').value, 0, 255);
-        let tiltValue = this.safeMinMax(document.getElementById('tiltRange').value, 0, 255);
+        const panRange = this.calculateRange({ lowValue: panValue, highValue: panValue });
+        const tiltRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
 
-        let panRange = this.calculateRange({ lowValue: panValue, highValue: panValue });
-        let titRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
         await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
-        await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
+        await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } });
     };
     resetPanTilt = async (id) => {
         this.saveLocalSetting("panTilt_" + id, { pan: 0, tilt: 0 });
@@ -2100,313 +2076,6 @@ class SettingsApp extends Globals {
         }
         this.hideLoader();
     };
-    rgbTypes = {
-        'RED': 'red',
-        'GREEN': 'green',
-        'BLUE': 'blue',
-        'AMBER': 'orange',
-        'WARM_WHITE': 'yellow',
-        'COOL_WHITE': 'white',
-        'UV': 'purple',
-        'CYAN': 'cyan',
-        'MAGENTA': 'magenta',
-        'YELLOW': 'yellow',
-        'RED_FINE': 'red',
-        'GREEN_FINE': 'green',
-        'BLUE_FINE': 'blue',
-        'AMBER_FINE': 'orange',
-        'WARM_WHITE_FINE': 'yellow',
-        'COOL_WHITE_FINE': 'white',
-        'UV_FINE': 'purple',
-        'CYAN_FINE': 'cyan',
-        'MAGENTA_FINE': 'magenta',
-        'YELLOW_FINE': 'yellow'
-    };
-
-
-    rgbControlsTable = async (activeStage, activeFixtureGroups) => {
-        var tData = [];
-
-        for (let group of activeFixtureGroups) {
-            if (group.fixtureId) {
-                for (let fixtureId of group.fixtureId) {
-                    let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
-                    let index = 0;
-
-                    for (let attribute of fixture.attribute) {
-                        if (Object.keys(this.rgbTypes).includes(attribute.type)) {
-                            if (!tData.some(data => data.id === fixture.id)) {
-                                tData.push({ id: fixtureId, name: fixture.name, group: group.name, active: fixture.enabled, type: attribute.type });
-                                let c = tData.find(data => data.id === fixture.id);
-                                if (!attribute.range) {
-                                    attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
-                                }
-
-                                if (!c.channels) {
-                                    c.channels = [];
-                                }
-                                c.channels.push({
-                                    channel: index,
-                                    params: {
-                                        attributes: attribute,
-                                        channel: index
-                                    }
-                                });
-                            } else {
-                                let c = tData.find(data => data.id === fixture.id);
-                                if (!c.channels) {
-                                    c.channels = [];
-                                }
-                                c.channels.push({
-                                    channel: index,
-                                    params: {
-                                        attributes: attribute,
-                                        channel: index
-                                    }
-                                });
-                            }
-                        }
-                        index++;
-                    }
-                }
-            }
-        }
-        //table builder
-        let table = document.getElementById('rgbcontrolls');
-        let tbody = document.createElement('tbody');
-        table.appendChild(tbody);
-        let groupName;
-
-        let rowIndex = 0;
-        for (let data of tData) {
-            if (rowIndex == 0) {
-                groupName = data.group;
-                // append Group Header
-                let groupHeader = document.createElement('tr');
-
-                let header = this.createTableCell(`<h5 class="fst-italic">${data.group} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
-                groupHeader.appendChild(header);
-                tbody.appendChild(groupHeader);
-            } else {
-                if (groupName != data.group) {
-                    //group changed
-                    groupName = data.group;
-                    // append Group Header
-                    let row = document.createElement('tr');
-
-                    let header = this.createTableCell(`<h5 class="fst-italic">${data.group} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
-                    row.appendChild(header);
-                    tbody.appendChild(row);
-                }
-            }
-
-
-            let fixtureNameRow = document.createElement('tr');
-            fixtureNameRow.dataset.id = data.id;
-
-            let fixtureNameCell = this.createTableCell(`<span style="font-size: 20px;text-wrap:nowrap;width:40px;">${data.name}</span><span name="expandTable" class="float-end" role="button" data-id="${data.id}" id="expand_${data.id}"><img src="/src/img/chevron-expand.svg" width="40" height="40"></span>`, "bg-warning", null, true, `background-color:;text-align: center; vertical-align: middle;`, 5);
-            fixtureNameRow.appendChild(fixtureNameCell)
-            tbody.appendChild(fixtureNameRow);
-
-            let togglesRow = document.createElement('tr');
-            togglesRow.dataset.id = data.id;
-            togglesRow.dataset.type = "channelRow";
-            togglesRow.dataset.name = "channelRow_" + data.id;
-            togglesRow.style.visibility = "";
-
-            let types = [];
-            for (let channel of data.channels) {
-                if (channel.params.attributes.type !== null && !types.includes(channel.params.attributes.type)) {
-                    types.push(channel.params.attributes.type);
-                }
-            }
-
-            let toggles = "";
-
-            for (let key in this.rgbTypes) {
-                if (types.includes(key))
-                    toggles += `<button class="btn my-1" name="colorToggleBtn" style="width:160px;background-color: ${this.rgbTypes[key]};" data-color="${key}" data-id="${data.id}" data-state="on"><img src="/src/img/lightbulb.svg" style="position:relative;top:-2px;">&nbsp;<span style="color: darkgrey">${key}</span></button>&nbsp;`;
-            }
-
-            let masterTogglesRow = document.createElement('tr');
-            let togglesCell = this.createTableCell(`<div>${toggles}</div>`, null, null, true, `text-align: center; vertical-align: middle;`, 5);
-            masterTogglesRow.appendChild(togglesCell)
-            tbody.appendChild(masterTogglesRow);
-
-            for (let channel of data.channels) {
-                let channelRow = document.createElement('tr');
-                channelRow.dataset.id = data.id;
-                channelRow.dataset.type = "channelRow";
-                channelRow.dataset.name = "channelRow_" + data.id;
-                channelRow.style.visibility = "";
-
-                let cell = this.createTableCell(`<span>${channel.params.attributes.name}</span><br><span style="font-size:10px;">${channel.params.attributes.type}<br>Channel: ${channel.channel + 1}</span>`, null, null, true, `background-color: ;text-align: center; vertical-align: middle;`);
-                channelRow.appendChild(cell);
-
-                let response = "";
-                response += `<table class="table table-borderless bg-lightgrey">`;
-                response += `<thead>`;
-                response += `</thead>`;
-                response += `<tbody>`;
-                response += `<tr>`;
-                response += `   <td width="15%" style="text-align:right">`;
-                response += `       <input type="number" name="rgbRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${channel.channel}_ValLow" data-fixtureid="${data.id}" data-type="dec" data-val="Low" data-group="${data.group}" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.lowValue)}">`;
-                response += `   </td>`;
-                response += `   <td width="70%">`;
-                response += `       <span class="me-2">0</span><input type="range" name="rgbRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="Low" data-channel="${channel.channel}" data-group="${data.group}" data-fixtureid="${data.id}" id="${data.id}_${channel.channel}_low"  value="${Math.floor(255 * channel.params.attributes.range.lowValue)}"><span class="me-2">255</span>`;
-                response += `   </td>`;
-                response += `   <td width="15%">`;
-                response += `   </td>`;
-                response += `</tr>`;
-                response += `<tr>`;
-                response += `   <td width="15%">`;
-                response += `   </td>`;
-                response += `   <td with="70%">`;
-                response += `       <span class="me-2">0</span><input type="range" name="rgbRange" class="form-range me-2 custom-range" style="min-width:200px;width:300px;position:relative;display:inline-block;top:5px" min="0" max="255" steps="1" data-type="dec" data-val="High" data-group="${data.group}" data-fixtureid="${data.id}" id="${data.id}_${channel.channel}_high" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.highValue)}"><span class="me-2">255</span>`;
-                response += `   </td>`;
-                response += `   <td width="15%" style="text-align:left">`;
-                response += `       <input type="number" name="rgbRangeNum" min="0" max="255" style="width:70px;display:inline-block;" class="form-control" id="${data.id}_${channel.channel}_ValHigh" data-fixtureid="${data.id}" data-type="dec" data-val="High" data-channel="${channel.channel}" data-group="${data.group}" data-channel="${channel.channel}" value="${Math.floor(255 * channel.params.attributes.range.highValue)}">`;
-                response += `    </td>`;
-                response += `</tr>`;
-                response += `</tbody>`;
-                response += `</table>`;
-
-                let cell2 = this.createTableCell(response, null, null, true, `background-color: ; text-align: center; vertical-align: middle;`);
-                channelRow.appendChild(cell2);
-
-                tbody.appendChild(channelRow);
-            }
-
-
-            rowIndex++;
-        }
-        $('input[name="rgbRangeNum"]').on('change', function (ele) {
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    //cannot be higher than the high values minimum current value
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value, 0, 255);
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-                if (this.dataset.val == "High") {
-                    //cannot be lower than the low values maximum current value
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value, 0, 255);
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-                //maestro.SettingsApp.putAttribute(this.dataset.fixtureid, this.dataset.channel, { attribute: { range: { lowValue: this.value / 255, highValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value / 255 } } });
-                let range = maestro.SettingsApp.calculateRange({ lowValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value, highValue: document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value });
-
-                maestro.SettingsApp.putAttribute(this.dataset.fixtureid, this.dataset.channel, {
-                    attribute: { range: range }
-                });
-            }
-        });
-
-        $('input[name="rgbRange"]').on('input', function (ele) {
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    //cannot be higher than the high values minimum current value
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value, 0, 255);
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-                if (this.dataset.val == "High") {
-                    //cannot be lower than the low values maximum current value
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_low`).value, 0, 255);
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.channel}_ValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-            }
-        });
-        $('input[name="rgbRange"]').on('mouseup', function (ele) {
-            if (!maestro.SettingsApp.leftMouseClick(ele)) return;
-
-            let type = this.dataset.type;
-            let fixtureId = this.dataset.fixtureid;
-            let val = this.dataset.val;
-            let channel = this.dataset.channel;
-
-            if (type == "int") {
-                let input = document.getElementById(`${fixtureId}_${channel}_Val`);
-                let event = new Event('change');
-                input.dispatchEvent(event);
-            }
-            if (type == "dec") {
-                let input = document.getElementById(`${fixtureId}_${channel}_Val${val}`);
-                let event = new Event('change');
-                input.dispatchEvent(event);
-            }
-
-        });
-        $('button[name="colorToggleBtn"]').on('click', async function (btn) {
-            let fixtureId = this.dataset.id;
-            let color = this.dataset.color;
-            let stage = await maestro.SettingsApp.getActiveStage();
-            let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
-            let state = this.dataset.state;
-
-            state == 'on' ? state = 'off' : state = 'on';
-            this.dataset.state = state;
-
-            let highValue = state == 'on' ? 255 : 0;
-
-            if (state == 'on')
-                this.querySelector('img').src = `/src/img/lightbulb.svg`
-            if (state == 'off')
-                this.querySelector('img').src = `/src/img/lightbulb-off.svg`
-
-            for (let fixture of fixtures) {
-                let index = 0;
-                for (let attr of fixture.attribute) {
-                    if (attr.type == color) {
-                        let range = maestro.SettingsApp.calculateRange({ lowValue: 0, highValue: highValue });
-                        maestro.SettingsApp.putAttribute(fixture.id, index, { attribute: { range: range } });
-                    }
-                    index++;
-                }
-            }
-        });
-        $('span[name="expandTable"]').on('click', function (ele) {
-            const fixtureId = this.dataset.id;
-            const state = this.dataset.state;
-
-            if (fixtureId == "expandall") {
-                const channelRow = document.querySelectorAll(`[data-type='channelRow']`);
-                channelRow.forEach(function (row) {
-                    row.style.visibility = state === 'open' ? 'collapse' : '';
-                })
-            } else {
-                const channelRow = document.querySelectorAll(`[data-name='channelRow_${fixtureId}']`);
-                channelRow.forEach(function (row) {
-                    row.style.visibility = state === 'open' ? 'collapse' : '';
-                })
-            }
-            if (this.dataset.state == "closed") {
-                this.dataset.state = "open";
-                this.querySelector('img').src = "/src/img/chevron-contract.svg";
-            } else {
-                this.dataset.state = "closed";
-                this.querySelector('img').src = "/src/img/chevron-expand.svg";
-            }
-        });
-
-
-        //console.log(tData);
-
-    };
     getGroupAvgDimmer = (activeStage, fixtureGroup, currGroupName) => {
         let values = [];
         let group = fixtureGroup.find(ele => ele.name == currGroupName);
@@ -2480,16 +2149,17 @@ class SettingsApp extends Globals {
 
         let rowIndex = 0;
         for (let data of tData) {
-            if (rowIndex == 0) {
+            if (rowIndex == 0 || groupName != data.groupName) {
                 let avgHighValue = this.getGroupAvgFocus(activeStage, activeFixtureGroups, data.groupName);
                 groupName = data.groupName;
                 // append Group Header
                 let groupHeader = document.createElement('tr');
                 groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
+                let row = document.createElement('tr');
 
                 let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
-                groupHeader.appendChild(header);
-                tbody.appendChild(groupHeader);
+                row.appendChild(header);
+                tbody.appendChild(row);
 
                 let groupFocus = document.createElement('tr');
                 groupFocus.style.backgroundColor = 'rgb(245, 240, 245)';
@@ -2501,31 +2171,6 @@ class SettingsApp extends Globals {
                 let focusCell = this.createTableCell(focus, "focusRow", null, true, `text-align: center; vertical-align: middle;`, 4);
                 groupFocus.appendChild(focusCell);
                 tbody.appendChild(groupFocus);
-            } else {
-                if (groupName != data.groupName) {
-                    let avgHighValue = this.getGroupAvgFocus(activeStage, activeFixtureGroups, data.groupName);
-                    //group changed
-                    groupName = data.groupName;
-                    // append Group Header
-                    let groupHeader = document.createElement('tr');
-                    groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
-                    let row = document.createElement('tr');
-
-                    let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
-                    row.appendChild(header);
-                    tbody.appendChild(row);
-
-                    let groupFocus = document.createElement('tr');
-                    groupFocus.style.backgroundColor = 'rgb(245, 240, 245)';
-
-                    let focus = `<div class="m-1 p-1">`
-                    focus += `<input type="range" name="groupFocus" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_focus_${groupName}" value="${avgHighValue}">`
-                    focus += `</div>`
-
-                    let focusCell = this.createTableCell(focus, "focusRow", null, true, `text-align: center; vertical-align: middle;`, 4);
-                    groupFocus.appendChild(focusCell);
-                    tbody.appendChild(groupFocus);
-                }
             }
             let row = document.createElement('tr');
             row.dataset.id = data.id;
@@ -2537,7 +2182,6 @@ class SettingsApp extends Globals {
             row.appendChild(channelCell);
 
             let response = "";
-
             if (data.attributes.staticValue && !data.attributes.range) {
                 response += `<table class="table table-borderless bg-lightgrey">`;
                 response += `<tr>`;
@@ -2551,8 +2195,7 @@ class SettingsApp extends Globals {
                 response += `   </td>`;
                 response += `</tr>`;
                 response += `</table>`;
-            }
-            if (data.attributes.range) {
+            } else if (data.attributes.range) {
                 response += `<table class="table table-borderless bg-lightgrey">`;
                 response += `<tr>`;
                 response += `   <td width="15%" style="text-align:right">`;
@@ -2584,52 +2227,71 @@ class SettingsApp extends Globals {
             rowIndex++;
         };
         $('input[name="focusRangeNum"]').on('change', function (ele) {
-            if (this.dataset.type == "int") {
-                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                maestro.Globals.debounce(maestro.SettingsApp.setFocus(this.dataset.fixtureid, this.dataset.channel, maestro.SettingsApp.safeMinMax(this.value, 0, 255)), 100);
-            }
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-                if (this.dataset.val == "High") {
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
+            const { type, fixtureid, uuid, val } = this.dataset;
 
-                }
-                maestro.Globals.debounce(maestro.SettingsApp.setFocus(this.dataset.fixtureid, this.dataset.channel, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value), 100);
+            if (type === "int") {
+                const value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                document.getElementById(`${fixtureid}_${uuid}_focus`).value = value;
+                maestro.Globals.debounce(maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, value), 100);
             }
-        })
+
+            if (type === "dec") {
+                const lowValue = document.getElementById(`${fixtureid}_${uuid}_focus_low`);
+                const highValue = document.getElementById(`${fixtureid}_${uuid}_focus_high`);
+                const lowValueInput = document.getElementById(`${fixtureid}_${uuid}_focusValLow`);
+                const highValueInput = document.getElementById(`${fixtureid}_${uuid}_focusValHigh`);
+
+                if (val === "Low") {
+                    if (Number(this.value) > Number(highValue.value)) {
+                        lowValue.value = highValue.value;
+                        lowValueInput.value = highValue.value;
+                    } else {
+                        lowValueInput.value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+
+                if (val === "High") {
+                    if (Number(this.value) < Number(lowValue.value)) {
+                        highValue.value = lowValue.value;
+                        highValueInput.value = lowValue.value;
+                    } else {
+                        highValueInput.value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
+                }
+
+                maestro.Globals.debounce(maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, highValue.value, lowValue.value), 100);
+            }
+        });
         $('input[name="focusRange"]').on('input', function (ele) {
-            if (this.dataset.type == "int") {
-                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusVal`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            const { type, fixtureid, uuid, val } = this.dataset;
+
+            if (type === "int") {
+                const value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                document.getElementById(`${fixtureid}_${uuid}_focusVal`).value = value;
             }
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value;
+
+            if (type === "dec") {
+                const lowValue = document.getElementById(`${fixtureid}_${uuid}_focus_low`);
+                const highValue = document.getElementById(`${fixtureid}_${uuid}_focus_high`);
+                const lowValueInput = document.getElementById(`${fixtureid}_${uuid}_focusValLow`);
+                const highValueInput = document.getElementById(`${fixtureid}_${uuid}_focusValHigh`);
+
+                if (val === "Low") {
+                    if (Number(this.value) > Number(highValue.value)) {
+                        lowValue.value = highValue.value;
+                        lowValueInput.value = highValue.value;
                     } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                        lowValueInput.value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                     }
                 }
-                if (this.dataset.val == "High") {
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focus_low`).value;
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_focusValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
 
+                if (val === "High") {
+                    if (Number(this.value) < Number(lowValue.value)) {
+                        highValue.value = lowValue.value;
+                        highValueInput.value = lowValue.value;
+                    } else {
+                        highValueInput.value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                    }
                 }
             }
         });
@@ -2732,7 +2394,7 @@ class SettingsApp extends Globals {
         for (let data of tData) {
 
 
-            if (rowIndex == 0) {
+            if (rowIndex == 0 || groupName != data.groupName) {
                 let avgHighValue = this.getGroupAvgDimmer(activeStage, activeFixtureGroups, data.groupName);
                 groupName = data.groupName;
                 // append Group Header
@@ -2753,34 +2415,7 @@ class SettingsApp extends Globals {
                 let dimmerCell = this.createTableCell(dimmer, "dimmerRow", null, true, `text-align: center; vertical-align: middle;`, 4);
                 groupDimmer.appendChild(dimmerCell);
                 tbody.appendChild(groupDimmer);
-
-            } else {
-                if (groupName != data.groupName) {
-                    let avgHighValue = this.getGroupAvgDimmer(activeStage, activeFixtureGroups, data.groupName);
-                    //group changed
-                    groupName = data.groupName;
-                    // append Group Header
-                    let groupHeader = document.createElement('tr');
-                    groupHeader.style.backgroundColor = 'rgb(245, 240, 245)';
-                    let row = document.createElement('tr');
-
-                    let header = this.createTableCell(`<h5 class="fst-italic">${data.groupName} Group</h5>`, null, null, true, `text-align: center; vertical-align: middle;`, 4);
-                    row.appendChild(header);
-                    tbody.appendChild(row);
-
-                    let groupDimmer = document.createElement('tr');
-                    groupDimmer.style.backgroundColor = 'rgb(245, 240, 245)';
-
-                    let dimmer = `<div class="m-1 p-1">`
-                    dimmer += `<input type="range" name="groupDimmer" data-group="${groupName}" class="form-range" min="0" max="255" steps="1" id="group_dimmer_${groupName}" value="${avgHighValue}">`
-                    dimmer += `</div>`
-
-                    let dimmerCell = this.createTableCell(dimmer, "dimmerRow", null, true, `text-align: center; vertical-align: middle;`, 4);
-                    groupDimmer.appendChild(dimmerCell);
-                    tbody.appendChild(groupDimmer);
-                }
             }
-
 
             let row = document.createElement('tr');
             row.dataset.id = data.id;
@@ -2841,51 +2476,69 @@ class SettingsApp extends Globals {
         }
 
         $('input[name="dimmerRangeNum"]').on('change', function (ele) {
-            if (this.dataset.type == "int") {
-                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(this.dataset.fixtureid, this.dataset.channel, maestro.SettingsApp.safeMinMax(this.value, 0, 255)), 100);
-            }
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
-                }
-                if (this.dataset.val == "High") {
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
-                    } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-                    }
+            const fixtureId = this.dataset.fixtureid;
+            const uuid = this.dataset.uuid;
+            const type = this.dataset.type;
+            const val = this.value;
+            const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
+            const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
 
-                }
-                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(this.dataset.fixtureid, this.dataset.channel, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value, document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value), 100);
+            if (type === "int") {
+                const newValue = maestro.SettingsApp.safeMinMax(val, 0, 255);
+                document.getElementById(`${fixtureId}_${uuid}_dimmer`).value = newValue;
+                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, newValue), 100);
             }
 
-        })
+            if (type === "dec") {
+                if (this.dataset.val === "Low") {
+                    if (Number(val) > Number(highValue)) {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value = highValue;
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValLow`).value = highValue;
+                    } else {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
+                    }
+                }
+
+                if (this.dataset.val === "High") {
+                    if (Number(val) < Number(lowValue)) {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value = lowValue;
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValHigh`).value = lowValue;
+                    } else {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
+                    }
+                }
+
+                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, highValue, lowValue), 100);
+            }
+        });
         $('input[name="dimmerRange"]').on('input', function (ele) {
-            if (this.dataset.type == "int") {
-                document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerVal`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+            const fixtureId = this.dataset.fixtureid;
+            const uuid = this.dataset.uuid;
+            const type = this.dataset.type;
+            const val = this.value;
+            const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
+            const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
+
+            if (type === "int") {
+                document.getElementById(`${fixtureId}_${uuid}_dimmerVal`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
             }
-            if (this.dataset.type == "dec") {
-                if (this.dataset.val == "Low") {
-                    if (Number(this.value) > Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value, 0, 255);
+
+            if (type === "dec") {
+                if (this.dataset.val === "Low") {
+                    if (Number(val) > Number(highValue)) {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value = highValue;
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(highValue, 0, 255);
                     } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValLow`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
                     }
                 }
-                if (this.dataset.val == "High") {
-                    if (Number(this.value) < Number(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value)) {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_high`).value = document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value;
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmer_low`).value, 0, 255);
+
+                if (this.dataset.val === "High") {
+                    if (Number(val) < Number(lowValue)) {
+                        document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value = lowValue;
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(lowValue, 0, 255);
                     } else {
-                        document.getElementById(`${this.dataset.fixtureid}_${this.dataset.uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
+                        document.getElementById(`${fixtureId}_${uuid}_dimmerValHigh`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
                     }
                 }
             }

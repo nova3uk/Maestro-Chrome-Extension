@@ -130,17 +130,15 @@ class App extends Globals {
         }
     };
     setStrobe = async (onOrOff, latched = false) => {
-        if (this.strobeActive == false && onOrOff == false) return;
-        if (this.latchedOn == true && onOrOff == false) return;
+        if (!this.strobeActive && !onOrOff) return;
+        if (this.latchedOn && !onOrOff) return;
 
-        //no fixtures to strobe
-        if (this.strobeParams.length == 0)
-            return;
+        // no fixtures to strobe
+        if (this.strobeParams.length === 0) return;
 
         this.strobeActive = onOrOff;
         this.latchedOn = latched;
 
-        //await this.getStrobeParams();
         const allFixtures = [
             { fixtures: this.shutterFixtures, attributeType: "SHUTTER" },
             { fixtures: this.strobeFixtures, attributeType: "STROBE" }
@@ -367,51 +365,52 @@ class App extends Globals {
         }
     };
     switchAutoPrograms = () => {
-        let autoFogEnabled = this.autoParams.autoFogEnabled;
-        let autoFogOnActivityPeak = this.autoParams.autoFogOnActivityPeak;
-        let autoFogOnTimer = this.autoParams.autoFogOnTimer;
-        let autoEffectsEnabled = this.autoParams.autoEffectsEnabled;
-        let autoStrobeEnabled = this.autoParams.autoStrobeEnabled;
+        const {
+            autoFogEnabled,
+            autoFogOnActivityPeak,
+            autoFogOnTimer,
+            autoEffectsEnabled,
+            autoStrobeEnabled
+        } = this.autoParams;
 
         if (autoEffectsEnabled) {
-            var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoEffectsOnPeak);
-            if (index == -1)
+            if (!maestro.Globals.arrActivityLevelCallbacks.includes(this.autoEffectsOnPeak)) {
                 maestro.Globals.arrActivityLevelCallbacks.push(this.autoEffectsOnPeak);
+            }
         } else {
-            //remove the callback as its switched off.
-            var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoEffectsOnPeak);
-            if (index !== -1)
-                maestro.Globals.arrActivityLevelCallbacks.splice(this.autoEffectsOnPeak);
+            const index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoEffectsOnPeak);
+            if (index !== -1) {
+                maestro.Globals.arrActivityLevelCallbacks.splice(index, 1);
+            }
         }
 
         if (autoStrobeEnabled) {
-            var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoStrobeOnPeak);
-            if (index == -1)
+            if (!maestro.Globals.arrActivityLevelCallbacks.includes(this.autoStrobeOnPeak)) {
                 maestro.Globals.arrActivityLevelCallbacks.push(this.autoStrobeOnPeak);
+            }
         } else {
-            //remove the callback as its switched off.
-            var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoStrobeOnPeak);
-            if (index !== -1)
-                maestro.Globals.arrActivityLevelCallbacks.splice(this.autoStrobeOnPeak);
+            const index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoStrobeOnPeak);
+            if (index !== -1) {
+                maestro.Globals.arrActivityLevelCallbacks.splice(index, 1);
+            }
         }
 
         if (autoFogEnabled) {
             if (autoFogOnActivityPeak) {
-                var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoFogOnPeak);
-                if (index == -1)
+                if (!maestro.Globals.arrActivityLevelCallbacks.includes(this.autoFogOnPeak)) {
                     maestro.Globals.arrActivityLevelCallbacks.push(this.autoFogOnPeak);
+                }
             } else {
-                //remove the callback as its switched off.
-                var index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoFogOnPeak);
-                if (index !== -1)
-                    maestro.Globals.arrActivityLevelCallbacks.splice(this.autoFogOnPeak);
+                const index = maestro.Globals.arrActivityLevelCallbacks.indexOf(this.autoFogOnPeak);
+                if (index !== -1) {
+                    maestro.Globals.arrActivityLevelCallbacks.splice(index, 1);
+                }
             }
-
 
             if (autoFogOnTimer) {
                 this.autoFogOnTimer();
-            };
-        };
+            }
+        }
     };
     autoStrobeOnPeak = async (level) => {
         if (!this.autoParams.autoStrobeEnabled) {

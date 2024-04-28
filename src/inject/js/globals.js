@@ -104,7 +104,28 @@ class Globals {
         name: "",
         fixtures: []
     };
-
+    rgbTypes = {
+        'RED': 'red',
+        'GREEN': 'green',
+        'BLUE': 'blue',
+        'AMBER': 'orange',
+        'WARM_WHITE': 'yellow',
+        'COOL_WHITE': 'white',
+        'UV': 'purple',
+        'CYAN': 'cyan',
+        'MAGENTA': 'magenta',
+        'YELLOW': 'yellow',
+        'RED_FINE': 'red',
+        'GREEN_FINE': 'green',
+        'BLUE_FINE': 'blue',
+        'AMBER_FINE': 'orange',
+        'WARM_WHITE_FINE': 'yellow',
+        'COOL_WHITE_FINE': 'white',
+        'UV_FINE': 'purple',
+        'CYAN_FINE': 'cyan',
+        'MAGENTA_FINE': 'magenta',
+        'YELLOW_FINE': 'yellow'
+    };
 
     // Variable to be monitored
     activityLevelRoot = 0;
@@ -267,11 +288,6 @@ class Globals {
         return diff;
     };
     upprageShutterParams = async (fixtureId, shutterParams) => {
-        //new
-        //"strobe_373bdc30-c32e-409d-91e7-70cdde906b95" :[{"channelId" : "6", "shutter" : 200, "strobe" : 255}, {"channelId" : "13", "shutter" : 100, "strobe" : 255}]
-        //old
-        //strobe_1fa611c0-6f81-43cf-9153-5d01b9c2d2ee": {"shutter": 255,"strobe": 200}
-
         try {
             if (shutterParams) {
                 if (shutterParams.shutter || shutterParams.strobe) {
