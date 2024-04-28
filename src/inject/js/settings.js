@@ -1873,7 +1873,7 @@ class SettingsApp extends Globals {
                                     for (let setting of attr.goboSetting.steps) {
                                         response += `<span class="me-2 mb-2 p-2" style="display:inline-block;">`
                                         response += `<span class="form-check form-switch">`
-                                        response += `    <input name="goboSwitch" class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="gobo_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <input name="goboSwitch" ${row.active == false ? "disabled " : ""}class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="gobo_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
                                         response += `    <label class="form-check-label" for="gobo_${row.id}_${i}_${x}">${setting.name}</label>`
                                         response += `</span>`
                                         response += `</span>`
@@ -1893,7 +1893,7 @@ class SettingsApp extends Globals {
                                     for (let setting of attr.prismSetting.steps) {
                                         response += `<span class="me-2 mb-2 p-2" style="display:inline-block;zwidth:120px;zheight:50px;">`
                                         response += `<span class="form-check form-switch">`
-                                        response += `    <input name="prismSwitch" class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="prism_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <input name="prismSwitch"  ${row.active == false ? "disabled " : ""}class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="prism_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
                                         response += `    <label class="form-check-label" for="prism_${row.id}_${i}_${x}">${setting.name}</label>`
                                         response += `</span>`
                                         response += `</span>`
