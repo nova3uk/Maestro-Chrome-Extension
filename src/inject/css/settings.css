@@ -1,13 +1,26 @@
+html {
+    overflow-x: hidden;
+    margin-right: calc(-1 * (100vw - 100%));
+  }
 .macro-active td{
     background-color: lightgreen;
 }
-.nav-tabs .nav-item .nav-link {
+.nav-tabs .nav-item .upper-panel {
     /* background-color: #0080FF; */
     background-color: rgb(75, 175, 237);
     color: #FFF;
 }
-  
-.nav-tabs .nav-item .nav-link.active {
+.nav-tabs .nav-item .lower-panel {
+    /* background-color: #0080FF; */
+    background-color: rgb(32, 25, 133);
+    color: #FFF;
+}
+.nav-tabs .nav-item .lower-panel.active {
+    /* background-color: #0080FF; */
+    background-color: rgb(73, 65, 183);
+    color: #FFF;
+}
+.nav-tabs .nav-item .upper-panel.active {
     color: #fff;
     background-color: #0091ff;
 }
