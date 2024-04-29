@@ -1325,44 +1325,31 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
         });
     };
-    panFanning = async (groupId, fanRate) => {
+    panFanning = async (groupId, midPoint, fanRate) => {
         let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
         let orderedFixtures = group[0].fixtureId;
         let fixtures = this.activeStage.fixture.filter(fixture => orderedFixtures.includes(fixture.id));
         let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
 
-        let i = 1;
         let numFixtures = panFixtures.length;
+        let halfNumFixtures = Math.floor(numFixtures / 2);
         let values = [];
-        for (let fixture of panFixtures) {
-            let panSetting = fixture.attribute.find(attr => attr.type === 'PAN').range;
-            values.push(Math.floor(panSetting.highValue * 255));
+
+        for (let i = 0; i < numFixtures; i++) {
+            let offset;
+            if (i < halfNumFixtures) {
+                // Left side
+                offset = (halfNumFixtures - i) * fanRate;
+            } else {
+                // Right side
+                offset = (i - halfNumFixtures + 1) * fanRate;
+            }
+
+            let value = Math.floor((midPoint + offset));
+            values.push(value);
         }
 
-        let leftSide = values.slice(0, values.length / 2);
-        let rightSide = values.slice(values.length / 2);
-
-        let leftIncrement = fanRate / (leftSide.length - 1);
-        let rightIncrement = fanRate / (rightSide.length - 1);
-
-        for (let i = 0; i < leftSide.length; i++) {
-            leftSide[i] += leftIncrement * 2;
-        }
-
-        for (let i = 0; i < rightSide.length; i++) {
-            rightSide[i] -= rightIncrement * 2;
-        }
-
-        let order = [];
-        for (let i = 0; i < leftSide.length; i++) {
-            order.push({ pos: leftSide[i] });
-        }
-
-        for (let i = 0; i < rightSide.length; i++) {
-            order.push({ pos: rightSide[i] });
-        }
-        console.log(order)
-        this.setPanFan(groupId, order);
+        this.setPanFan(groupId, values);
     };
     setPanFan = async (groupId, order) => {
         let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
