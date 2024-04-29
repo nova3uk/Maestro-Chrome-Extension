@@ -1357,7 +1357,7 @@ class SettingsApp extends Globals {
         } else {
             this.setPanTilt(ids);
         }
-    }, 100);
+    }, 50);
     resetPanTiltAll = async (ids) => {
         this.deleteLocalSetting("panTiltAll");
         for (let id of ids) {

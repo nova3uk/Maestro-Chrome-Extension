@@ -10,7 +10,7 @@ body{
 }
 .nav-tabs .nav-link{
     border: 0px;
-    margin-right: 2px;
+    margin-right: 1px;
 }
 .table>thead>tr>th{
     background-color: rgb(222, 222, 222);
