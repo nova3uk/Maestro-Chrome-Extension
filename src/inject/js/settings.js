@@ -1332,16 +1332,21 @@ class SettingsApp extends Globals {
         let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
 
         let numFixtures = panFixtures.length;
-        let halfNumFixtures = Math.floor(numFixtures / 2);
         let values = [];
 
 
+        const halfNumFixtures = Math.floor(numFixtures / 2);
         for (let i = 0; i < numFixtures; i++) {
             let offset;
             if (i < halfNumFixtures) {
-                // Left side
-                offset = (halfNumFixtures - i) * fanRate;
+            // Left side
+            offset = (halfNumFixtures - i) * fanRate;
+            let value = Math.floor(midPoint - offset);
+            values.push(value);
             } else {
+            // Right side
+            offset = (i - halfNumFixtures + 1) * fanRate;
+            let value = Math.floor(midPoint + offset);
                 // Right side
                 offset = (i - halfNumFixtures + 1) * fanRate;
             }
@@ -1349,6 +1354,7 @@ class SettingsApp extends Globals {
             let value = Math.floor((midPoint + offset));
             value = Math.max(0, Math.min(value, 255)); // Ensure value is between 0 and 255
             values.push(value);
+            }
         }
 
         this.setPanFan(groupId, values);
@@ -1362,6 +1368,8 @@ class SettingsApp extends Globals {
         let i = 0;
         for (let fixture of panFixtures) {
             const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
+            const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
+            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
             const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
 
             document.getElementById(`fixtureNameVals_${fixture.id}`).innerText = order[i];
