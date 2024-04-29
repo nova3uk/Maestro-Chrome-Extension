@@ -1339,14 +1339,14 @@ class SettingsApp extends Globals {
         for (let i = 0; i < numFixtures; i++) {
             let offset;
             if (i < halfNumFixtures) {
-            // Left side
-            offset = (halfNumFixtures - i) * fanRate;
-            let value = Math.floor(midPoint - offset);
-            values.push(value);
+                // Left side
+                offset = (halfNumFixtures - i) * fanRate;
+                let value = Math.floor(midPoint - offset);
+                values.push(value);
             } else {
-            // Right side
-            offset = (i - halfNumFixtures + 1) * fanRate;
-            let value = Math.floor(midPoint + offset);
+                // Right side
+                offset = (i - halfNumFixtures + 1) * fanRate;
+                let value = Math.floor(midPoint + offset);
                 // Right side
                 offset = (i - halfNumFixtures + 1) * fanRate;
             }
@@ -1354,7 +1354,7 @@ class SettingsApp extends Globals {
             let value = Math.floor((midPoint + offset));
             value = Math.max(0, Math.min(value, 255)); // Ensure value is between 0 and 255
             values.push(value);
-            }
+
         }
 
         this.setPanFan(groupId, values);
