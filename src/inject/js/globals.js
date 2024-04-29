@@ -208,6 +208,20 @@ class Globals {
     getAttributeTypes = () => this.attributeTypes;
     getHttpMethods = () => this.httpMethods;
 
+    safeZero = (obj) => {
+        try {
+            obj = Number(obj);
+        } catch (e) {
+            if (this.logging)
+                console.error(e);
+        }
+
+        if (typeof obj === 'number' && !isNaN(obj)) {
+            return obj;
+        } else {
+            return 0;
+        }
+    };
     safeMinMax = (obj, minNumber, maxNumber) => {
         try {
             obj = Number(obj);
@@ -236,6 +250,16 @@ class Globals {
             }, wait);
         };
     };
+    throttle = (func, delay) => {
+        let lastCall = 0;
+        return function (...args) {
+            const now = new Date().getTime();
+            if (now - lastCall >= delay) {
+                func(...args);
+                lastCall = now;
+            }
+        };
+    }
     leftMouseClick = (evt) => {
         if ("button" in evt) {
             return evt.button == 0;
@@ -269,7 +293,10 @@ class Globals {
     formatDate = (d, withSeconds = false) => {
         return d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + (withSeconds ? ":" + (d.getSeconds().toString().length == 2 ? d.getSeconds().toString() : "0" + d.getSeconds().toString()) : "");
     }
-    getScaledValue = (value, sourceRangeMin, sourceRangeMax, targetRangeMin, targetRangeMax) => {
+    getScaledValue = (value, inMin, inMax, outMin, outMax) => {
+        return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+    }
+    getScaledValue2 = (value, sourceRangeMin, sourceRangeMax, targetRangeMin, targetRangeMax) => {
         var targetRange = targetRangeMax - targetRangeMin;
         var sourceRange = sourceRangeMax - sourceRangeMin;
         return (value - sourceRangeMin) * targetRange / sourceRange + targetRangeMin;

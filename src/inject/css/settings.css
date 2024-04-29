@@ -194,3 +194,26 @@ input[type="range"] {
    outline: 3px solid #053a5f;
    outline-offset: 0.125rem; 
  }
+ #box {
+    width: 450px;
+    height: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    background: white;
+    border: 1px solid black;
+    position: relative;
+    background-image: linear-gradient(0deg, transparent 24px, #000 25px, #000 26px, transparent 27px), linear-gradient(90deg, transparent 24px, #000 25px, #000 26px, transparent 27px);
+    background-size: 25px 25px;
+}
+
+#dot {
+    width: 20px;
+    height: 20px;
+    background: #308fe8;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: move;
+}

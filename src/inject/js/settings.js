@@ -63,6 +63,65 @@ class SettingsApp extends Globals {
             });
         }, 1000);
     };
+    coordFinderSetPosition = async (x, y) => {
+        if (!document.getElementById('dot')) return;
+        const box = document.getElementById('box');
+
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+        const xPixel = (x / 255) * boxWidth;
+        const yPixel = (y / 255) * boxHeight;
+        document.getElementById('dot').style.left = xPixel + 'px';
+        document.getElementById('dot').style.top = yPixel + 'px';
+    };
+    loadCoordFinder = async (callback = null) => {
+        const box = document.getElementById('box');
+        const dot = document.getElementById('dot');
+        const coordinates = document.getElementById('coordinates');
+
+        dot.addEventListener('mousedown', function (event) {
+            event.preventDefault();
+
+            let shiftX = event.clientX - dot.getBoundingClientRect().left;
+            let shiftY = event.clientY - dot.getBoundingClientRect().top;
+
+            function onMouseMove(event) {
+                let newLeft = event.clientX - shiftX - box.getBoundingClientRect().left;
+                let newTop = event.clientY - shiftY - box.getBoundingClientRect().top;
+
+                if (newLeft < 0) newLeft = 0;
+                let rightEdge = box.offsetWidth;
+                if (newLeft > rightEdge) newLeft = rightEdge;
+
+                if (newTop < 0) newTop = 0;
+                let bottomEdge = box.offsetHeight;
+                if (newTop > bottomEdge) newTop = bottomEdge;
+
+                dot.style.left = newLeft + 'px';
+                dot.style.top = newTop + 'px';
+
+                let scaledX = Math.round(maestro.SettingsApp.getScaledValue(newLeft, 0, box.offsetWidth, 0, 255));
+                let scaledY = Math.round(maestro.SettingsApp.getScaledValue(newTop, 0, box.offsetHeight, 0, 255));
+
+                if (typeof callback == "function") {
+                    callback(scaledX, scaledY);
+                }
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        dot.ondragstart = function () {
+            return false;
+        };
+    };
     setDimmerValue = async (value) => {
         let brightness = maestro.SettingsApp.getScaledValue(value, 0, 255, 50, 100) + '%'
         if (value == 0) {
@@ -1193,8 +1252,18 @@ class SettingsApp extends Globals {
         let fixtureNames = "";
         let fixtureIds = [];
 
+        let boxResponse = (x, y) => {
+            document.getElementById('panRange').value = x;
+            document.getElementById('tiltRange').value = y;
+            document.getElementById('panRangeVal').value = x;
+            document.getElementById('tiltRangeVal').value = y;
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+        }
+
+        maestro.SettingsApp.loadCoordFinder(boxResponse);
+
         if (id == "panOrTiltAll") {
-            this.preloadPanTilValues(id);
+            maestro.SettingsApp.preloadPanTilValues(id);
             let fixtures = maestro.SettingsApp.getAllMovers();
 
             for (let f of fixtures) {
@@ -1209,7 +1278,7 @@ class SettingsApp extends Globals {
             document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
             document.getElementById('fixtureName').innerHTML = fixtureNames;
         } else {
-            this.preloadPanTilValues(id);
+            maestro.SettingsApp.preloadPanTilValues(id);
 
             fixtureIds.push(id);
             let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
@@ -1220,27 +1289,36 @@ class SettingsApp extends Globals {
 
         $('#panTiltFinder').modal('show');
 
+        setTimeout(() => {
+            maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
+        }, 200);
+
         document.getElementById('panRange').addEventListener('input', function () {
             document.getElementById('panRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
-            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id)
+            maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
         });
         document.getElementById('tiltRange').addEventListener('input', function () {
             document.getElementById('tiltRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);;
-            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id)
+            maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
         });
         document.getElementById('tiltRangeVal').addEventListener('change', function () {
             document.getElementById('tiltRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
         });
         document.getElementById('panRangeVal').addEventListener('change', function (ele) {
             document.getElementById('panRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
         });
         document.getElementById('panTiltReset').addEventListener('click', function () {
             document.getElementById('panRange').value = 0;
             document.getElementById('tiltRange').value = 0;
             document.getElementById('panRangeVal').value = "";
             document.getElementById('tiltRangeVal').value = "";
+            maestro.SettingsApp.coordFinderSetPosition(0, 0);
             maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
         });
     };
@@ -1272,14 +1350,14 @@ class SettingsApp extends Globals {
             return this.resetPanTilt(ids);
         }
     }
-    panTiltHandler = async (id) => {
+    panTiltHandler = this.debounce((id) => {
         let ids = JSON.parse(id);
         if (Array.isArray(ids)) {
-            return this.panTiltAll(ids);
+            this.panTiltAll(ids);
         } else {
-            return this.setPanTilt(ids);
+            this.setPanTilt(ids);
         }
-    };
+    }, 100);
     resetPanTiltAll = async (ids) => {
         this.deleteLocalSetting("panTiltAll");
         for (let id of ids) {
@@ -2256,7 +2334,7 @@ class SettingsApp extends Globals {
             if (type === "int") {
                 const value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
                 document.getElementById(`${fixtureid}_${uuid}_focus`).value = value;
-                maestro.Globals.debounce(maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, value), 100);
+                maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, value);
             }
 
             if (type === "dec") {
@@ -2283,7 +2361,7 @@ class SettingsApp extends Globals {
                     }
                 }
 
-                maestro.Globals.debounce(maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, highValue.value, lowValue.value), 100);
+                maestro.SettingsApp.setFocus(fixtureid, this.dataset.channel, highValue.value, lowValue.value);
             }
         });
         $('input[name="focusRange"]').on('input', function (ele) {
@@ -2504,16 +2582,17 @@ class SettingsApp extends Globals {
             const uuid = this.dataset.uuid;
             const type = this.dataset.type;
             const val = this.value;
-            const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
-            const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
 
             if (type === "int") {
                 const newValue = maestro.SettingsApp.safeMinMax(val, 0, 255);
                 document.getElementById(`${fixtureId}_${uuid}_dimmer`).value = newValue;
-                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, newValue), 100);
+                maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, newValue);
             }
 
             if (type === "dec") {
+                const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
+                const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
+
                 if (this.dataset.val === "Low") {
                     if (Number(val) > Number(highValue)) {
                         document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value = highValue;
@@ -2532,7 +2611,7 @@ class SettingsApp extends Globals {
                     }
                 }
 
-                maestro.Globals.debounce(maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, highValue, lowValue), 100);
+                maestro.SettingsApp.setDimmer(fixtureId, this.dataset.channel, highValue, lowValue);
             }
         });
         $('input[name="dimmerRange"]').on('input', function (ele) {
@@ -2716,8 +2795,7 @@ class SettingsApp extends Globals {
                 index++;
             }
         }
-
-    }
+    };
     setFocus = async (fixtureId, channel, valueHigh, valueLow = null) => {
         let stage = await this.getActiveStage();
         let fixtures = stage.fixture.filter(fixture => fixture.id == fixtureId);
