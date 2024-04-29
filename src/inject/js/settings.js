@@ -1313,6 +1313,9 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
         });
+        document.getElementById('panFanRange').addEventListener('input', function () {
+            document.getElementById('panFanRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, -127, 127);
+        });
         document.getElementById('panTiltReset').addEventListener('click', function () {
             document.getElementById('panRange').value = 0;
             document.getElementById('tiltRange').value = 0;
@@ -1321,6 +1324,61 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.coordFinderSetPosition(0, 0);
             maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
         });
+    };
+    panFanning = async (groupId, fanRate) => {
+        let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
+        let orderedFixtures = group[0].fixtureId;
+        let fixtures = this.activeStage.fixture.filter(fixture => orderedFixtures.includes(fixture.id));
+        let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
+
+        let i = 1;
+        let numFixtures = panFixtures.length;
+        let values = [];
+        for (let fixture of panFixtures) {
+            let panSetting = fixture.attribute.find(attr => attr.type === 'PAN').range;
+            values.push(Math.floor(panSetting.highValue * 255));
+        }
+
+        let leftSide = values.slice(0, values.length / 2);
+        let rightSide = values.slice(values.length / 2);
+
+        let leftIncrement = fanRate / (leftSide.length - 1);
+        let rightIncrement = fanRate / (rightSide.length - 1);
+
+        for (let i = 0; i < leftSide.length; i++) {
+            leftSide[i] += leftIncrement * 2;
+        }
+
+        for (let i = 0; i < rightSide.length; i++) {
+            rightSide[i] -= rightIncrement * 2;
+        }
+
+        let order = [];
+        for (let i = 0; i < leftSide.length; i++) {
+            order.push({ pos: leftSide[i] });
+        }
+
+        for (let i = 0; i < rightSide.length; i++) {
+            order.push({ pos: rightSide[i] });
+        }
+        console.log(order)
+        this.setPanFan(groupId, order);
+    };
+    setPanFan = async (groupId, order) => {
+        let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
+        let orderedFixtures = group[0].fixtureId;
+        let fixtures = this.activeStage.fixture.filter(fixture => orderedFixtures.includes(fixture.id));
+        let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
+
+        let i = 0;
+        for (let fixture of panFixtures) {
+            const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
+            const panRange = this.calculateRange({ lowValue: 0, highValue: order[i].pos });
+            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
+            i++;
+        }
+
+
     };
     preloadPanTilValues = async (id) => {
         let currentSetting;
@@ -2619,14 +2677,15 @@ class SettingsApp extends Globals {
             const uuid = this.dataset.uuid;
             const type = this.dataset.type;
             const val = this.value;
-            const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
-            const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
 
             if (type === "int") {
                 document.getElementById(`${fixtureId}_${uuid}_dimmerVal`).value = maestro.SettingsApp.safeMinMax(val, 0, 255);
             }
 
             if (type === "dec") {
+                const lowValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value;
+                const highValue = document.getElementById(`${fixtureId}_${uuid}_dimmer_high`).value;
+
                 if (this.dataset.val === "Low") {
                     if (Number(val) > Number(highValue)) {
                         document.getElementById(`${fixtureId}_${uuid}_dimmer_low`).value = highValue;
@@ -2652,7 +2711,6 @@ class SettingsApp extends Globals {
 
             let type = this.dataset.type;
             let fixtureId = this.dataset.fixtureid;
-            let val = this.dataset.val;
             let uuid = this.dataset.uuid;
 
             if (type == "int") {
@@ -2661,6 +2719,7 @@ class SettingsApp extends Globals {
                 input.dispatchEvent(event);
             }
             if (type == "dec") {
+                let val = this.dataset.val;
                 let input = document.getElementById(`${fixtureId}_${uuid}_dimmerVal${val}`);
                 let event = new Event('change');
                 input.dispatchEvent(event);
