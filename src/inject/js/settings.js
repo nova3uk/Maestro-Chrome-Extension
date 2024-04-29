@@ -1347,34 +1347,36 @@ class SettingsApp extends Globals {
     setPanFanLimits = () => {
         document.getElementById('panFanRange').value = 0;
         document.getElementById('panFanRangeVal').value = 0;
-
+    
         let panTiltFixtureNameFields = document.querySelectorAll('span[name="fixtureNameValsSpan"]');
         panTiltFixtureNameFields.forEach(field => {
             field.textContent = '';
         });
-
+    
         let numFixtures = document.querySelectorAll('[name="panTiltFixtureNameField"]').length;
         let pan = Number(document.getElementById('panRangeVal').value);
-
+    
         let halfNumFixtures = Math.floor(numFixtures / 2);
-        let distanceToLeftEdge = pan / halfNumFixtures;
-        let distanceToRightEdge = (255 - pan) / halfNumFixtures;
-
+        let distanceToLeftEdge = Math.floor(pan / halfNumFixtures);
+        let distanceToRightEdge = Math.floor((255 - pan) / halfNumFixtures);
+    
         let maxRange = Math.min(distanceToLeftEdge, distanceToRightEdge);
         let minRange = -maxRange;
-
+    
         document.getElementById('panFanRange').min = minRange;
         document.getElementById('panFanRange').max = maxRange;
+        document.getElementById('panFanRangeVal').min = minRange;
+        document.getElementById('panFanRangeVal').max = maxRange;
     };
     panFanning = async (midPoint, fanRate) => {
         midPoint = Number(midPoint);
         fanRate = Number(fanRate);
-
+    
         let panFixtures = maestro.SettingsApp.getAllMovers();
-
+    
         let numFixtures = panFixtures.length;
         let values = [];
-
+    
         const halfNumFixtures = Math.floor(numFixtures / 2);
         for (let i = 0; i < numFixtures; i++) {
             let offset;
@@ -1384,15 +1386,15 @@ class SettingsApp extends Globals {
                 let value = Math.floor(midPoint - offset);
                 value = Math.max(0, Math.min(value, 255));
                 values.push(value);
-            } else if (i > halfNumFixtures) {
+            } else if (numFixtures % 2 !== 0 && i === halfNumFixtures) {
+                // Middle fixture when numFixtures is odd
+                values.push(midPoint);
+            } else {
                 // Right side
-                offset = (i - halfNumFixtures) * fanRate;
+                offset = (numFixtures % 2 === 0 ? i - halfNumFixtures + 1 : i - halfNumFixtures) * fanRate;
                 let value = Math.floor(midPoint + offset);
                 value = Math.max(0, Math.min(value, 255));
                 values.push(value);
-            } else {
-                // Middle fixture when numFixtures is odd
-                values.push(midPoint);
             }
         }
         this.setPanFan(panFixtures, values);
