@@ -1270,13 +1270,14 @@ class SettingsApp extends Globals {
                 if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
                     fixtureNames += `<div class="text-danger">(ignored)${f.name}</div><br>`;
                 } else {
-                    fixtureNames += `<div class="border-bottom">${f.name}<span class="ms-2 float-end" id="fixtureNameVals_${f.id}"></span></div>`;
+                    fixtureNames += `<div class="border-bottom" name="panTiltFixtureNameField">${f.name}<span class="ms-2 float-end" name="fixtureNameValsSpan" id="fixtureNameVals_${f.id}"></span></div>`;
                     fixtureIds.push(f.id);
                 }
             }
 
             document.getElementById('panTiltFinder').dataset.id = JSON.stringify(fixtureIds);
             document.getElementById('fixtureName').innerHTML = fixtureNames;
+            document.getElementById('panFanRow').style.display = "";
         } else {
             maestro.SettingsApp.preloadPanTilValues(id);
 
@@ -1285,6 +1286,7 @@ class SettingsApp extends Globals {
 
             document.getElementById('panTiltFinder').dataset.id = JSON.stringify(id);
             document.getElementById('fixtureName').innerText = fixture.name;
+            document.getElementById('panFanRow').style.display = "none";
         }
 
         $('#panTiltFinder').modal('show');
@@ -1297,6 +1299,8 @@ class SettingsApp extends Globals {
             document.getElementById('panRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id)
             maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
+
+            maestro.SettingsApp.setPanFanLimits();
         });
         document.getElementById('tiltRange').addEventListener('input', function () {
             document.getElementById('tiltRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);;
@@ -1312,9 +1316,17 @@ class SettingsApp extends Globals {
             document.getElementById('panRange').value = maestro.SettingsApp.safeMinMax(this.value, 0, 255);
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
             maestro.SettingsApp.coordFinderSetPosition(maestro.SettingsApp.safeZero(document.getElementById('panRangeVal').value), maestro.SettingsApp.safeZero(document.getElementById('tiltRangeVal').value));
+
+            maestro.SettingsApp.setPanFanLimits();
+
         });
         document.getElementById('panFanRange').addEventListener('input', function () {
             document.getElementById('panFanRangeVal').value = maestro.SettingsApp.safeMinMax(this.value, -127, 127);
+            maestro.SettingsApp.panFanning(document.getElementById('panRangeVal').value, this.value);
+        });
+        document.getElementById('panFanRangeVal').addEventListener('input', function () {
+            document.getElementById('panFanRange').value = maestro.SettingsApp.safeMinMax(this.value, -127, 127);
+            maestro.SettingsApp.panFanning(document.getElementById('panRangeVal').value, this.value);
         });
         document.getElementById('panTiltReset').addEventListener('click', function () {
             document.getElementById('panRange').value = 0;
@@ -1323,17 +1335,45 @@ class SettingsApp extends Globals {
             document.getElementById('tiltRangeVal').value = "";
             maestro.SettingsApp.coordFinderSetPosition(0, 0);
             maestro.SettingsApp.resetPanTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+
+            let panTiltFixtureNameFields = document.querySelectorAll('span[name="fixtureNameValsSpan"]');
+            panTiltFixtureNameFields.forEach(field => {
+                field.textContent = '';
+            });
+            document.getElementById('panFanRange').value = 0;
+            document.getElementById('panFanRangeVal').value = 0;
         });
     };
-    panFanning = async (groupId, midPoint, fanRate) => {
-        let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
-        let orderedFixtures = group[0].fixtureId;
-        let fixtures = this.activeStage.fixture.filter(fixture => orderedFixtures.includes(fixture.id));
-        let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
+    setPanFanLimits = () => {
+        document.getElementById('panFanRange').value = 0;
+        document.getElementById('panFanRangeVal').value = 0;
+
+        let panTiltFixtureNameFields = document.querySelectorAll('span[name="fixtureNameValsSpan"]');
+        panTiltFixtureNameFields.forEach(field => {
+            field.textContent = '';
+        });
+
+        let numFixtures = document.querySelectorAll('[name="panTiltFixtureNameField"]').length;
+        let pan = Number(document.getElementById('panRangeVal').value);
+
+        let halfNumFixtures = Math.floor(numFixtures / 2);
+        let distanceToLeftEdge = pan / halfNumFixtures;
+        let distanceToRightEdge = (255 - pan) / halfNumFixtures;
+
+        let maxRange = Math.min(distanceToLeftEdge, distanceToRightEdge);
+        let minRange = -maxRange;
+
+        document.getElementById('panFanRange').min = minRange;
+        document.getElementById('panFanRange').max = maxRange;
+    };
+    panFanning = async (midPoint, fanRate) => {
+        midPoint = Number(midPoint);
+        fanRate = Number(fanRate);
+
+        let panFixtures = maestro.SettingsApp.getAllMovers();
 
         let numFixtures = panFixtures.length;
         let values = [];
-
 
         const halfNumFixtures = Math.floor(numFixtures / 2);
         for (let i = 0; i < numFixtures; i++) {
@@ -1342,43 +1382,31 @@ class SettingsApp extends Globals {
                 // Left side
                 offset = (halfNumFixtures - i) * fanRate;
                 let value = Math.floor(midPoint - offset);
+                value = Math.max(0, Math.min(value, 255));
+                values.push(value);
+            } else if (i > halfNumFixtures) {
+                // Right side
+                offset = (i - halfNumFixtures) * fanRate;
+                let value = Math.floor(midPoint + offset);
+                value = Math.max(0, Math.min(value, 255));
                 values.push(value);
             } else {
-                // Right side
-                offset = (i - halfNumFixtures + 1) * fanRate;
-                let value = Math.floor(midPoint + offset);
-                // Right side
-                offset = (i - halfNumFixtures + 1) * fanRate;
+                // Middle fixture when numFixtures is odd
+                values.push(midPoint);
             }
-
-            let value = Math.floor((midPoint + offset));
-            value = Math.max(0, Math.min(value, 255)); // Ensure value is between 0 and 255
-            values.push(value);
-
         }
-
-        this.setPanFan(groupId, values);
+        this.setPanFan(panFixtures, values);
     };
-    setPanFan = async (groupId, order) => {
-        let group = this.activeStage.fixtureGroup.filter(fixtureGroup => fixtureGroup.id === groupId);
-        let orderedFixtures = group[0].fixtureId;
-        let fixtures = this.activeStage.fixture.filter(fixture => orderedFixtures.includes(fixture.id));
-        let panFixtures = fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN'));
-
+    setPanFan = async (panFixtures, order) => {
         let i = 0;
         for (let fixture of panFixtures) {
             const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
             const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
-            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
-            const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
 
             document.getElementById(`fixtureNameVals_${fixture.id}`).innerText = order[i];
-
             //await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
             i++;
         }
-
-
     };
     preloadPanTilValues = async (id) => {
         let currentSetting;
@@ -1390,6 +1418,7 @@ class SettingsApp extends Globals {
                 document.getElementById('panRangeVal').value = currentSetting.pan;
                 document.getElementById('tiltRangeVal').value = currentSetting.tilt;
             }
+            maestro.SettingsApp.setPanFanLimits();
         } else {
             currentSetting = await maestro.SettingsApp.getLocalSetting("panTilt_" + id);
             if (currentSetting) {
@@ -1461,7 +1490,7 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
     getAllMovers = () => {
-        return maestro.SettingsApp.fixtures.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
+        return maestro.SettingsApp.activeStage.fixture.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
     }
     macroTable = async (macros) => {
         let cues = await this.getCues();
