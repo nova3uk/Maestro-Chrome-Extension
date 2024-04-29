@@ -1347,22 +1347,22 @@ class SettingsApp extends Globals {
     setPanFanLimits = () => {
         document.getElementById('panFanRange').value = 0;
         document.getElementById('panFanRangeVal').value = 0;
-    
+
         let panTiltFixtureNameFields = document.querySelectorAll('span[name="fixtureNameValsSpan"]');
         panTiltFixtureNameFields.forEach(field => {
             field.textContent = '';
         });
-    
+
         let numFixtures = document.querySelectorAll('[name="panTiltFixtureNameField"]').length;
         let pan = Number(document.getElementById('panRangeVal').value);
-    
+
         let halfNumFixtures = Math.floor(numFixtures / 2);
         let distanceToLeftEdge = Math.floor(pan / halfNumFixtures);
         let distanceToRightEdge = Math.floor((255 - pan) / halfNumFixtures);
-    
+
         let maxRange = Math.min(distanceToLeftEdge, distanceToRightEdge);
         let minRange = -maxRange;
-    
+
         document.getElementById('panFanRange').min = minRange;
         document.getElementById('panFanRange').max = maxRange;
         document.getElementById('panFanRangeVal').min = minRange;
@@ -1371,12 +1371,12 @@ class SettingsApp extends Globals {
     panFanning = async (midPoint, fanRate) => {
         midPoint = Number(midPoint);
         fanRate = Number(fanRate);
-    
+
         let panFixtures = maestro.SettingsApp.getAllMovers();
-    
+
         let numFixtures = panFixtures.length;
         let values = [];
-    
+
         const halfNumFixtures = Math.floor(numFixtures / 2);
         for (let i = 0; i < numFixtures; i++) {
             let offset;
@@ -2210,6 +2210,30 @@ class SettingsApp extends Globals {
             await maestro.SettingsApp.switchPrisms(this.dataset.id);
 
         });
+        document.getElementById('toggleAllGobo').addEventListener('click', async function () {
+            let disableButtons = $('button[name="btn_disable_gobos"]:not(:disabled)');
+            let enableButtons = $('button[name="btn_enable_gobos"]:not(:disabled)');
+
+            for (let i = 0; i < disableButtons.length; i++) {
+                await disableButtons[i].click();
+            }
+
+            for (let i = 0; i < enableButtons.length; i++) {
+                await enableButtons[i].click();
+            }
+        })
+        document.getElementById('toggleAllPrism').addEventListener('click', async function () {
+            let disableButtons = $('button[name="btn_disable_prism"]:not(:disabled)');
+            let enableButtons = $('button[name="btn_enable_prism"]:not(:disabled)');
+
+            for (let i = 0; i < disableButtons.length; i++) {
+                await disableButtons[i].click();
+            }
+
+            for (let i = 0; i < enableButtons.length; i++) {
+                await enableButtons[i].click();
+            }
+        })
     };
     switchGobos = async (fixtureId, onOrOff = true, exceptOpen = true) => {
         this.showLoader();
