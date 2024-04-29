@@ -231,12 +231,7 @@ class Globals {
         }
 
         if (typeof obj === 'number' && !isNaN(obj)) {
-            if (obj < minNumber)
-                return minNumber;
-            if (obj > maxNumber)
-                return maxNumber;
-
-            return obj;
+            return Math.min(Math.max(obj, minNumber), maxNumber);
         } else {
             return minNumber;
         }

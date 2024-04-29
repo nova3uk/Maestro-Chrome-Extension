@@ -1268,9 +1268,9 @@ class SettingsApp extends Globals {
 
             for (let f of fixtures) {
                 if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
-                    fixtureNames += `<span class="text-danger">(ignored)${f.name}</span><br>`;
+                    fixtureNames += `<div class="text-danger">(ignored)${f.name}</div><br>`;
                 } else {
-                    fixtureNames += `<span>${f.name}</span><br>`;
+                    fixtureNames += `<div class="border-bottom">${f.name}<span class="ms-2 float-end" id="fixtureNameVals_${f.id}"></span></div>`;
                     fixtureIds.push(f.id);
                 }
             }
@@ -1335,6 +1335,7 @@ class SettingsApp extends Globals {
         let halfNumFixtures = Math.floor(numFixtures / 2);
         let values = [];
 
+
         for (let i = 0; i < numFixtures; i++) {
             let offset;
             if (i < halfNumFixtures) {
@@ -1346,6 +1347,7 @@ class SettingsApp extends Globals {
             }
 
             let value = Math.floor((midPoint + offset));
+            value = Math.max(0, Math.min(value, 255)); // Ensure value is between 0 and 255
             values.push(value);
         }
 
@@ -1360,8 +1362,11 @@ class SettingsApp extends Globals {
         let i = 0;
         for (let fixture of panFixtures) {
             const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
-            const panRange = this.calculateRange({ lowValue: 0, highValue: order[i].pos });
-            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
+            const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
+
+            document.getElementById(`fixtureNameVals_${fixture.id}`).innerText = order[i];
+
+            //await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
             i++;
         }
 
