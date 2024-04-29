@@ -1406,7 +1406,7 @@ class SettingsApp extends Globals {
             const panRange = this.calculateRange({ lowValue: order[i], highValue: order[i] });
 
             document.getElementById(`fixtureNameVals_${fixture.id}`).innerText = order[i];
-            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
+            this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } });
             i++;
         }
     };
