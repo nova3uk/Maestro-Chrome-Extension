@@ -1516,6 +1516,23 @@ class SettingsApp extends Globals {
             document.getElementById('panFanRange').value = 0;
             document.getElementById('panFanRangeVal').value = 0;
         });
+        document.getElementById('panTiltSetDefault').addEventListener('click', function () {
+            let fixtures = document.getElementById('panTiltFinder').dataset.id;
+            if (confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?')) {
+                if (Array.isArray(JSON.parse(fixtures))) {
+                    for (let fixture of JSON.parse(fixtures)) {
+                        maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
+                        maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                    }
+
+                } else {
+                    maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
+                    maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                }
+
+                document.location.reload();
+            }
+        });
     };
     setPanFanLimits = () => {
         document.getElementById('panFanRange').value = 0;
