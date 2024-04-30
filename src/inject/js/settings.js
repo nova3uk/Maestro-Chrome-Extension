@@ -323,6 +323,8 @@ class SettingsApp extends Globals {
             if (confirm('Are you sure you want to clear the current config?')) {
                 chrome.storage.local.clear(function () {
                     //local settings
+                    chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
+
                     chrome.storage.local.set({ autoFogOnActivityPeak: false });
                     chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
                     chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
@@ -420,6 +422,7 @@ class SettingsApp extends Globals {
                             if (confirm("Config file is ready to import.\n\nDo you want to continue and apply the new config?")) {
                                 chrome.storage.local.clear(function () {
                                     chrome.storage.local.set(parse);
+                                    chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
                                     if (!alert('Config restored successfully.')) { window.location.reload(); }
                                 });
                             }
