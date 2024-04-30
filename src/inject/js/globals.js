@@ -345,7 +345,26 @@ class Globals {
     calculateRange = (range = this.attributeTypes.range) => {
         return { lowValue: range.lowValue / 255, highValue: range.highValue / 255 };
     };
+    putAttribute = async (fixtureId, attributeId, attribute, stageId) => {
+        let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/output/stage/${stageId ? stageId : this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
 
+        let options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attribute)
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            return response.json();
+        } catch (error) {
+            if (this.logging)
+                console.error('Fatal error updating fixture data:', error);
+        }
+    }; 
     prepareFetch = async function (method = this.httpMethods, url, params = {}, returnJson = true) {
         let options = {
             method: method,

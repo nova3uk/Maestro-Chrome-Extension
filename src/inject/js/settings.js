@@ -921,26 +921,6 @@ class SettingsApp extends Globals {
             console.error('Error processing attribute changes:', e);
         }
     };
-    putAttribute = async (fixtureId, attributeId, attribute) => {
-        let url = `${maestro.SettingsApp.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}/attribute/${attributeId}`;
-
-        let options = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(attribute)
-        };
-
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error ${response.status}`);
-            }
-            return response.json();
-        } catch (error) {
-            if (this.logging)
-                console.error('Fatal error updating fixture data:', error);
-        }
-    };
     patchFixture = async (fixtureId, fixture) => {
         delete fixture.fixture.fixtureProfileModeId;
         delete fixture.fixture.id;
