@@ -1214,7 +1214,7 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return '<span id="name_' + row.id + '">' + value + '</span>';
+                        return `<span id="name_${row.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.active ? "" : "Fixture is Disabled"}">${value}</span>`;
                     }
                 },
                 {}, {},
