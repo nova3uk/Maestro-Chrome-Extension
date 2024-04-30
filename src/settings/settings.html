@@ -646,310 +646,357 @@
             <!-- Effects -->
             <div class="tab-pane" id="tabpanel-effects" role="tabpanel" aria-labelledby="simple-tab-12">
                 <h2 class="mt-3"></h2>
-
-                <table id="effects" class="table table-bordered table-primary my-1">
-                    <thead class="table-light">
-                        <tr>
-                            <th data-field="name" data-sortable="false" width="200">Effect</th>
-                            <th data-field="fixtures" data-sortable="false">Parameters</th>
-                            <th data-field="active" data-sortable="false" width="100">Status</th>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/arrow-clockwise.svg" width="30" height="30"><br>
-                                Circles
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCPanStart" class="form-control" type="number" min="0" max="255"
-                                                value="127">
-                                            <label for="efCPanStart">Pan Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCTiltStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="efCTiltStart">Tilt Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCDelay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="efCDelay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCRadius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="efCRadius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCSteps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="efCSteps">Steps</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectCircle" data-effect="animateCircle" data-type="effectBtn"
-                                    class="btn btn-primary">Start</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/arrow-clockwise.svg" width="30" height="30">
-                                <img src="/src/img/arrow-clockwise.svg" width="30" height="30"
-                                    style="position: relative; left: -20px;">
-                                <img src="/src/img/arrow-clockwise.svg" width="30" height="30"
-                                    style="position: relative; left: -40px;"><br>
-                                Circles - Fan
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFPanStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="efCFPanStart">Pan Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFTiltStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="efCFTiltStart">Tilt Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFDelay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="efCDelay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFRadius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="efCFRadius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFSteps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="efCS8teps">Steps</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efCFFan" class="form-control" type="number" min="1" max="128"
-                                                value="10">
-                                            <label for="efCFFan">Fan</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectCircleFan" data-effect="animateCircleWithFan" data-type="effectBtn"
-                                    class="btn btn-primary">Start</button></td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/infinity.svg" width="30" height="30"><br>
-                                Figure of 8
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8PanStart" class="form-control" type="number" min="0" max="255"
-                                                value="127">
-                                            <label for="ef8PanStart">Pan Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8TiltStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="ef8TiltStart">Tilt Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8Delay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="ef8Delay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8Radius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="ef8Radius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8Steps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="ef8Steps">Steps</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectEight" data-effect="animateFigureEight" data-type="effectBtn"
-                                    class="btn btn-primary">Start</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/infinity.svg" width="30" height="30">
-                                <img src="/src/img/infinity.svg" width="30" height="30"
-                                    style="position: relative; left: -20px;">
-                                <img src="/src/img/infinity.svg" width="30" height="30"
-                                    style="position: relative; left: -40px;"><br>
-                                Figure of 8 - Fan
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FPanStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="ef8FPanStart">Pan Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FTiltStart" class="form-control" type="number" min="0"
-                                                max="255" value="127">
-                                            <label for="ef8FTiltStart">Tilt Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FDelay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="ef8FDelay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FRadius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="ef8FRadius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FSteps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="ef8FSteps">Steps</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="ef8FFan" class="form-control" type="number" min="1" max="128"
-                                                value="10">
-                                            <label for="ef8FFan">Fan</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectEightFan" data-effect="animateFigureEightWithFan"
-                                    data-type="effectBtn" class="btn btn-primary">Start</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/arrow-down-up.svg" width="30" height="30"><br>
-                                Up & Down
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efUDTiltStart" class="form-control" type="number" min="0"
-                                                max="255" value="80">
-                                            <label for="efUDTiltStart">Tilt Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efUDDelay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="efUDDelay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efUDRadius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="efUDRadius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efUDSteps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="efUDSteps">Steps</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectUpDown" data-effect="animateUpDown" data-type="effectBtn"
-                                    class="btn btn-primary">Start</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">
-                                <img src="/src/img/arrow-left-right.svg" width="30" height="30"><br>
-                                Left & Right
-                            </td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efLRPanStart" class="form-control" type="number" min="0"
-                                                max="255" value="80">
-                                            <label for="efLRPanStart">Pan Start</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efLRDelay" class="form-control" type="number" min="1" max="500"
-                                                value="100">
-                                            <label for="efLRDelay">Speed</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efLRRadius" class="form-control" type="number" min="0" max="180"
-                                                value="50">
-                                            <label for="efLRRadius">Size</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="form-floating mb-1">
-                                            <input id="efLRSteps" class="form-control" type="number" min="90" max="360"
-                                                value="180">
-                                            <label for="efLRSteps">Steps</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><button id="effectLeftRight" data-effect="animateLeftRight" data-type="effectBtn"
-                                    class="btn btn-primary">Start</button></td>
-                        </tr>
-                    </thead>
-                </table>
+                <div>
+                    <p>
+                        Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt
+                        channel.
+                    <ul>
+                        <li>Pan/Tilt Start: The central Pan/Tilt Position of the effect.</li>
+                        <li>Speed: Lower = faster.</li>
+                        <li>Size: The size of the effect, higher = bigger.</li>
+                        <li>Steps: The number of points along the axis of travel. More = Smoother & Slower, Less = More
+                            abrupt but faster.</li>
+                        <li>Fan: The size of the gap between each fixture in the effect, higher = bigger.</li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="text-danger my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="position:relative;top:-2px;" width="16" height="16"
+                        fill="currentColor" class="bi bi-exclamation-octagon-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    <i>These switches are live edits, and will take effect immediately</i>
+                </div>
+                <div class="bootstrap-table bootstrap5">
+                    <div class="fixed-table-toolbar"></div>
+                    <div class="fixed-table-container" style="padding-bottom: 0px;">
+                        <div class="fixed-table-header" style="display: none;">
+                            <table></table>
+                        </div>
+                        <div class="fixed-table-body">
+                            <table id="effects" class="table table-bordered table-primary my-1">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th data-field="name" data-sortable="false" width="200">
+                                            <div class="th-inner">Effect</div>
+                                        </th>
+                                        <th data-field="fixtures" data-sortable="false">
+                                            <div class="th-inner">Settings</div>
+                                        </th>
+                                        <th data-field="active" data-sortable="false" width="100">
+                                            <div class="th-inner">Status</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/arrow-clockwise.svg" width="30" height="30"><br>
+                                            Circles
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCPanStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="efCPanStart">Pan Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCTiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="efCTiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCDelay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="efCDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCRadius" class="form-control" type="number" min="0"
+                                                            max="180" value="30">
+                                                        <label for="efCRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCSteps" class="form-control" type="number" min="90"
+                                                            max="180" value="90">
+                                                        <label for="efCSteps">Steps</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectCircle" data-effect="animateCircle" data-type="effectBtn"
+                                                class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/arrow-clockwise.svg" width="30" height="30">
+                                            <img src="/src/img/arrow-clockwise.svg" width="30" height="30"
+                                                style="position: relative; left: -20px;">
+                                            <img src="/src/img/arrow-clockwise.svg" width="30" height="30"
+                                                style="position: relative; left: -40px;"><br>
+                                            Circles - Fan
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFPanStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="efCFPanStart">Pan Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFTiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="efCFTiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFDelay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="efCDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFRadius" class="form-control" type="number"
+                                                            min="0" max="180" value="30">
+                                                        <label for="efCFRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFSteps" class="form-control" type="number"
+                                                            min="90" max="180" value="90">
+                                                        <label for="efCS8teps">Steps</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efCFFan" class="form-control" type="number" min="1"
+                                                            max="64" value="10">
+                                                        <label for="efCFFan">Fan</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectCircleFan" data-effect="animateCircleWithFan"
+                                                data-type="effectBtn" class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/infinity.svg" width="30" height="30"><br>
+                                            Figure of 8
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8PanStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="ef8PanStart">Pan Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8TiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="ef8TiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8Delay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="ef8Delay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8Radius" class="form-control" type="number" min="0"
+                                                            max="180" value="30">
+                                                        <label for="ef8Radius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8Steps" class="form-control" type="number" min="90"
+                                                            max="180" value="90">
+                                                        <label for="ef8Steps">Steps</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectEight" data-effect="animateFigureEight"
+                                                data-type="effectBtn" class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/infinity.svg" width="30" height="30">
+                                            <img src="/src/img/infinity.svg" width="30" height="30"
+                                                style="position: relative; left: -20px;">
+                                            <img src="/src/img/infinity.svg" width="30" height="30"
+                                                style="position: relative; left: -40px;"><br>
+                                            Figure of 8 - Fan
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FPanStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="ef8FPanStart">Pan Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FTiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="127">
+                                                        <label for="ef8FTiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FDelay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="ef8FDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FRadius" class="form-control" type="number"
+                                                            min="0" max="180" value="50">
+                                                        <label for="ef8FRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FSteps" class="form-control" type="number"
+                                                            min="90" max="180" value="90">
+                                                        <label for="ef8FSteps">Steps</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="ef8FFan" class="form-control" type="number" min="1"
+                                                            max="64" value="10">
+                                                        <label for="ef8FFan">Fan</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectEightFan" data-effect="animateFigureEightWithFan"
+                                                data-type="effectBtn" class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/arrow-down-up.svg" width="30" height="30"><br>
+                                            Up & Down
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDTiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="80">
+                                                        <label for="efUDTiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDDelay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="efUDDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDRadius" class="form-control" type="number"
+                                                            min="0" max="180" value="90">
+                                                        <label for="efUDRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDSteps" class="form-control" type="number"
+                                                            min="90" max="180" value="90">
+                                                        <label for="efUDSteps">Steps</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectUpDown" data-effect="animateUpDown" data-type="effectBtn"
+                                                class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            <img src="/src/img/arrow-left-right.svg" width="30" height="30"><br>
+                                            Left & Right
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efLRPanStart" class="form-control" type="number"
+                                                            min="0" max="255" value="80">
+                                                        <label for="efLRPanStart">Pan Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efLRDelay" class="form-control" type="number" min="1"
+                                                            max="500" value="10">
+                                                        <label for="efLRDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efLRRadius" class="form-control" type="number"
+                                                            min="0" max="180" value="90">
+                                                        <label for="efLRRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efLRSteps" class="form-control" type="number"
+                                                            min="90" max="180" value="90">
+                                                        <label for="efLRSteps">Steps</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectLeftRight" data-effect="animateLeftRight"
+                                                data-type="effectBtn" class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <div class="my-5"></div>
             </div>
             <!-- Fixture Controls -->
