@@ -25,6 +25,7 @@ class SettingsApp extends Globals {
         this.activeStageId = this.stageId;
 
         this.controlPageLink();
+        this.injectEffects();
         this.stageTable();
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
         this.bindMacroBtn();
@@ -38,7 +39,6 @@ class SettingsApp extends Globals {
         this.bindAutoEffects();
         this.tabObserver();
         this.autoMacrosWatcher();
-        this.injectEffects();
         this.bindEffects();
 
         await this.loadMacros(async (macros) => {
@@ -70,7 +70,7 @@ class SettingsApp extends Globals {
         s.src = "/src/inject/js/effects.js";
         (document.head || document.documentElement).appendChild(s);
     };
-    bindEffects = () => {
+    bindEffects = async () => {
         document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 let table = document.getElementById("effects");
@@ -118,6 +118,15 @@ class SettingsApp extends Globals {
                     return;
                 }
                 if (e.target.innerText == "Start") {
+                    let macros = await this.loadMacros();
+                    macros = await macros.filter(macro => macro.macro.stageId == this.stageId);
+                    let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
+                    if (hasRunningMacro) {
+                        if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
+                            return;
+                        }
+                    }
+
                     document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
                         if (e.target.id != btn.id) {
                             btn.disabled = true;
@@ -163,13 +172,30 @@ class SettingsApp extends Globals {
             });
         });
 
+        let activeEffect = await this.getLocalSetting("activeEffect");
         let table = document.getElementById("effects");
         let inputElements = table.querySelectorAll("input");
         inputElements.forEach(async input => {
             let s = await this.getLocalSetting(input.id);
             if (s) input.value = s;
             input.addEventListener('change', async (e) => await maestro.SettingsApp.saveLocalSetting(e.target.id, e.target.value));
+
+            if (activeEffect) {
+                if (input.id !== activeEffect)
+                    input.disabled = true;
+            }
         });
+
+        if (activeEffect) {
+            document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
+                if (btn.id != activeEffect) {
+                    btn.disabled = true;
+                } else {
+                    let event = new Event('click');
+                    btn.dispatchEvent(event);
+                }
+            });
+        }
     };
     coordFinderSetPosition = async (x, y) => {
         if (!document.getElementById('dot')) return;
@@ -782,6 +808,13 @@ class SettingsApp extends Globals {
             if (showLoader) {
                 this.showLoader();
             }
+            let effectActive = await this.getLocalSetting("activeEffect");
+            if (effectActive) {
+                if (!confirm('There is an Effect active, if you start this macro whilst an Effect is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
+                    return;
+                }
+            }
+
             const deleteButton = document.querySelector(`button[name="btn_delete"][data-id="${macroName}"]`);
             const applyButton = document.querySelector(`button[name="btn_apply"][data-id="${macroName}"]`);
             const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macroName}"]`);
@@ -1334,8 +1367,14 @@ class SettingsApp extends Globals {
         $('input[name="shutter_strobe"]').on('change', function (btn) {
             maestro.SettingsApp.changeStrobeParam(this.dataset.id, this.dataset.channelid, this.dataset.type, this.dataset.stageid);
         });
-        $('.panOrTilt').on('click', function (btn) {
+        $('.panOrTilt').on('click', async function (btn) {
+            let effectActive = await maestro.SettingsApp.getLocalSetting("activeEffect");
+            if (effectActive) {
+                alert('There is an Effect active, you cannot modify the pan/tilt settings whilst an Effect is active.');
+                return;
+            }
             maestro.SettingsApp.panOrTiltOpen(this);
+            return false;
         });
     }
     panOrTiltOpen = (btn) => {
