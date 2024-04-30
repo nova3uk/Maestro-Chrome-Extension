@@ -315,6 +315,28 @@ class Globals {
 
         return diff;
     };
+    logChanges = async (stageId, changeSet) => {
+        try {
+            if (!this.logging) return;
+
+            const changeLogItem = {
+                stageId: stageId,
+                timestamp: new Date().toISOString(),
+                changeSet: changeSet
+            };
+
+            let changeLog = await this.getLocalSetting('changeLog');
+            if (!changeLog) {
+                changeLog = [];
+            }
+            changeLog.push(changeLogItem);
+
+            this.saveLocalSetting('changeLog', changeLog);
+        } catch (e) {
+            if (this.logging)
+                console.error('Error logging changes:', e);
+        }
+    };
     upprageShutterParams = async (fixtureId, shutterParams) => {
         try {
             if (shutterParams) {
@@ -365,6 +387,9 @@ class Globals {
             if (!response.ok) {
                 throw new Error(`HTTP error ${response.status}`);
             }
+            if (this.logging)
+                this.logChanges(stageId, { fixtureId: fixtureId, attributeId: attributeId, attribute: attribute });
+
             return response.json();
         } catch (error) {
             if (this.logging)

@@ -815,6 +815,7 @@ class SettingsApp extends Globals {
                 }
             }
 
+            var changeSet = [];
             const deleteButton = document.querySelector(`button[name="btn_delete"][data-id="${macroName}"]`);
             const applyButton = document.querySelector(`button[name="btn_apply"][data-id="${macroName}"]`);
             const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macroName}"]`);
@@ -850,6 +851,7 @@ class SettingsApp extends Globals {
                 }
             }
 
+
             for (let fixture of macros[0]?.macro.fixtures || []) {
                 let currentProfile = await this.getFixture(fixture.id);
 
@@ -861,11 +863,17 @@ class SettingsApp extends Globals {
                 if (diff.length === 0) {
                     ignoredFixtures.push({ fixtureId: fixture.id, name: fixture.name });
                     continue;
+                } else {
+                    //const filteredAttribute = fixture.attribute.filter((attr, index) => diff.includes(index.toString()));
+                    //modifiedFixtures.push({ fixtureId: fixture.id, name: fixture.name, attribute: filteredAttribute });
                 }
 
-                await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
+                let changes = await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
+                changeSet.push(...changes);
                 this.storeFixtureProfile(macroName, currentProfile);
             }
+
+            //console.log(modifiedFixtures);
 
             if (ignoredFixtures.length > 0) {
                 if (ignoredFixtures.length === macros[0]?.macro.fixtures.length) {
@@ -907,6 +915,7 @@ class SettingsApp extends Globals {
                 })
             }
 
+            this.logChanges(stageId, changeSet);
             this.hideLoader();
         } catch (e) {
             if (this.logging) {
@@ -930,6 +939,8 @@ class SettingsApp extends Globals {
             const macros = await this.loadMacros();
             const filteredMacros = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
 
+            var changeSet = [];
+
             if (filteredMacros.length > 0) {
                 const fixtures = filteredMacros[0].macro.fixtures;
                 const promiseArray = [];
@@ -940,15 +951,11 @@ class SettingsApp extends Globals {
                     if (originalProfile) {
                         const diff = this.getObjectDiff(originalProfile.fixture.attribute, fixture.attribute);
                         promiseArray.push(
-                            new Promise((resolve, reject) => {
+                            new Promise(async (resolve, reject) => {
                                 try {
-                                    maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture)
-                                        .then(() => {
-                                            resolve();
-                                        })
-                                        .catch(e => {
-                                            reject(e);
-                                        });
+                                    let changes = await maestro.SettingsApp.processAttributeChanges(diff, fixture.id, originalProfile.fixture, fixture);
+                                    changeSet.push(...changes);
+                                    resolve();
                                 } catch (e) {
                                     reject(e);
                                 }
@@ -990,6 +997,8 @@ class SettingsApp extends Globals {
                         macroLastStopTimeElement.innerHTML = maestro.SettingsApp.formatDate(new Date(m.macro.autoMacroLastStopped + 1000), true);
                     }
                 });
+
+                this.logChanges(stageId, changeSet);
             }
         } catch (e) {
             if (this.logging) {
@@ -1035,6 +1044,7 @@ class SettingsApp extends Globals {
     }
     processAttributeChanges = async (diff, fixtureId, newProfile, oldProfile) => {
         try {
+            let modifiedParams = [];
             for (let attr of diff) {
                 let attrNew = newProfile.attribute[attr];
                 let attrOld = oldProfile.attribute[attr];
@@ -1050,7 +1060,9 @@ class SettingsApp extends Globals {
                         }
                     };
                     this.putAttribute(fixtureId, attr, update);
+                    modifiedParams.push({ fixtureId, attr, update });
                 }
+                return modifiedParams;
             };
         } catch (e) {
             console.error('Error processing attribute changes:', e);
