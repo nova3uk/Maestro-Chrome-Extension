@@ -35,7 +35,7 @@ class Effects extends Globals {
         radius = Number(radius);
         numSteps = Number(numSteps);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -78,7 +78,7 @@ class Effects extends Globals {
         numSteps = Number(numSteps);
         fanRate = Number(fanRate);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -120,7 +120,7 @@ class Effects extends Globals {
         radius = Number(radius);
         numSteps = Number(numSteps);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -163,7 +163,7 @@ class Effects extends Globals {
         numSteps = Number(numSteps);
         fanRate = Number(fanRate);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -204,7 +204,7 @@ class Effects extends Globals {
         range = Number(range);
         numSteps = Number(numSteps);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         while (this.animationRunning) {
@@ -239,7 +239,7 @@ class Effects extends Globals {
         range = Number(range);
         numSteps = Number(numSteps);
 
-        let fixtures = this.getAllMovers();
+        let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step

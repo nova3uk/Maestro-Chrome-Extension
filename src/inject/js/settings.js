@@ -1171,7 +1171,9 @@ class SettingsApp extends Globals {
                         pantilt: panOrTilt,
                         channels: channels,
                         ignore: ignore,
-                        shutterParams: shutterParams
+                        shutterParams: shutterParams,
+                        pan: panOrTilt ? await this.getFixtureSettings(activeStage.id, fixture.id, "defaultPan") : null,
+                        tilt: panOrTilt ? await this.getFixtureSettings(activeStage.id, fixture.id, "defaultTilt") : null
                     });
                     i++;
                 }
@@ -1183,7 +1185,7 @@ class SettingsApp extends Globals {
 
         $('#fixtures').bootstrapTable({
             onClickRow: function (row, field, $element) {
-                if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore" || $element == "colorWheel")
+                if ($element == "shutter" || $element == "strobe" || $element == "pantilt" || $element == "ignore" || $element == "colorWheel" || $element == "channelType" || $element == "fixturePan" || $element == "fixtureTilt")
                     return false;
 
                 let checkbox = document.getElementById('cb_' + row.id);
@@ -1215,13 +1217,33 @@ class SettingsApp extends Globals {
                         return '<span id="name_' + row.id + '">' + value + '</span>';
                     }
                 },
-                {}, {}, {
-                    field: 'active',
+                {}, {},
+                {
+                    field: 'fixturePan',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        return row.active == true ? 'Yes' : 'No';
+                        if (row.pantilt) {
+                            let response = "";
+                            response += `<label style="font-size:10px;position:relative;top:-10px;" for="pan_${row.id}">Pan</label><br>`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="fixture_default_pan" data-id="${row.id}" data-stageid="${row.stageId}" id="pan_${row.id}" min="0" max="255" value="${row.pan ? row.pan : ""}">`;
+                            return response;
+                        }
+
+                    }
+                }, {
+                    field: 'fixtureTilt',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        if (row.pantilt) {
+                            let response = "";
+                            response += `<label style="font-size:10px;position:relative;top:-10px;" for="tilt_${row.id}">Tilt</label><br>`;
+                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="fixture_default_tilt" data-id="${row.id}" data-stageid="${row.stageId}" id="tilt_${row.id}" min="0" max="255" value="${row.tilt ? row.tilt : ""}">`;
+                            return response;
+                        }
                     }
                 }, {
                     field: 'channelType',
@@ -1298,7 +1320,7 @@ class SettingsApp extends Globals {
                     }
                 },
                 {
-                    field: 'active',
+                    field: 'select',
                     title: 'Select',
                     align: 'center',
                     valign: 'middle',
@@ -1385,8 +1407,20 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.panOrTiltOpen(this);
             return false;
         });
+        $('input[name="fixture_default_pan"]').on('change', function (btn) {
+            let id = this.dataset.id;
+            let stageId = this.dataset.stageid;
+            let value = this.value;
+            maestro.SettingsApp.saveFixtureSettings(stageId, id, "defaultPan", value);
+        });
+        $('input[name="fixture_default_tilt"]').on('change', function (btn) {
+            let id = this.dataset.id;
+            let stageId = this.dataset.stageid;
+            let value = this.value;
+            maestro.SettingsApp.saveFixtureSettings(stageId, id, "defaultTilt", value);
+        });
     }
-    panOrTiltOpen = (btn) => {
+    panOrTiltOpen = async (btn) => {
         let id = btn.dataset.id;
         let fixtureNames = "";
         let fixtureIds = [];
@@ -1403,7 +1437,7 @@ class SettingsApp extends Globals {
 
         if (id == "panOrTiltAll") {
             maestro.SettingsApp.preloadPanTilValues(id);
-            let fixtures = maestro.SettingsApp.getAllMovers();
+            let fixtures = await maestro.SettingsApp.getAllMovers();
 
             for (let f of fixtures) {
                 if (maestro.SettingsApp.ignoredFixtures.find(ele => ele.id == f.id)) {
@@ -1511,7 +1545,7 @@ class SettingsApp extends Globals {
         midPoint = Number(midPoint);
         fanRate = Number(fanRate);
 
-        let panFixtures = maestro.SettingsApp.getAllMovers();
+        let panFixtures = await maestro.SettingsApp.getAllMovers();
 
         let numFixtures = panFixtures.length;
         let values = [];

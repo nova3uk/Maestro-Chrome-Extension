@@ -445,6 +445,20 @@ class Globals {
 
         return await this.activeStage.fixture.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
     }
+    getFixtureSettings = async (stageId, fixtureId, setting) => {
+        let fx = await this.getLocalSetting(`${stageId}_${fixtureId}`);
+        if (fx) {
+            return fx[setting] ? fx[setting] : null;
+        }
+    };
+    saveFixtureSettings = async (stageId, fixtureId, setting, value) => {
+        let fx = await this.getLocalSetting(`${stageId}_${fixtureId}`);
+        if (!fx) {
+            fx = {};
+        }
+        fx[setting] = value;
+        await this.saveLocalSetting(`${stageId}_${fixtureId}`, fx);
+    };
     getStages = async (forceRefresh = false) => {
         if (!this.stage || forceRefresh) {
             const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
