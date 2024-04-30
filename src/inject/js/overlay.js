@@ -1,3 +1,4 @@
+"use strict";
 var maestro = maestro || {};
 class OverlayApp extends Globals {
     constructor(scriptSource, loggingOn = false) {

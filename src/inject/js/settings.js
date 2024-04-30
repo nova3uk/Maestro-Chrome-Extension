@@ -19,7 +19,7 @@ class SettingsApp extends Globals {
         this.version = await this.getLocalSetting("version");
         this.logging = await this.getSetting("loggingToggle");
 
-        document.getElementById('versionNumber').innerText = `v${this.version}`
+        document.getElementById('versionNumber').innerText = `${this.version ? "v" + this.version : ""}`
 
         await this.getStages();
         this.activeStageId = this.stageId;
@@ -38,6 +38,7 @@ class SettingsApp extends Globals {
         this.bindAutoEffects();
         this.tabObserver();
         this.autoMacrosWatcher();
+        this.injectEffects();
 
         await this.loadMacros(async (macros) => {
             if (macros) {
@@ -62,6 +63,11 @@ class SettingsApp extends Globals {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         }, 1000);
+    };
+    injectEffects = () => {
+        var s = document.createElement("script");
+        s.src = "/src/inject/js/effects.js";
+        (document.head || document.documentElement).appendChild(s);
     };
     coordFinderSetPosition = async (x, y) => {
         if (!document.getElementById('dot')) return;
