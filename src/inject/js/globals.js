@@ -35,6 +35,12 @@ class Globals {
     btnTimer;
     strobeBtn;
     strobeActive = false;
+    activeStage;
+    stageId;
+    fixtures;
+    stage;
+    groups;
+    activeStageFixtureGroups;
     stageId = null;
     stage = null;
     fixtures = [];
@@ -364,7 +370,7 @@ class Globals {
             if (this.logging)
                 console.error('Fatal error updating fixture data:', error);
         }
-    }; 
+    };
     prepareFetch = async function (method = this.httpMethods, url, params = {}, returnJson = true) {
         let options = {
             method: method,
@@ -433,6 +439,12 @@ class Globals {
     getFixture = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
     };
+    getAllMovers = async () => {
+        if (!this.activeStage)
+            await this.getStages();
+
+        return await this.activeStage.fixture.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
+    }
     getStages = async (forceRefresh = false) => {
         if (!this.stage || forceRefresh) {
             const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);

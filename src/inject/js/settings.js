@@ -1630,9 +1630,6 @@ class SettingsApp extends Globals {
         await this.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } });
         await this.putAttribute(id, fixtureTiltIndex, { attribute: { range: titRange } });
     };
-    getAllMovers = () => {
-        return maestro.SettingsApp.activeStage.fixture.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
-    }
     macroTable = async (macros) => {
         let cues = await this.getCues();
 

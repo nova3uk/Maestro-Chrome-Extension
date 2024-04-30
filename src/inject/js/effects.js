@@ -6,14 +6,9 @@ class Effects extends Globals {
         this.scriptSource = scriptSource;
         this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();
+        if (!this.stage)
+            this.getStages();
     }
-    //maestro.Effects.animateFigureEight(128, 80, 50,50,180, 'start')
-    //maestro.Effects.animateFigureEightWithFan(128, 80, 50,50,180, 10, 'start')
-    //maestro.Effects.animateCircle(128, 80, 50,50,180, 'start')
-    //maestro.Effects.animateCircleWithFan(128, 80, 50, 50, 180, 10, 'start')
-    //maestro.Effects.animateUpDown(80, 50, 50, 180, 'start')
-    //maestro.Effects.animateLeftRight(128, 50, 50, 180, 'start')
-
     animationRunning = false;
 
     canRun = () => {
@@ -40,7 +35,7 @@ class Effects extends Globals {
         radius = Number(radius);
         numSteps = Number(numSteps);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -83,7 +78,7 @@ class Effects extends Globals {
         numSteps = Number(numSteps);
         fanRate = Number(fanRate);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -125,7 +120,7 @@ class Effects extends Globals {
         radius = Number(radius);
         numSteps = Number(numSteps);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -168,7 +163,7 @@ class Effects extends Globals {
         numSteps = Number(numSteps);
         fanRate = Number(fanRate);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -209,7 +204,7 @@ class Effects extends Globals {
         range = Number(range);
         numSteps = Number(numSteps);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         while (this.animationRunning) {
@@ -244,7 +239,7 @@ class Effects extends Globals {
         range = Number(range);
         numSteps = Number(numSteps);
 
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = this.getAllMovers();
         let numFixtures = fixtures.length;
 
         // Calculate the angle between each step
@@ -267,7 +262,7 @@ class Effects extends Globals {
         }
     };
     setTiltD = async (id, tiltValue) => {
-        const fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+        const fixture = this.fixtures.find(ele => ele.id == id);
         const ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
         if (ignoreFixtures) return;
 
@@ -275,10 +270,10 @@ class Effects extends Globals {
 
         const tiltRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
 
-        await maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.SettingsApp.stageId);
+        await maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.Effects.stageId);
     };
     setPanTiltD = async (id, panValue, tiltValue) => {
-        const fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
+        const fixture = this.fixtures.find(ele => ele.id == id);
         const ignoreFixtures = await this.getLocalSetting("fixture_ignore_" + fixture.id);
         if (ignoreFixtures) return;
 
@@ -289,13 +284,13 @@ class Effects extends Globals {
         const tiltRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
 
         await Promise.all([
-            maestro.Effects.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } }, maestro.SettingsApp.stageId),
-            maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.SettingsApp.stageId)
+            maestro.Effects.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } }, maestro.Effects.stageId),
+            maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.Effects.stageId)
         ]);
     };
 
     resetPanTiltD = async () => {
-        let fixtures = maestro.SettingsApp.getAllMovers();
+        let fixtures = await this.getAllMovers();
 
         let panRange = this.calculateRange({ lowValue: 0, highValue: 255 });
         let titRange = this.calculateRange({ lowValue: 0, highValue: 255 });
@@ -303,8 +298,8 @@ class Effects extends Globals {
         for (let fixture of fixtures) {
             const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
             const fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
-            await maestro.Effects.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } }, maestro.SettingsApp.stageId);
-            await maestro.Effects.putAttribute(fixture.id, fixtureTiltIndex, { attribute: { range: titRange } }, maestro.SettingsApp.stageId);
+            await this.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } }, maestro.Effects.stageId);
+            await this.putAttribute(fixture.id, fixtureTiltIndex, { attribute: { range: titRange } }, maestro.Effects.stageId);
         }
     };
 };
