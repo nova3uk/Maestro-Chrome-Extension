@@ -73,6 +73,9 @@ class SettingsApp extends Globals {
     bindEffects = () => {
         document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
             btn.addEventListener('click', async (e) => {
+                let table = document.getElementById("effects");
+                let inputElements = table.querySelectorAll("input");
+
                 if (e.target.innerText == "Stop") {
                     document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
                         if (e.target.id != btn.id) {
@@ -94,7 +97,7 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'stop');
                             break;
                         case "effectCircleFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan')), 'stop';
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan'), 'stop');
                             break;
                         case "effectEight":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'stop');
@@ -103,12 +106,15 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'stop');
                             break;
                         case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRaius'), getById('efUDSteps'), 'stop');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'stop');
                             break;
                         case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRaius'), getById('efUDSteps'), 'stop');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'stop');
                             break;
                     }
+                    inputElements.forEach(async input => {
+                        input.disabled = false;
+                    });
                     return;
                 }
                 if (e.target.innerText == "Start") {
@@ -132,7 +138,7 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'start');
                             break;
                         case "effectCircleFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan')), 'start';
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan'), 'start');
                             break;
                         case "effectEight":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'start');
@@ -141,28 +147,28 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'start');
                             break;
                         case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRaius'), getById('efUDSteps'), 'start');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'start');
                             break;
                         case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRaius'), getById('efUDSteps'), 'start');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'start');
                             break;
                     }
 
+                    inputElements.forEach(async input => {
+                        input.disabled = true;
+                    });
                     return;
                 }
 
             });
         });
-        var table = document.getElementById("effects");
-        var inputElements = table.querySelectorAll("input");
+
+        let table = document.getElementById("effects");
+        let inputElements = table.querySelectorAll("input");
         inputElements.forEach(async input => {
             let s = await this.getLocalSetting(input.id);
-            if (s)
-                input.value = s;
-
-            input.addEventListener('change', async (e) => {
-                maestro.SettingsApp.saveLocalSetting(e.target.id, e.target.value);
-            });
+            if (s) input.value = s;
+            input.addEventListener('change', async (e) => await maestro.SettingsApp.saveLocalSetting(e.target.id, e.target.value));
         });
     };
     coordFinderSetPosition = async (x, y) => {

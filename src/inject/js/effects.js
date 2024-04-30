@@ -288,8 +288,10 @@ class Effects extends Globals {
         const panRange = this.calculateRange({ lowValue: panValue, highValue: panValue });
         const tiltRange = this.calculateRange({ lowValue: tiltValue, highValue: tiltValue });
 
-        await maestro.Effects.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } }, maestro.SettingsApp.stageId);
-        await maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.SettingsApp.stageId);
+        await Promise.all([
+            maestro.Effects.putAttribute(id, fixturePanIndex, { attribute: { range: panRange } }, maestro.SettingsApp.stageId),
+            maestro.Effects.putAttribute(id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.SettingsApp.stageId)
+        ]);
     };
 
     resetPanTiltD = async () => {
@@ -299,9 +301,10 @@ class Effects extends Globals {
         let titRange = this.calculateRange({ lowValue: 0, highValue: 255 });
 
         for (let fixture of fixtures) {
+            const fixturePanIndex = fixture.attribute.findIndex(ele => ele.type === 'PAN');
             const fixtureTiltIndex = fixture.attribute.findIndex(ele => ele.type == 'TILT');
-            await maestro.Effects.putAttribute(fixture.id, fixtureTiltIndex, { attribute: { range: tiltRange } }, maestro.SettingsApp.stageId);
-
+            await maestro.Effects.putAttribute(fixture.id, fixturePanIndex, { attribute: { range: panRange } }, maestro.SettingsApp.stageId);
+            await maestro.Effects.putAttribute(fixture.id, fixtureTiltIndex, { attribute: { range: titRange } }, maestro.SettingsApp.stageId);
         }
     };
 };
