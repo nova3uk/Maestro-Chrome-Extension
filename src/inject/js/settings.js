@@ -39,6 +39,7 @@ class SettingsApp extends Globals {
         this.tabObserver();
         this.autoMacrosWatcher();
         this.injectEffects();
+        this.bindEffects();
 
         await this.loadMacros(async (macros) => {
             if (macros) {
@@ -68,6 +69,101 @@ class SettingsApp extends Globals {
         var s = document.createElement("script");
         s.src = "/src/inject/js/effects.js";
         (document.head || document.documentElement).appendChild(s);
+    };
+    bindEffects = () => {
+        document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (e.target.innerText == "Stop") {
+                    document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
+                        if (e.target.id != btn.id) {
+                            btn.disabled = false;
+                        }
+                    });
+                    e.target.innerText = "Start";
+                    e.target.classList.remove('btn-danger');
+                    e.target.classList.add('btn-primary');
+
+                    await this.deleteLocalSetting("activeEffect");
+
+                    function getById(id) {
+                        return document.getElementById(id).value;
+                    }
+
+                    switch (e.target.id) {
+                        case "effectCircle":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'stop');
+                            break;
+                        case "effectCircleFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan')), 'stop';
+                            break;
+                        case "effectEight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'stop');
+                            break;
+                        case "effectEightFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'stop');
+                            break;
+                        case "effectUpDown":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRaius'), getById('efUDSteps'), 'stop');
+                            break;
+                        case "effectLeftRight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRaius'), getById('efUDSteps'), 'stop');
+                            break;
+                    }
+                    return;
+                }
+                if (e.target.innerText == "Start") {
+                    document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
+                        if (e.target.id != btn.id) {
+                            btn.disabled = true;
+                        }
+                    });
+                    e.target.innerText = "Stop";
+                    e.target.classList.remove('btn-primary');
+                    e.target.classList.add('btn-danger');
+
+                    await this.saveLocalSetting("activeEffect", e.target.id);
+
+                    function getById(id) {
+                        return document.getElementById(id).value;
+                    }
+
+                    switch (e.target.id) {
+                        case "effectCircle":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'start');
+                            break;
+                        case "effectCircleFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan')), 'start';
+                            break;
+                        case "effectEight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'start');
+                            break;
+                        case "effectEightFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'start');
+                            break;
+                        case "effectUpDown":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRaius'), getById('efUDSteps'), 'start');
+                            break;
+                        case "effectLeftRight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRaius'), getById('efUDSteps'), 'start');
+                            break;
+                    }
+
+                    return;
+                }
+
+            });
+        });
+        var table = document.getElementById("effects");
+        var inputElements = table.querySelectorAll("input");
+        inputElements.forEach(async input => {
+            let s = await this.getLocalSetting(input.id);
+            if (s)
+                input.value = s;
+
+            input.addEventListener('change', async (e) => {
+                maestro.SettingsApp.saveLocalSetting(e.target.id, e.target.value);
+            });
+        });
     };
     coordFinderSetPosition = async (x, y) => {
         if (!document.getElementById('dot')) return;
