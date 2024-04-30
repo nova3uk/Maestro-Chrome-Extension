@@ -1069,6 +1069,15 @@ class SettingsApp extends Globals {
     bindMacroBtn = async () => {
         const addMacroBtn = document.getElementById('addMacro');
         addMacroBtn.addEventListener('click', async () => {
+
+            let effectActive = await maestro.SettingsApp.getLocalSetting("activeEffect");
+            if (effectActive) {
+                alert('There is an Effect active, you cannot create macros whilst an Effect is active.');
+                await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-effects");
+                document.location.reload();
+                return;
+            }
+
             const checkboxes = document.querySelectorAll('input[name="fixture_cbx"]:checked');
             if (checkboxes.length === 0) {
                 return alert('Please select at least one fixture');

@@ -221,3 +221,8 @@ input[type="range"] {
     font-size: 0.7rem;
     font-weight: bold;
 }
+.link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
