@@ -471,7 +471,9 @@ class OverlayApp extends Globals {
             audioLevelMeter.style.height = '10px';
             audioLevelMeter.style.backgroundColor = 'green';
             audioLevelMeter.style.borderRadius = '6px';
-            audioLevelMeter.style.transition = "width 600ms linear";
+            audioLevelMeter.style.transition = "width 300ms linear";
+            audioLevelMeter.style.opacity = '0.7';
+
             audioLevelWrapper.appendChild(audioLevelMeter);;
         }
         if (!document.getElementById('activityLevelMeter')) {
@@ -494,7 +496,8 @@ class OverlayApp extends Globals {
             activityLevelMeter.style.width = '0%';
             activityLevelMeter.style.height = '10px';
             activityLevelMeter.style.borderRadius = '6px';
-            activityLevelMeter.style.transition = "width 600ms linear";
+            activityLevelMeter.style.transition = "width 300ms linear";
+            activityLevelMeter.style.opacity = '0.7';
             activityLevelWrapper.appendChild(activityLevelMeter);;
         }
 
