@@ -459,6 +459,10 @@ class OverlayApp extends Globals {
             audioLevelWrapper.style.height = '10px';
             audioLevelWrapper.style.backgroundColor = '#37383a';
             audioLevelWrapper.style.borderRadius = '6px';
+            audioLevelWrapper.style.backgroundImage = `url('${this.Origin}/src/img/volume-up.svg')`
+            audioLevelWrapper.style.backgroundSize = `14px 14px`
+            audioLevelWrapper.style.backgroundRepeat = `no-repeat`
+            audioLevelWrapper.style.backgroundPosition = `center center`
             container.appendChild(audioLevelWrapper);
 
             let audioLevelMeter = document.createElement('div');
@@ -478,6 +482,10 @@ class OverlayApp extends Globals {
             activityLevelWrapper.style.marginTop = '2px';
             activityLevelWrapper.style.backgroundColor = '#37383a';
             activityLevelWrapper.style.borderRadius = '6px';
+            activityLevelWrapper.style.backgroundImage = `url('${this.Origin}/src/img/activity.svg')`
+            activityLevelWrapper.style.backgroundSize = `14px 14px`
+            activityLevelWrapper.style.backgroundRepeat = `no-repeat`
+            activityLevelWrapper.style.backgroundPosition = `center center`
             container.appendChild(activityLevelWrapper);
 
             let activityLevelMeter = document.createElement('div');
