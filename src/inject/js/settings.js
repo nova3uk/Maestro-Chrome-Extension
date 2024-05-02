@@ -50,19 +50,29 @@ class SettingsApp extends Globals {
         });
 
         setInterval(async () => {
-            this.watchForStageChange();
-            await this.getBrightness().then(() => {
-                let val = Math.floor(this.brightness.value * 255);
-                document.getElementById('master_dimmer').value = val;
-                maestro.SettingsApp.setDimmerValue(val);
-            });
+            try{
+                this.watchForStageChange();
+                await this.getBrightness().then(() => {
+                    let val = Math.floor(this.brightness.value * 255);
+                    document.getElementById('master_dimmer').value = val;
+                    maestro.SettingsApp.setDimmerValue(val);
+                });
+            }catch(e){
+            if (this.logging)
+                console.error('Error in interval:', e);
+            }
         }, 60000);
 
         setTimeout(() => {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
+            try{
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                });
+            }catch(e){
+                if (this.logging)
+                    console.error('Error in tooltip:', e);
+            }
         }, 1000);
     };
     injectEffects = () => {
