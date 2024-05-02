@@ -1479,7 +1479,7 @@ class SettingsApp extends Globals {
             fixtureIds.push(id);
             let fixture = maestro.SettingsApp.fixtures.find(ele => ele.id == id);
 
-            document.getElementById('panTiltFinder').dataset.id = JSON.stringify(id);
+            document.getElementById('panTiltFinder').dataset.id = `["${id}"]`;
             document.getElementById('fixtureName').innerText = fixture.name;
             document.getElementById('panFanRow').style.display = "none";
         }
@@ -1538,13 +1538,13 @@ class SettingsApp extends Globals {
             document.getElementById('panFanRange').value = 0;
             document.getElementById('panFanRangeVal').value = 0;
         });
-        document.getElementById('panTiltSetDefault').addEventListener('click', function () {
+        document.getElementById('panTiltSetDefault').addEventListener('click', async function () {
             let fixtures = document.getElementById('panTiltFinder').dataset.id;
             if (confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?')) {
                 if (Array.isArray(JSON.parse(fixtures))) {
                     for (let fixture of JSON.parse(fixtures)) {
-                        maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
+                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
                     }
 
                     if (confirm('Would you also like to set the default Pan/Tilt for all Mover Effects?')) {
@@ -1561,8 +1561,8 @@ class SettingsApp extends Globals {
 
                     }
                 } else {
-                    maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
-                    maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                    await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
+                    await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
                 }
 
                 document.location.reload();

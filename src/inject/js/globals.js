@@ -477,12 +477,16 @@ class Globals {
         }
     };
     saveFixtureSettings = async (stageId, fixtureId, setting, value) => {
-        let fx = await this.getLocalSetting(`${stageId}_${fixtureId}`);
-        if (!fx) {
-            fx = {};
+        try{
+            let fx = await this.getLocalSetting(`${stageId}_${fixtureId}`);
+            if (!fx) {
+                fx = {};
+            }
+            fx[setting] = value;
+            await this.saveLocalSetting(`${stageId}_${fixtureId}`, fx);
+        }catch(e){
+            console.log(e);
         }
-        fx[setting] = value;
-        await this.saveLocalSetting(`${stageId}_${fixtureId}`, fx);
     };
     getStages = async (forceRefresh = false) => {
         if (!this.stage || forceRefresh) {
