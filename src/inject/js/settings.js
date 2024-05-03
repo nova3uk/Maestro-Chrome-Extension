@@ -50,26 +50,26 @@ class SettingsApp extends Globals {
         });
 
         setInterval(async () => {
-            try{
+            try {
                 this.watchForStageChange();
                 await this.getBrightness().then(() => {
                     let val = Math.floor(this.brightness.value * 255);
                     document.getElementById('master_dimmer').value = val;
                     maestro.SettingsApp.setDimmerValue(val);
                 });
-            }catch(e){
-            if (this.logging)
-                console.error('Error in interval:', e);
+            } catch (e) {
+                if (this.logging)
+                    console.error('Error in interval:', e);
             }
         }, 60000);
 
         setTimeout(() => {
-            try{
+            try {
                 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
                 tooltipTriggerList.map(function (tooltipTriggerEl) {
                     return new bootstrap.Tooltip(tooltipTriggerEl)
                 });
-            }catch(e){
+            } catch (e) {
                 if (this.logging)
                     console.error('Error in tooltip:', e);
             }
@@ -2277,7 +2277,6 @@ class SettingsApp extends Globals {
                             for (let attr of row.attributes) {
                                 if (attr.type == 'GOBO') {
                                     let x = 0;
-
                                     response += `<span style="display:inline-block;"><h6>${attr.name}</h6></span></br>`
                                     for (let setting of attr.goboSetting.steps) {
                                         response += `<span class="me-2 mb-2 p-2" style="display:inline-block;">`
