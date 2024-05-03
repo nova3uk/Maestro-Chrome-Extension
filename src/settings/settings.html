@@ -571,7 +571,11 @@
             <h2 class="mt-3"></h2>
             <!-- Macro Controls -->
             <div class="tab-pane active" id="tabpanel-macros" role="tabpanel" aria-labelledby="simple-tab-4">
-                <div>
+                <a class="float-end" data-bs-toggle="collapse" href="#macroControlsInfoPanel" role="button"
+                    aria-expanded="false" aria-controls="macroControlsInfoPanel">
+                    <img width="20" height="20" src="/src/img/chevron-contract.svg">
+                </a>
+                <div class="collapse show" id="macroControlsInfoPanel">
                     <p class="h6">
                         <span class="text-success">
                             <svg xmlns="http://www.w3.org/2000/svg" style="position:relative;top:-2px;" width="20"
@@ -643,8 +647,11 @@
             </div>
             <!-- Effects -->
             <div class="tab-pane" id="tabpanel-effects" role="tabpanel" aria-labelledby="simple-tab-12">
-                <h2 class="mt-3"></h2>
-                <div>
+                <a class="float-end" data-bs-toggle="collapse" href="#effectControlsInfoPane" role="button"
+                    aria-expanded="false" aria-controls="effectControlsInfoPane">
+                    <img width="20" height="20" src="/src/img/chevron-contract.svg">
+                </a>
+                <div class="collapse show" id="effectControlsInfoPane">
                     <p>
                         Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt
                         channel.
@@ -1105,8 +1112,11 @@
             </div>
             <!-- Fixture Toggles Controls -->
             <div class="tab-pane" id="tabpanel-toggles" role="tabpanel" aria-labelledby="simple-tab-8">
-                <h2 class="mt-3"></h2>
-                <div>
+                <a class="float-end" data-bs-toggle="collapse" href="#toggleControlsInfoPane" role="button"
+                    aria-expanded="false" aria-controls="toggleControlsInfoPane">
+                    <img width="20" height="20" src="/src/img/chevron-contract.svg">
+                </a>
+                <div class="collapse show" id="toggleControlsInfoPane">
                     <p class="h6">Toggle Fixture Settings</p>
                     The MaestroDMX Interface requires you to switch all toggles one by one, these fixture toggles
                     help
@@ -1151,8 +1161,11 @@
             </div>
             <!-- Dimmer Controls -->
             <div class="tab-pane" id="tabpanel-dimmers" role="tabpanel" aria-labelledby="simple-tab-9">
-                <h2 class="mt-3"></h2>
-                <div>
+                <a class="float-end" data-bs-toggle="collapse" href="#dimmerControlsInfoPane" role="button"
+                    aria-expanded="false" aria-controls="dimmerControlsInfoPane">
+                    <img width="20" height="20" src="/src/img/chevron-contract.svg">
+                </a>
+                <div class="collapse show" id="dimmerControlsInfoPane">
                     <p class="h6">Dimmers</p>
                     You can adjust the dimmer levels of all fixtures here.<br>
                     You can also use the "Set All Dimmers" buttons to set all dimmers to a specific level at once.<br>
@@ -1257,12 +1270,17 @@
             </div>
             <!-- Focus Controls -->
             <div class="tab-pane" id="tabpanel-focus" role="tabpanel" aria-labelledby="simple-tab-9">
-                <h2 class="mt-1"></h2>
-                <p class="h6">Focus & Zoom</p>
-                You can adjust the focus or zoom channels of all fixtures here.<br>
-                MaestroDMX currently does not have a dedicated focus channel.<br>
-                These toggles require the Focus channel to be named "Focus" or include the word focus in the name.
-                <div class="my-3"></div>
+                <a class="float-end" data-bs-toggle="collapse" href="#focusControlsInfoPane" role="button"
+                    aria-expanded="false" aria-controls="focusControlsInfoPane">
+                    <img width="20" height="20" src="/src/img/chevron-contract.svg">
+                </a>
+                <div class="collapse show" id="focusControlsInfoPane">
+                    <p class="h6">Focus & Zoom</p>
+                    You can adjust the focus or zoom channels of all fixtures here.<br>
+                    MaestroDMX currently does not have a dedicated focus channel.<br>
+                    These toggles require the Focus channel to be named "Focus" or include the word focus in the name.
+                    <div class="my-3"></div>
+                </div>
                 <div class="bootstrap-table bootstrap5">
                     <div class="fixed-table-toolbar"></div>
                     <div class="fixed-table-container" style="padding-bottom: 0px;">
@@ -1362,14 +1380,15 @@
                             <p id="fixtureName" class="h5"></p>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-warning" id="panTiltSetDefault" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="The default center point is used for Mover Effects. ">Save
+                    <div class="xmodal-footer p-3">
+                        <button type="button" class="btn btn-warning float-start"
+                            sxtyle="position: relative;left:-160px;" id="panTiltSetDefault" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="The default center point is used for Mover Effects.">Save
                             Center Point</button>
-                        <button type="button" class="btn btn-danger" id="panTiltReset" data-bs-toggle="tooltip"
-                            data-bs-placement="top"
+                        <button type="button" class="btn btn-primary float-end" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger me-2 float-end" id="panTiltReset"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
                             title="This resets Pan and Tilt for all movers to 0-255">Reset</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
 
