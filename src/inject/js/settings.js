@@ -522,15 +522,6 @@ class SettingsApp extends Globals {
     bindDownloadStage = async () => {
         var link = document.getElementById('downloadStage')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}`);
-        // document.getElementById('downloadStage').addEventListener('click', async () => {
-        //     await maestro.SettingsApp.getStages(true);
-        //     let result = maestro.SettingsApp.prettyJSON(maestro.SettingsApp.activeStage);
-        //     var url = 'data:application/json;base64,' + btoa(result);
-        //     chrome.downloads.download({
-        //         url: url,
-        //         filename: `backup_stage_${Date.now()}_${maestro.SettingsApp.activeStage.name.replace(/[^a-z0-9]/gi, '_')}.json`
-        //     });
-        // });
     };
     //download eveyrthign except fixture backup
     bindConfigBtn = async () => {
