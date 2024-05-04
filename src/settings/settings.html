@@ -301,20 +301,34 @@
             <!-- Backup Panel -->
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
                 <h5>Backup & Restore</h5>
-                <p>
-                    Backup Now, will create a Snapshot of the currently loaded stage, all settings in this page and
-                    store it locally.<br>
-                    You can download the Config which *includes* the Fixture Backup and all settings in this
-                    page.<br><br>
-                    If you want backup of the settings, without the fixtures, you can download the Config file only
-                    via
-                    the Download Config button.<br><br>
-                    Restore Backup can be used to upload the earlier downloaded Backup or Config file.<br>
-                    If you restore a config which contains a Fixture Backup, it will overwrite the current stage's
-                    fixture settings!<br><br>
-                    If you're not sure, go to Stages and Download Stage from the Maestro which will give you a
-                    backup of the current stage before you import a config and overwrite the fixtures.
-                </p>
+                <ul>
+                    <li>
+                        Backup Now, will create a Snapshot of the currently loaded stage, plus all settings in this page
+                        and
+                        store it locally.
+                    </li>
+                    <li>
+                        You can download the Config which <b>*includes*</b> the Fixture Backup and all settings via the
+                        Download Backup button.
+                    </li>
+                    <li>
+                        If you want a backup of the settings only, without the fixtures, you can download the Config
+                        file
+                        only via the Download Config button.
+                    </li>
+                    <li>
+                        Restore Backup can be used to upload the earlier downloaded Backup or Config file.
+                    </li>
+                    <li>
+                        If you restore a config which contains a Fixture Backup, it will overwrite the current stage's
+                        fixture settings!
+                    </li>
+                    <li>
+                        If you're not sure, go to <a id="downloadStage" target="_blank">Stages</a> and Download Stage
+                        from the Maestro which will give you a backup of the current stage.
+                    </li>
+                </ul>
+
                 <i>Please note. You can import a file from a different stage, but it will fail if the fixtures
                     do not match.</i>
                 <br><br>
@@ -798,7 +812,7 @@
                                                     <div class="form-floating mb-1">
                                                         <input id="efCFSteps" class="form-control" type="number"
                                                             min="90" max="180" value="90">
-                                                        <label for="efCS8teps">Steps</label>
+                                                        <label for="efCFSteps">Steps</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-2">
