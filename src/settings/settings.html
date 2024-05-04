@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark"
+    <nav class="navbar navbar-expand navbar-dark fixed-top"
         style="background-color: #081728 !important;font-family:Roboto, Helvetica, Arial, sans-serif;">
         <div class="container">
             <h2 class="text-light">
@@ -47,7 +47,7 @@
             </span>
         </div>
     </nav>
-    <div class="container mt-3">
+    <div role="main" class="container mt-3">
         <!-- Upper Navigation Menu -->
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -320,8 +320,8 @@
                 <br><br>
                 <div class="my-3">
                     <button class="btn btn-warning" id="backupFixtures">Backup Fixtures</button>
-                    <button class="btn btn-info" id="downloadBackup">Download Backup</button>
-                    <button class="btn btn-secondary" id="downloadConfig">Download Config</button>
+                    <button class="btn btn-warning" id="downloadBackup">Download Backup</button>
+                    <button class="btn btn-warning" id="downloadConfig">Download Config</button>
                     <button class="btn btn-danger" id="clearConfig">Clear Config</button>
                     <button class="btn btn-danger" id="restoreBackup">Restore Backup</button><br><br>
                     <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>

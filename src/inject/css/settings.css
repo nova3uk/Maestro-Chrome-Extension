@@ -4,6 +4,7 @@ html {
   }
 body{
     background-color: rgb(199, 198, 198);
+    padding-top: 60px;
 }   
 .tab-content .tab-pane {
     background-color: rgb(199, 198, 198) !important;
