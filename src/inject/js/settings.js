@@ -363,6 +363,28 @@ class SettingsApp extends Globals {
         this.getLocalSetting('activeSettingsTab').then(tab => {
             $('.nav-tabs a[href="#' + tab + '"]').tab('show');
         });
+
+        $('div[data-type="collapsable"]').on("shown.bs.collapse", async (e) => {
+            var id = $(e.target).attr("id");
+            await this.saveLocalSetting(id, true);
+        })
+        $('div[data-type="collapsable"]').on("hidden.bs.collapse", async (e) => {
+            var id = $(e.target).attr("id");
+            await this.saveLocalSetting(id, false);
+        })
+        $(document).ready(function () {
+            $('div[data-type="collapsable"]').each(async function () {
+                var id = $(this).attr("id");
+                var state = await maestro.SettingsApp.getLocalSetting(id);
+
+                if (state == true)
+                    $(this).collapse('show');
+                if (state == false)
+                    $(this).collapse('hide');
+
+            });
+
+        })
     };
     watchOffline = async () => {
         try {

@@ -575,7 +575,7 @@
                     aria-expanded="false" aria-controls="macroControlsInfoPanel">
                     <img width="20" height="20" src="/src/img/chevron-contract.svg">
                 </a>
-                <div class="collapse show" id="macroControlsInfoPanel">
+                <div class="collapse show" id="macroControlsInfoPanel" data-type="collapsable">
                     <p class="h6">
                         <span class="text-success">
                             <svg xmlns="http://www.w3.org/2000/svg" style="position:relative;top:-2px;" width="20"
@@ -651,7 +651,7 @@
                     aria-expanded="false" aria-controls="effectControlsInfoPane">
                     <img width="20" height="20" src="/src/img/chevron-contract.svg">
                 </a>
-                <div class="collapse show" id="effectControlsInfoPane">
+                <div class="collapse show" id="effectControlsInfoPane" data-type="collapsable">
                     <p>
                         Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt
                         channel.
@@ -1116,7 +1116,7 @@
                     aria-expanded="false" aria-controls="toggleControlsInfoPane">
                     <img width="20" height="20" src="/src/img/chevron-contract.svg">
                 </a>
-                <div class="collapse show" id="toggleControlsInfoPane">
+                <div class="collapse show" id="toggleControlsInfoPane" data-type="collapsable">
                     <p class="h6">Toggle Fixture Settings</p>
                     The MaestroDMX Interface requires you to switch all toggles one by one, these fixture toggles
                     help
@@ -1165,12 +1165,14 @@
                     aria-expanded="false" aria-controls="dimmerControlsInfoPane">
                     <img width="20" height="20" src="/src/img/chevron-contract.svg">
                 </a>
-                <div class="collapse show" id="dimmerControlsInfoPane">
+                <div class="collapse show" id="dimmerControlsInfoPane" data-type="collapsable">
                     <p class="h6">Dimmers</p>
                     You can adjust the dimmer levels of all fixtures here.<br>
                     You can also use the "Set All Dimmers" buttons to set all dimmers to a specific level at once.<br>
                     The master dimmer, is the Global Brightness control, the same as on the Show page of MaestroDMX.
-                    <div class="my-3"></div>
+                </div>
+                <div class="mb-3"><br></div>
+                <div>
                     <div class="m-1 p-2 text-bg-dark rounded-3">
                         <span id="masterDimmerVal" class="float-end"></span>
                         <label for="master_dimmer" class="form-label h6 float" style="margin-left:45%;">Master
@@ -1274,7 +1276,7 @@
                     aria-expanded="false" aria-controls="focusControlsInfoPane">
                     <img width="20" height="20" src="/src/img/chevron-contract.svg">
                 </a>
-                <div class="collapse show" id="focusControlsInfoPane">
+                <div class="collapse show" id="focusControlsInfoPane" data-type="collapsable">
                     <p class="h6">Focus & Zoom</p>
                     You can adjust the focus or zoom channels of all fixtures here.<br>
                     MaestroDMX currently does not have a dedicated focus channel.<br>
