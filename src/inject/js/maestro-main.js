@@ -272,7 +272,7 @@ class App extends Globals {
                     if (this.logging) console.log('Strobe button found.');
                 }
                 if (!document.mouseupEventAdded) {
-                    document.addEventListener('mouseup', () => this.setStrobe(false), false);
+                    document.addEventListener('mouseup', () => setTimeout(() => { this.setStrobe(false) }, 50), false);
                     document.mouseupEventAdded = true;
                     if (this.logging) console.log('Document mouseup event added.');
                 }
