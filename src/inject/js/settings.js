@@ -827,8 +827,8 @@ class SettingsApp extends Globals {
         var link = document.getElementById('controlPageLink')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
     };
-    loadMacros = (callback) => {
-        return this.getLocalSetting("macros").then(macros => {
+    loadMacros = async (callback) => {
+        return await this.getLocalSetting("macros").then(macros => {
             if (!macros) {
                 if (typeof callback == "function") {
                     callback(macros);
@@ -2247,13 +2247,13 @@ class SettingsApp extends Globals {
                 }
             }
 
-            await this.loadMacros().then((macros) => {
-                if (macros) {
-                    for (let macro of macros) {
-                        macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
-                    };
-                }
-            });
+            let macros = await this.loadMacros();
+
+            if (macros) {
+                for (let macro of macros) {
+                    macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
+                };
+            }
 
             var tData = [];
 
