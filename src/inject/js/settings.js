@@ -28,14 +28,13 @@ class SettingsApp extends Globals {
         this.activeStageId = this.stageId;
 
         this.controlPageLink();
-        this.injectEffects();
         this.stageTable();
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
-        this.bindMacroBtn();
-        this.cuesTable();
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
         this.dimmerTable(this.activeStage, this.activeStageFixtureGroups);
         this.focusTable(this.activeStage, this.activeStageFixtureGroups);
+        this.bindMacroBtn();
+        this.cuesTable();
         this.loadBackupRestoreBtns();
         this.bindAutoMacros();
         this.bindAutoFog();
@@ -77,11 +76,6 @@ class SettingsApp extends Globals {
                     console.error('Error in tooltip:', e);
             }
         }, 1000);
-    };
-    injectEffects = () => {
-        var s = document.createElement("script");
-        s.src = "/src/inject/js/effects.js";
-        (document.head || document.documentElement).appendChild(s);
     };
     bindEffects = async () => {
         document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
