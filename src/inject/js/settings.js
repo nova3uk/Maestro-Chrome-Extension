@@ -14,6 +14,9 @@ class SettingsApp extends Globals {
     autoMacrosTimer = null;
     storageWatcher = null;
     autoMacroRoutineRunning = false;
+    macrosToKill = [];
+    macroTimer = null;
+    macroTimerRunning = false;
 
     init = async () => {
         this.version = await this.getLocalSetting("version");
@@ -970,6 +973,11 @@ class SettingsApp extends Globals {
                 }
 
             }
+            if (macros[0]?.macro.autoStopTimer) {
+                if (Number(macros[0]?.macro.autoStopTimer) > 0) {
+                    this.macroStopTimer(macros[0]?.macro.name, macros[0]?.macro.stageId);
+                }
+            }
             this.logChanges(stageId, changeSet);
             this.hideLoader();
         } catch (e) {
@@ -982,6 +990,43 @@ class SettingsApp extends Globals {
             this.hideLoader();
         }
     }
+    macroTimerWorker = () => {
+        this.macroTimer = setInterval(async () => {
+            if (this.macroTimerRunning) return;
+            this.macroTimerRunning = true;
+
+            let index = 0;
+            for (let timer of this.macrosToKill) {
+                let macros = await this.loadMacros();
+                macros = macros.filter(macro => macro.macro.stageId == timer.stageId && macro.macro.name == timer.macroName);
+                if (macros[0]?.macro.autoStopTimer) {
+                    if (macros[0]?.macro.autoMacroLastRun + (macros[0]?.macro.autoStopTimer * 1000) < Date.now()) {
+                        this.revertMacro(timer.macroName, timer.stageId, false);
+                        this.macrosToKill.splice(index, 1);
+                        if (this.macrosToKill.length == 0) {
+                            clearInterval(this.macroTimer);
+                            this.macroTimer = null;
+                        }
+                        if (this.logging) {
+                            console.log('Macro stopped due to timer');
+                        }
+                    }
+                }
+                index++;
+            }
+            this.macroTimerRunning = false;
+        }, 1000);
+    };
+    macroStopTimer = (macroName, stageId) => {
+        if (!this.macrosToKill.includes({ macroName: macroName, stageId: stageId })) {
+            this.macrosToKill.push(
+                { macroName: macroName, stageId: stageId }
+            );
+            if (!this.macroTimer) {
+                this.macroTimerWorker();
+            }
+        }
+    };
     revertMacro = async (macroName, stageId, showLoader = true) => {
         try {
             if (showLoader) {
@@ -992,12 +1037,15 @@ class SettingsApp extends Globals {
 
             this.currentCue = await this.getShowState();
             const macros = await this.loadMacros();
-            const filteredMacros = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
+            const m = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
 
             var changeSet = [];
 
-            if (filteredMacros.length > 0) {
-                const fixtures = filteredMacros[0].macro.fixtures;
+            if (m.length > 0) {
+                //ignore already stopped..
+                if (m[0].macro.macroRunning == false) return;
+
+                const fixtures = m[0].macro.fixtures;
                 const promiseArray = [];
 
                 for (const fixture of fixtures) {
@@ -1035,12 +1083,12 @@ class SettingsApp extends Globals {
                 const macroElement = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
                 macroElement.classList.remove('macro-active');
 
-                if (filteredMacros[0]?.macro.cueIdEnd) {
+                if (m[0]?.macro.cueIdEnd) {
                     const cues = await this.getCues();
-                    const cueIndex = cues.findIndex(cue => cue.uuid === filteredMacros[0].macro.cueIdEnd);
+                    const cueIndex = cues.findIndex(cue => cue.uuid === m[0].macro.cueIdEnd);
                     await this.startCue(cueIndex);
                 }
-                if (filteredMacros[0]?.macro.effectId) {
+                if (m[0]?.macro.effectId) {
                     let activeEffect = await this.getLocalSetting("activeEffect");
                     if (activeEffect) {
                         //stop currently running effect
@@ -1050,7 +1098,7 @@ class SettingsApp extends Globals {
                             effectBtn.dispatchEvent(event);
                         }
                     }
-                    if (filteredMacros[0]?.macro.effectIdEnd) {
+                    if (m[0]?.macro.effectIdEnd) {
                         let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectIdEnd}"]`);
                         if (effectBtn) {
                             let event = new Event('click');
@@ -1111,6 +1159,9 @@ class SettingsApp extends Globals {
                     const clearButton = document.querySelector(`button[name="btn_clr"][data-id="${macro.macro.name}"]`);
                     clearButton.disabled = false;
                     document.querySelector(`[data-id="${macro.macro.name}"][data-stageid="${macro.macro.stageId}"]`).classList.add('macro-active');
+
+                    //add to the list of watchers to stop the macro after the timer
+                    this.macroStopTimer(macro.macro.name, macro.macro.stageId);
                 }
             }
         }
@@ -1827,8 +1878,8 @@ class SettingsApp extends Globals {
                         let response = "";
                         response = `<span name="editMacroName" role="button" class="cursor-pointer me-1" style="position:absolute;top:5px;right:5px;" data-stageid="${row.stageId}" data-name="${row.name}" data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Macro"><img src="pencil-fill.svg" width="14" height="14"></span>`
                         response += `<span style="display:inline-block;width: 150px;overflow-wrap: break-word;">${row.name}</span><br>`;
-                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:12px;">Last Start: <span name="macroLastRunTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastRun == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastRun + 1000), true)}</span></span>`;
-                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:0px;">Last Stop: <span name="macroLastStopTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastStopped == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastStopped + 1000), true)}</span></span>`;
+                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:12px;font-weight:bold;color: lightcoral;">Last Start: <span name="macroLastRunTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastRun == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastRun + 1000), true)}</span></span>`;
+                        response += `<span style="font-size:10px;display:block;position:absolute;bottom:0px;font-weight:bold;color: lightcoral;">Last Stop: <span name="macroLastStopTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastStopped == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastStopped + 1000), true)}</span></span>`;
                         return response;
                     }
                 },
@@ -1856,73 +1907,56 @@ class SettingsApp extends Globals {
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (!cues) return;
+                        let select = "";
 
-                        let select = '<div class="border border-black rounded p-1">';
-                        select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span>';
-                        select += `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
-                        select += '<option value="">-- Start Cue --</option>';
-                        for (let cue of row.cues) {
-                            select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueId == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
-                        }
-                        select += '</select>';
-
-                        select += `<select name="endCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Stop" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
-                        select += '<option value="">-- End Cue --</option>';
-                        for (let cue of row.cues) {
-                            select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueIdEnd == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
-                        }
-                        select += '</select>';
-                        select += '</div>';
-                        //select += '<br>';
+                        //timers
                         select += '<div class="border border-black rounded p-1 mt-1">';
-                        select += '<span style="font-weight:bold;font-size:10px;">Move Effect Triggers</span>';
-
-                        if (!row.effects) return;
-
-                        select += `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
-                        select += '<option value="">-- Start Effect --</option>';
-                        for (let effect in row.effects) {
-                            select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectId == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
-                        }
-                        select += '</select>';
-
-                        select += `<select name="endEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Stop" id="endEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
-                        select += '<option value="">-- End Effect --</option>';
-                        for (let effect in row.effects) {
-                            select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectIdEnd == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
-                        }
-                        select += '</select>';
+                        select += '<span style="font-weight:bold;font-size:10px;">AutoStop Timer</span>';
+                        select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}">`;
                         select += '</div>';
 
+                        if (cues) {
+                            //cue triggers
+                            select += '<div class="border border-black rounded p-1 mt-1">';
+                            select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span>';
+                            select += `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                            select += '<option value="">-- Start Cue --</option>';
+                            for (let cue of row.cues) {
+                                select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueId == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
+                            }
+                            select += '</select>';
+
+                            select += `<select name="endCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Stop" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                            select += '<option value="">-- End Cue --</option>';
+                            for (let cue of row.cues) {
+                                select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueIdEnd == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
+                            }
+                            select += '</select>';
+                            select += '</div>';
+                        }
+                        if (row.effects) {
+                            //Effect Triggers
+                            select += '<div class="border border-black rounded p-1 mt-1">';
+                            select += '<span style="font-weight:bold;font-size:10px;">Move Effect Triggers</span>';
+
+                            select += `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                            select += '<option value="">-- Start Effect --</option>';
+                            for (let effect in row.effects) {
+                                select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectId == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                            }
+                            select += '</select>';
+
+                            select += `<select name="endEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Stop" id="endEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                            select += '<option value="">-- End Effect --</option>';
+                            for (let effect in row.effects) {
+                                select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectIdEnd == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                            }
+                            select += '</select>';
+                            select += '</div>';
+                        }
                         return select;
                     }
                 },
-                // {
-                //     field: 'move',
-                //     align: 'center',
-                //     valign: 'middle',
-                //     clickToSelect: false,
-                //     formatter: function (value, row, index) {
-                //         if (!row.effects) return;
-
-                //         let select = `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-primary" style="width: 100%;">`;
-                //         select += '<option value="">-- Start Effect --</option>';
-                //         for (let effect in row.effects) {
-                //             select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectId == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
-                //         }
-                //         select += '</select><br>';
-
-                //         select += `<select name="endEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Stop" id="endEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-primary" style="width: 100%;">`;
-                //         select += '<option value="">-- End Effect --</option>';
-                //         for (let effect in row.effects) {
-                //             select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectIdEnd == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
-                //         }
-                //         select += '</select>';
-
-                //         return select;
-                //     }
-                // },
                 {
                     field: 'activityTriggerHigh',
                     align: 'center',
@@ -2110,6 +2144,31 @@ class SettingsApp extends Globals {
                 await maestro.SettingsApp.applyEffectToMacro(this.dataset.id, this.dataset.stageid, effect, true, false);
             }
             $(this).blur();
+        });
+        $('input[name="macroStopTimer"').on('change', async function (timer) {
+            let macro = this.dataset.id;
+            let stageId = this.dataset.stageid;
+            let time = this.value;
+
+            if (time == "") {
+                time = null;
+            } else {
+                if (Number(this.value) < Number(this.min)) {
+                    this.value = this.min;
+                }
+                if (Number(this.value) > Number(this.max)) {
+                    this.value = this.max;
+                }
+            }
+
+            maestro.SettingsApp.loadMacros().then(macros => {
+                for (let m of macros) {
+                    if (m.macro.name == macro && m.macro.stageId == stageId) {
+                        m.macro.autoStopTimer = (this.value == "" ? null : this.value);
+                    }
+                }
+                maestro.SettingsApp.saveLocalSetting("macros", macros);
+            });
         });
     };
     stageTable = () => {
