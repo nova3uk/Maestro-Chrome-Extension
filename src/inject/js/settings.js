@@ -1859,7 +1859,7 @@ class SettingsApp extends Globals {
                         if (!cues) return;
 
                         let select = '<div class="border border-black rounded p-1">';
-                        select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span><br>';
+                        select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span>';
                         select += `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
                         select += '<option value="">-- Start Cue --</option>';
                         for (let cue of row.cues) {
@@ -1874,9 +1874,9 @@ class SettingsApp extends Globals {
                         }
                         select += '</select>';
                         select += '</div>';
-                        select += '<br>';
-                        select += '<div class="border border-black rounded p-1">';
-                        select += '<span style="font-weight:bold;font-size:10px;">Effect Triggers</span><br>';
+                        //select += '<br>';
+                        select += '<div class="border border-black rounded p-1 mt-1">';
+                        select += '<span style="font-weight:bold;font-size:10px;">Move Effect Triggers</span>';
 
                         if (!row.effects) return;
 
