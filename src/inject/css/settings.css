@@ -1,8 +1,8 @@
 html {
-    overflow-x: hidden;
-    margin-right: calc(-1 * (100vw - 100%));
+    scrollbar-gutter: stable;
   }
 body{
+    overflow-y: scroll !important;
     background-color: rgb(199, 198, 198);
     padding-top: 60px;
 }   
