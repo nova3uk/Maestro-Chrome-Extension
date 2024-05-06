@@ -282,7 +282,7 @@
                     <button class="btn btn-warning" id="downloadBackup">Download Backup</button>
                     <button class="btn btn-warning" id="downloadConfig">Download Config</button>
                     <button class="btn btn-danger" id="clearConfig">Clear Config</button>
-                    <button class="btn btn-danger" id="restoreBackup">Restore Backup</button><br><br>
+                    <button class="btn btn-link" id="restoreBackup">Restore Backup</button><br><br>
                     <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
                 </div>
             </div>
@@ -481,18 +481,22 @@
                 <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
                     href="#macroControlsInfoPanel" role="button" aria-expanded="false"
                     aria-controls="macroControlsInfoPanel">
-                    <i class="bi bi-chevron-contract" width="20" height="20"></i>
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
                 </a>
-                <div class="collapse show" id="macroControlsInfoPanel" data-type="collapsable">
+                <div class="collapse" id="macroControlsInfoPanel" data-type="collapsable">
                     <p class="h6">
-                        <i class="bi bi-info-circle-fill"></i>
+                        <span class="text-success">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
                         <i>You can create macros via the Fixtures Tab</i>
                     </p>
                     <p>
                         See "Creating Macros" Section above for information on how to create a macro and how they
                         work.
                     </p>
-                    <h6>Triggers</h6>
+                    <h6><strong>Triggers</strong></h6>
                     <p>
                         The AutoStop trigger will stop the macro after the specified time (in secondsm, max
                         3600(1hr)).<br>
@@ -511,7 +515,7 @@
                         If another macro is triggered which also has a Start or End Effect whilst the first is still
                         active, it will take over.
                     </p>
-                    <h6>Auto Macros</h6>
+                    <h6><strong>Auto Macros</strong></h6>
                     <p>
                         You can specify the On and Off Activity Level for the macro to be triggered.<br>
                         Macro Triggering can be enabled/disabled globally via the "Auto Macros" tab above.<br>
@@ -556,9 +560,11 @@
                 <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
                     href="#effectControlsInfoPane" role="button" aria-expanded="false"
                     aria-controls="effectControlsInfoPane">
-                    <i class="bi bi-chevron-contract" width="20" height="20"></i>
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
                 </a>
-                <div class="collapse show" id="effectControlsInfoPane" data-type="collapsable">
+                <div class="collapse" id="effectControlsInfoPane" data-type="collapsable">
                     <p>
                         Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt
                         channel.
@@ -922,8 +928,14 @@
             </div>
             <!-- Fixture Controls -->
             <div class="tab-pane" id="tabpanel-fixtures" role="tabpanel" aria-labelledby="simple-tab-5">
-                <h2 class="mt-3"></h2>
-                <div>
+                <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
+                    href="#fixtureControlsInfoPanel" role="button" aria-expanded="false"
+                    aria-controls="fixtureControlsInfoPanel">
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
+                </a>
+                <div class="collapse" id="fixtureControlsInfoPanel" data-type="collapsable">
                     <p class="h6">
                         <span class="text-success">
                             <i class="bi bi-info-circle"></i>
@@ -992,7 +1004,6 @@
             <div class="tab-pane" id="tabpanel-cues" role="tabpanel" aria-labelledby="simple-tab-7">
                 <h2 class="mt-3"></h2>
                 <div>
-                    <p class="h6">Trigger Cue On Macro</p>
                     You can "apply" a cue when a macro is started or stopped.<br>
                     More info is available on the Macros Tab.
                 </div>
@@ -1022,10 +1033,11 @@
                 <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
                     href="#toggleControlsInfoPane" role="button" aria-expanded="false"
                     aria-controls="toggleControlsInfoPane">
-                    <i class="bi bi-chevron-contract" width="20" height="20"></i>
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
                 </a>
-                <div class="collapse show" id="toggleControlsInfoPane" data-type="collapsable">
-                    <p class="h6">Toggle Fixture Settings</p>
+                <div class="collapse" id="toggleControlsInfoPane" data-type="collapsable">
                     The MaestroDMX Interface requires you to switch all toggles one by one, these fixture toggles
                     help
                     to automate the process.<br>
@@ -1035,16 +1047,16 @@
                     disable all Gobos/Prisms except those.<br><br>
                     <i></i>Please note: If these toggles are active when you create a Macro, they will be saved to
                     the
-                    Macro.</i><br>
+                    Macro.</i>
+                </div>
+                <br>
+                <div id="goboMasters" class="float-end mb-2 ">
+                    <btn id="toggleAllGobo" class="btn btn-primary" data-state="false">Toggle All Gobos</btn>
+                    <btn id="toggleAllPrism" class="btn btn-primary">Toggle All Prisms</btn>
                 </div>
                 <div class="text-danger my-1">
                     <i class="bi bi-exclamation-octagon-fill"></i>
                     <i>These switches are live edits, and will take effect immediately</i>
-                </div>
-                <h2 class="mt-1"></h2>
-                <div id="goboMasters" class="float-end mb-2 ">
-                    <btn id="toggleAllGobo" class="btn btn-danger" data-state="false">Toggle All Gobos</btn>
-                    <btn id="toggleAllPrism" class="btn btn-danger">Toggle All Prisms</btn>
                 </div>
                 <table id="toggles" class="table my-1" data-classes="table table-bordered my-1 table-primary">
                     <thead class="table-light">
@@ -1068,15 +1080,17 @@
                 <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
                     href="#dimmerControlsInfoPane" role="button" aria-expanded="false"
                     aria-controls="dimmerControlsInfoPane">
-                    <i class="bi bi-chevron-contract" width="20" height="20"></i>
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
                 </a>
-                <div class="collapse show" id="dimmerControlsInfoPane" data-type="collapsable">
-                    <p class="h6">Dimmers</p>
+                <div class="collapse" id="dimmerControlsInfoPane" data-type="collapsable">
                     You can adjust the dimmer levels of all fixtures here.<br>
                     You can also use the "Set All Dimmers" buttons to set all dimmers to a specific level at once.<br>
                     The master dimmer, is the Global Brightness control, the same as on the Show page of MaestroDMX.
+                    <br>
                 </div>
-                <div class="mb-3"><br></div>
+                <br>
                 <div>
                     <div class="m-1 p-2 text-bg-dark rounded-3">
                         <span id="masterDimmerVal" class="float-end"></span>
@@ -1156,10 +1170,11 @@
                 <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
                     href="#focusControlsInfoPane" role="button" aria-expanded="false"
                     aria-controls="focusControlsInfoPane">
-                    <i class="bi bi-chevron-contract" width="20" height="20"></i>
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
                 </a>
-                <div class="collapse show" id="focusControlsInfoPane" data-type="collapsable">
-                    <p class="h6">Focus & Zoom</p>
+                <div class="collapse" id="focusControlsInfoPane" data-type="collapsable">
                     You can adjust the focus or zoom channels of all fixtures here.<br>
                     MaestroDMX currently does not have a dedicated focus channel.<br>
                     These toggles require the Focus channel to be named "Focus" or include the word focus in the name.

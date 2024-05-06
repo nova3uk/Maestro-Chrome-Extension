@@ -80,6 +80,12 @@ class SettingsApp extends Globals {
     bindEffects = async () => {
         document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
             btn.addEventListener('click', async (e) => {
+                let macros = await this.loadMacros();
+                if (!macros) {
+                    alert('No Macros found, please create a macro first.');
+                    return;
+                }
+
                 let table = document.getElementById("effects");
                 let inputElements = table.querySelectorAll("input");
 
@@ -125,8 +131,7 @@ class SettingsApp extends Globals {
                     return;
                 }
                 if (e.target.innerText == "Start") {
-                    let macros = await this.loadMacros();
-                    macros = await macros.filter(macro => macro.macro.stageId == this.stageId);
+                    macros = macros.filter(macro => macro.macro.stageId == this.stageId);
                     let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
                     if (hasRunningMacro) {
                         if (e.isTrusted)
@@ -375,7 +380,7 @@ class SettingsApp extends Globals {
                 var id = $(this).attr("id");
                 var state = await maestro.SettingsApp.getLocalSetting(id);
 
-                if (state == true)
+                if (state == null || state == true)
                     $(this).collapse('show');
                 if (state == false)
                     $(this).collapse('hide');
@@ -2489,7 +2494,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'name',
                     formatter: function (value, row, index) {
-                        return `<h6>${row.name}</h6>`;
+                        return `<h6 class="fw-bold">${row.name}</h6>`;
                     }
                 },
                 {
@@ -2502,16 +2507,18 @@ class SettingsApp extends Globals {
                             for (let attr of row.attributes) {
                                 if (attr.type == 'GOBO') {
                                     let x = 0;
-                                    response += `<span style="display:inline-block;"><h6>${attr.name}</h6></span></br>`
+                                    response += `<span class="badge text-bg-primary" style="min-width:100px;position:relative;bottom:-10px;">${attr.name}</span><br>`
+                                    response += `<div class="border border-primary rounded">`;
                                     for (let setting of attr.goboSetting.steps) {
-                                        response += `<span class="me-2 mb-2 p-2" style="display:inline-block;">`
+                                        response += `<span class="me-2 m-1 p-2 border" style="display:inline-block;">`
                                         response += `<span class="form-check form-switch">`
-                                        response += `    <input name="goboSwitch" ${row.active == false ? "disabled " : ""}class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="gobo_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
-                                        response += `    <label class="form-check-label" for="gobo_${row.id}_${i}_${x}">${setting.name}</label>`
+                                        response += `    <input name="goboSwitch" role="button" ${row.active == false ? "disabled " : ""}class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="gobo_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <label class="form-check-label fw-bold" role="button" for="gobo_${row.id}_${i}_${x}">${setting.name}</label>`
                                         response += `</span>`
                                         response += `</span>`
                                         x++;
                                     }
+                                    response += `</div>`
                                     response += `</br>`;
                                 }
                                 i++;
@@ -2522,17 +2529,19 @@ class SettingsApp extends Globals {
                             for (let attr of row.attributes) {
                                 if (attr.type == 'PRISM') {
                                     let x = 0;
-                                    response += `<span style="display:inline-block;"><h6>${attr.name}</h6></span></br>`
+                                    response += `<span class="badge text-bg-primary" style="min-width:100px;position:relative;bottom:-10px;">${attr.name}</span><br>`
+                                    response += `<div class="border border-primary rounded">`;
                                     for (let setting of attr.prismSetting.steps) {
-                                        response += `<span class="me-2 mb-2 p-2" style="display:inline-block;zwidth:120px;zheight:50px;">`
+                                        response += `<span class="me-2 m-1 p-2" style="display:inline-block;zwidth:120px;zheight:50px;">`
                                         response += `<span class="form-check form-switch">`
-                                        response += `    <input name="prismSwitch"  ${row.active == false ? "disabled " : ""}class="form-check-input" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="prism_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
-                                        response += `    <label class="form-check-label" for="prism_${row.id}_${i}_${x}">${setting.name}</label>`
+                                        response += `    <input name="prismSwitch" role="button" ${row.active == false ? "disabled " : ""}class="form-check-input text-success" type="checkbox" data-name="${setting.name}" data-type="${attr.type}" data-channel="${i}" data-index="${x}" data-fixtureid="${row.id}" id="prism_${row.id}_${i}_${x}"${setting.enabled == true ? " checked" : ""}>`
+                                        response += `    <label class="form-check-label fw-bold" role="button" for="prism_${row.id}_${i}_${x}">${setting.name}</label>`
                                         response += `</span>`
                                         response += `</span>`
                                         x++;
                                     }
-
+                                    response += `</div>`
+                                    response += `</br>`;
                                 }
                                 i++;
                             }
