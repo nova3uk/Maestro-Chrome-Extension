@@ -24,6 +24,8 @@ Currently supporting Maestro Firmware versions 1.2.0 and 1.3.0!
 11. Fixture Toggles - bulk edit split channels, such as Gobo or Prism all in one screen on all fixtures. Settings can be stored and recalled from a Macro.
 12. Dimmer Control. Adjust dimmers for all fixtures per Group or Globally. Settings can be stored and recalled from a Macro.
 13. Focus and Zoom controls. Control channels named Focus, or Zoom channels for all fixtures from one screen. Settings can be stored and recalled from a Macro.
+14. Move Effects (Circle, Circle Fan, Figure of 8, Figure of 8 Fan, Left/Right, Up/Down)
+15. Trigger move effect on macro start or end.
 
 Additional features may be added in future if needed, but the extension should be seen as a temporary solution which should become redundant as the Maestro team release new updates.
 
