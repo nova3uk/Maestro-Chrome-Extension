@@ -132,9 +132,10 @@ class SettingsApp extends Globals {
                     macros = await macros.filter(macro => macro.macro.stageId == this.stageId);
                     let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
                     if (hasRunningMacro) {
-                        if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
-                            return;
-                        }
+                        if (e.isTrusted)
+                            if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
+                                return;
+                            }
                     }
 
                     document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
@@ -951,7 +952,24 @@ class SettingsApp extends Globals {
                     await this.startCue(cueIndex);
                 })
             }
+            if (macros[0]?.macro.effectId) {
+                let activeEffect = await this.getLocalSetting("activeEffect");
+                if (activeEffect) {
+                    //stop currently running effect
+                    let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectId}"]`);
+                    if (effectBtn) {
+                        let event = new Event('click');
+                        effectBtn.dispatchEvent(event);
+                    }
+                }
 
+                let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectId}"]`);
+                if (effectBtn) {
+                    let event = new Event('click');
+                    effectBtn.dispatchEvent(event);
+                }
+
+            }
             this.logChanges(stageId, changeSet);
             this.hideLoader();
         } catch (e) {
@@ -1017,10 +1035,28 @@ class SettingsApp extends Globals {
                 const macroElement = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
                 macroElement.classList.remove('macro-active');
 
-                if (filteredMacros[0].macro.cueIdEnd) {
+                if (filteredMacros[0]?.macro.cueIdEnd) {
                     const cues = await this.getCues();
                     const cueIndex = cues.findIndex(cue => cue.uuid === filteredMacros[0].macro.cueIdEnd);
                     await this.startCue(cueIndex);
+                }
+                if (filteredMacros[0]?.macro.effectId) {
+                    let activeEffect = await this.getLocalSetting("activeEffect");
+                    if (activeEffect) {
+                        //stop currently running effect
+                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectId}"]`);
+                        if (effectBtn) {
+                            let event = new Event('click');
+                            effectBtn.dispatchEvent(event);
+                        }
+                    }
+                    if (filteredMacros[0]?.macro.effectIdEnd) {
+                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectIdEnd}"]`);
+                        if (effectBtn) {
+                            let event = new Event('click');
+                            effectBtn.dispatchEvent(event);
+                        }
+                    }
                 }
 
                 await maestro.SettingsApp.loadMacros().then(macros => {
@@ -1766,7 +1802,8 @@ class SettingsApp extends Globals {
                 fixtureName: fixtures.map(fixture => fixture.name),
                 cueId: macro.macro.cueId,
                 cueName: cue ? cue.name : "",
-                cues: cues
+                cues: cues,
+                effects: { ...maestro.SettingsApp.moveEffects }
             });
         };
 
@@ -1814,30 +1851,78 @@ class SettingsApp extends Globals {
                     }
                 },
                 {
-                    field: 'cue',
+                    field: 'triggers',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         if (!cues) return;
 
-                        let select = `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        let select = '<div class="border border-black rounded p-1">';
+                        select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span><br>';
+                        select += `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
                         select += '<option value="">-- Start Cue --</option>';
                         for (let cue of row.cues) {
                             select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueId == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
                         }
-                        select += '</select><br>';
+                        select += '</select>';
 
-                        select += `<select name="endCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Stop" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select text-center text-primary" style="width: 100%;">`;
+                        select += `<select name="endCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Stop" id="endCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
                         select += '<option value="">-- End Cue --</option>';
                         for (let cue of row.cues) {
                             select += `<option value="${cue.name}" data-id="{row.name}" data-uuid="${cue.uuid}" ${row.macro.macro.cueIdEnd == cue.uuid ? " selected" : ""}>${cue.name}</option>`;
                         }
                         select += '</select>';
+                        select += '</div>';
+                        select += '<br>';
+                        select += '<div class="border border-black rounded p-1">';
+                        select += '<span style="font-weight:bold;font-size:10px;">Effect Triggers</span><br>';
+
+                        if (!row.effects) return;
+
+                        select += `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                        select += '<option value="">-- Start Effect --</option>';
+                        for (let effect in row.effects) {
+                            select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectId == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                        }
+                        select += '</select>';
+
+                        select += `<select name="endEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Stop" id="endEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
+                        select += '<option value="">-- End Effect --</option>';
+                        for (let effect in row.effects) {
+                            select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectIdEnd == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                        }
+                        select += '</select>';
+                        select += '</div>';
 
                         return select;
                     }
                 },
+                // {
+                //     field: 'move',
+                //     align: 'center',
+                //     valign: 'middle',
+                //     clickToSelect: false,
+                //     formatter: function (value, row, index) {
+                //         if (!row.effects) return;
+
+                //         let select = `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-primary" style="width: 100%;">`;
+                //         select += '<option value="">-- Start Effect --</option>';
+                //         for (let effect in row.effects) {
+                //             select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectId == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                //         }
+                //         select += '</select><br>';
+
+                //         select += `<select name="endEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Stop" id="endEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-primary" style="width: 100%;">`;
+                //         select += '<option value="">-- End Effect --</option>';
+                //         for (let effect in row.effects) {
+                //             select += `<option value="${effect}" data-id="{row.name}" data-uuid="${effect}" ${row.macro.macro.effectIdEnd == effect ? " selected" : ""}>${row.effects[effect]}</option>`;
+                //         }
+                //         select += '</select>';
+
+                //         return select;
+                //     }
+                // },
                 {
                     field: 'activityTriggerHigh',
                     align: 'center',
@@ -1995,10 +2080,34 @@ class SettingsApp extends Globals {
                 let cues = await maestro.SettingsApp.getCues(true);
                 let uuid = document.querySelector(`select[name="endCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
 
-                if (uuid == "") return alert('Please select a macro');
+                if (uuid == "") return alert('Please select a Cue');
 
                 let cue = cues.find(cue => cue.uuid == uuid);
                 await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, true, false);
+            }
+            $(this).blur();
+        });
+        $('select[name="startEffectList"]').on('change', async function (btn) {
+            if (this.value == "") {
+                await maestro.SettingsApp.removeEffectFromMacro(this.dataset.id, this.dataset.stageid);
+            } else {
+                let effect = document.querySelector(`select[name="startEffectList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
+
+                if (effect == "") return alert('Please select an Effect');
+
+                await maestro.SettingsApp.applyEffectToMacro(this.dataset.id, this.dataset.stageid, effect, false, false);
+            }
+            $(this).blur();
+        });
+        $('select[name="endEffectList"]').on('change', async function (btn) {
+            if (this.value == "") {
+                await maestro.SettingsApp.removeEffectFromMacro(this.dataset.id, this.dataset.stageid, true);
+            } else {
+                let effect = document.querySelector(`select[name="endEffectList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
+
+                if (effect == "") return alert('Please select a macro');
+
+                await maestro.SettingsApp.applyEffectToMacro(this.dataset.id, this.dataset.stageid, effect, true, false);
             }
             $(this).blur();
         });
@@ -2197,6 +2306,39 @@ class SettingsApp extends Globals {
                 console.error('Error loading cues:', e);
         };
     };
+    removeEffectFromMacro = async (macroName, stageId, endEffect = false) => {
+        let macros = await this.loadMacros();
+        let macro = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
+        if (macro) {
+            if (endEffect) {
+                delete macro.macro.effectIdEnd;
+            } else {
+                delete macro.macro.effectId;
+            }
+            this.saveLocalSetting("macros", macros);
+        }
+    }
+    applyEffectToMacro = async (macroName, stageId, effectId, endEffect = false, reload = true) => {
+        let row = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
+        if (row.classList.contains('macro-active')) {
+            alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
+            return false;
+        }
+
+        let macros = await this.loadMacros();
+        let macro = macros.find(macro => macro.macro.stageId == stageId && macro.macro.name == macroName);
+        if (macro) {
+            if (endEffect) {
+                macro.macro.effectIdEnd = effectId;
+            } else {
+                macro.macro.effectId = effectId;
+            }
+
+            maestro.SettingsApp.saveLocalSetting("macros", macros);
+            await maestro.SettingsApp.saveLocalSetting('activeSettingsTab', 'tabpanel-macros');
+            if (reload) document.location.reload();
+        }
+    }
     removeCueFromMacro = async (macroName, stageId, endCue = false) => {
         let macros = await this.loadMacros();
         let macro = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == stageId);
@@ -2238,6 +2380,9 @@ class SettingsApp extends Globals {
         }
         return this.cues;
     }
+    getEffects = () => {
+        return this.moveEffects;
+    };
     createShowDropdown = (id, data, onChange) => {
         let select = document.createElement('select');
         select.id = id;

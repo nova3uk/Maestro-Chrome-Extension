@@ -132,6 +132,14 @@ class Globals {
         'MAGENTA_FINE': 'magenta',
         'YELLOW_FINE': 'yellow'
     };
+    moveEffects = {
+        animateCircle: "Circles",
+        animateCircleWithFan: "Circles with Fan",
+        animateFigureEight: "Figure 8",
+        animateFigureEightWithFan: "Figure 8 with Fan",
+        animateUpDown: "Up and Down",
+        animateLeftRight: "Left and Right"
+    };
 
     // Variable to be monitored
     activityLevelRoot = 0;
