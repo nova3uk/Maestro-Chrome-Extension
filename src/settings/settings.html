@@ -278,9 +278,9 @@
                     do not match.</i>
                 <br><br>
                 <div class="my-3">
-                    <button class="btn btn-warning" id="backupFixtures">Backup Fixtures</button>
-                    <button class="btn btn-warning" id="downloadBackup">Download Backup</button>
-                    <button class="btn btn-warning" id="downloadConfig">Download Config</button>
+                    <button class="btn btn-dark" id="backupFixtures">Backup Fixtures</button>
+                    <button class="btn btn-dark" id="downloadBackup">Download Backup</button>
+                    <button class="btn btn-dark" id="downloadConfig">Download Config</button>
                     <button class="btn btn-danger" id="clearConfig">Clear Config</button>
                     <button class="btn btn-link" id="restoreBackup">Restore Backup</button><br><br>
                     <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
@@ -564,6 +564,10 @@
                         <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
                     </span>
                 </a>
+                <div data-id="noMovers" class="text-dark my-1" style="display: none;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 20px;"></i>
+                    <i style="font-size:20px;">No Fixtures with Pan or Tilt found. Move Effects are disabled. </i>
+                </div>
                 <div class="collapse" id="effectControlsInfoPane" data-type="collapsable">
                     <p>
                         Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt

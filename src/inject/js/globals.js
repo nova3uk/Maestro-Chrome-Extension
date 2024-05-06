@@ -475,6 +475,8 @@ class Globals {
     getAllMovers = async () => {
         if (!this.activeStage)
             await this.getStages();
+        if (!this.activeStage.fixture)
+            return [];
 
         return await this.activeStage.fixture.filter(fixture => fixture.attribute.some(attr => attr.type === 'PAN' || attr.type === 'TILT'));
     }

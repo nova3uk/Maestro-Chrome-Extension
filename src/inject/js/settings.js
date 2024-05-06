@@ -78,14 +78,26 @@ class SettingsApp extends Globals {
         }, 1000);
     };
     bindEffects = async () => {
+        let fixtures = await maestro.SettingsApp.getAllMovers();
+        if (!fixtures || fixtures?.length == 0) {
+            let table = document.getElementById("effects");
+            let inputElements = table.querySelectorAll("input");
+            let btnElements = table.querySelectorAll("button");
+
+            inputElements.forEach(async input => {
+                input.disabled = true;
+            });
+            btnElements.forEach(async btn => {
+                btn.disabled = true;
+            });
+
+            document.querySelector('div[data-id="noMovers"]').style.display = "block";
+
+            return;
+        }
         document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 let macros = await this.loadMacros();
-                if (!macros) {
-                    alert('No Macros found, please create a macro first.');
-                    return;
-                }
-
                 let table = document.getElementById("effects");
                 let inputElements = table.querySelectorAll("input");
 
@@ -131,13 +143,15 @@ class SettingsApp extends Globals {
                     return;
                 }
                 if (e.target.innerText == "Start") {
-                    macros = macros.filter(macro => macro.macro.stageId == this.stageId);
-                    let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
-                    if (hasRunningMacro) {
-                        if (e.isTrusted)
-                            if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
-                                return;
-                            }
+                    if (macros.length > 0) {
+                        macros = macros.filter(macro => macro.macro.stageId == this.stageId);
+                        let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
+                        if (hasRunningMacro) {
+                            if (e.isTrusted)
+                                if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
+                                    return;
+                                }
+                        }
                     }
 
                     document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
