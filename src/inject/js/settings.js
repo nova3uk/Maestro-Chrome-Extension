@@ -1922,8 +1922,8 @@ class SettingsApp extends Globals {
 
                         //timers
                         select += '<div class="border border-black rounded p-1 mt-1">';
-                        select += '<span style="font-weight:bold;font-size:10px;">AutoStop Timer</span>';
-                        select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}" placeholder="AutoStop Timer in Seconds">`;
+                        select += '<span style="font-weight:bold;font-size:10px;">AutoStop Trigger</span>';
+                        select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}" placeholder="AutoStop Time in Seconds">`;
                         select += '</div>';
 
                         if (cues) {
