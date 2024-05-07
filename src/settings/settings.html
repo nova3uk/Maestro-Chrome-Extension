@@ -1335,6 +1335,47 @@
                 </div>
             </div>
         </div>
+        <!-- Modal MacroDiff -->
+        <div id="modalMacroDiff" class="modal modal-xl fade" role="dialog">
+            <div class=" modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Macro Attributes
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="changeTable" class="table table-bordered my-1 table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th data-field="fixture" data-sortable="false">
+                                        <div class="th-inner">
+                                            Fixture Name
+                                        </div>
+                                        <div class="fht-cell"></div>
+                                    </th>
+                                    <th data-field="setting" data-sortable="false">
+                                        <div class="th-inner">
+                                            Setting
+                                        </div>
+                                    </th>
+                                    <th data-field="type" data-sortable="false" data-width="700">
+                                        <div class="th-inner">
+                                            Attribute
+                                        </div>
+                                        <div class="fht-cell"></div>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary float-end" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="modalLoading"
             style="position:absolute;z-index: 9999999;top:0;left:0;background-color: grey;width:100%;height:100vh;opacity: .5;filter: alpha(opacity=50);">
             <div class="spinner-border text-primary" style="position:relative;top:50%;left:50%;width:60px;height:60px;">

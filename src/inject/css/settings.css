@@ -228,3 +228,6 @@ input[type="range"] {
     text-decoration: underline;
     cursor: pointer;
 }
+#changeTable{
+    font-size: 11px;
+}

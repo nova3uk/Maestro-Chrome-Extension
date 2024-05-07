@@ -915,9 +915,6 @@ class SettingsApp extends Globals {
                 if (diff.length === 0) {
                     ignoredFixtures.push({ fixtureId: fixture.id, name: fixture.name });
                     continue;
-                } else {
-                    //const filteredAttribute = fixture.attribute.filter((attr, index) => diff.includes(index.toString()));
-                    //modifiedFixtures.push({ fixtureId: fixture.id, name: fixture.name, attribute: filteredAttribute });
                 }
 
                 let changes = await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
@@ -1001,6 +998,27 @@ class SettingsApp extends Globals {
             this.hideLoader();
         }
     }
+    getMacroDiff = async (macroName, stageId) => {
+        let macros = await this.loadMacros();
+        macros = macros.filter(macro => macro.macro.name === macroName && macro.macro.stageId === stageId);
+        let mods = [];
+
+        for (let fixture of macros[0]?.macro.fixtures || []) {
+            let currentProfile = await this.getFixture(fixture.id);
+
+            if (!currentProfile) {
+                continue;
+            }
+
+            let diff = this.getObjectDiff(fixture.attribute, currentProfile.attribute);
+            if (diff.length != 0) {
+                for (let change in diff) {
+                    mods.push({ fixture: fixture.name, change: fixture.attribute[diff[change]] });
+                }
+            }
+        }
+        return mods;
+    };
     macroTimerWorker = () => {
         this.macroTimer = setInterval(async () => {
             if (this.macroTimerRunning) return;
@@ -1197,8 +1215,8 @@ class SettingsApp extends Globals {
                     this.putAttribute(fixtureId, attr, update);
                     modifiedParams.push({ fixtureId, attr, update });
                 }
-                return modifiedParams;
             };
+            return modifiedParams;
         } catch (e) {
             console.error('Error processing attribute changes:', e);
         }
@@ -1891,6 +1909,7 @@ class SettingsApp extends Globals {
                         response += `<span style="display:inline-block;width: 150px;overflow-wrap: break-word;">${row.name}</span><br>`;
                         response += `<span style="font-size:10px;display:block;position:absolute;bottom:12px;font-weight:bold;color: lightcoral;">Last Start: <span name="macroLastRunTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastRun == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastRun + 1000), true)}</span></span>`;
                         response += `<span style="font-size:10px;display:block;position:absolute;bottom:0px;font-weight:bold;color: lightcoral;">Last Stop: <span name="macroLastStopTime" data-id="${row.name}" data-stageid="${row.stageId}">${row.macro.macro.autoMacroLastStopped == null ? 'Never' : maestro.SettingsApp.formatDate(new Date(row.macro.macro.autoMacroLastStopped + 1000), true)}</span></span>`;
+                        response += `<span role="button" name="macroDiff" data-bs-toggle="tooltip" data-bs-placement="right" class="text-success" title="View Macro changes vs live" style="display:block;position:absolute;bottom:0px;right:0px;" data-id="${row.name}" data-stageid="${row.stageId}"><i class="bi bi-file-diff" style="font-size:20px;"></i></span>`
                         return response;
                     }
                 },
@@ -2179,6 +2198,63 @@ class SettingsApp extends Globals {
                     }
                 }
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
+            });
+        });
+        $('span[name="macroDiff"]').on('click', async function (btn) {
+            let data = await maestro.SettingsApp.getMacroDiff(this.dataset.id, this.dataset.stageid);
+            let macro = document.querySelector("table#macros tr[data-id='" + this.dataset.id + "']");
+            if (macro && macro.classList.contains('macro-active')) {
+                return alert("Macro is currently running, therefore no unapplied changes can be shown.");
+            }
+
+            if (data.length == 0) return alert('Macro is the same as live settings');
+
+            $('#changeTable').bootstrapTable({
+                columns: [{
+                    field: 'fixture',
+                    title: 'Fixture'
+                }, {
+                    field: 'fixture.change.name',
+                    title: 'Setting',
+                    formatter: function (value, row, index) {
+                        return row.change.name ? row.change.name : row.change.type;
+                    }
+                }, {
+                    field: 'fixture.change.type',
+                    title: 'Attribute Setting',
+                    formatter: function (value, row, index) {
+                        switch (row.change.type) {
+                            case 'GOBO':
+                                let goboSetting = '';
+                                for (let gobo of row.change.goboSetting.steps) {
+                                    goboSetting += `<span class='me-2 border border-${gobo.enabled == true ? "success" : "danger"} rounded m-1 p-1' style='display:inline-block;'>${gobo.name} - ${gobo.enabled == true ? "<span>On</span>" : "<span>Off</span>"}</span>`;
+                                }
+                                return goboSetting;
+                            case 'PRISM':
+                                let prismSetting = '';
+                                for (let prism of row.change.prismSetting.steps) {
+                                    prismSetting += `<span class='me-2  border border-${prism.enabled == true ? "success" : "danger"} rounded m-1 p-1'>${prism.name} - ${prism.enabled == true ? "<span>On</span>" : "<span>Off</span>"}</span>`;
+                                }
+                                return prismSetting;
+                            default:
+                                if (row.change.range) {
+                                    return `Range: Low=${Math.round(255 * row.change.range.lowValue)} High=${Math.round(255 * row.change.range.highValue)}`
+                                }
+                                if (row.change.staticValue) {
+                                    return `Static Value: ${row.change.staticValue.value}`;
+                                }
+                                if (row.change.toggleSetting) {
+                                    return `Toggle: On=${row.change.toggleSetting.onValue} Off=${row.change.toggleSetting.offValue}`
+                                }
+                        }
+                    }
+                }],
+                data: data
+            });
+
+            $('#modalMacroDiff').modal('show');
+            $('#modalMacroDiff').on('hidden.bs.modal', function () {
+                $('#changeTable').bootstrapTable('destroy');
             });
         });
     };
@@ -2781,10 +2857,10 @@ class SettingsApp extends Globals {
         for (let fixtureId of group.fixtureId) {
             let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
             for (let attr of fixture.attribute) {
-                if (attr.type == "STATIC" && (attr.name.toUpperCase() == "FOCUS" || attr.name.toUpperCase().indexOf("FOCUS") !== -1)) {
+                if (attr.type == "STATIC" && (attr.name && attr.name.toUpperCase() == "FOCUS" || attr.name && attr.name.toUpperCase().indexOf("FOCUS") !== -1)) {
                     values.push(attr.staticValue.value);
                 }
-                if (attr.type == "ZOOM") {
+                if (attr?.type == "ZOOM") {
                     values.push(Math.floor(255 * attr.range.highValue));
                 }
             }
@@ -2801,10 +2877,10 @@ class SettingsApp extends Globals {
                     let fixture = activeStage.fixture.find(ele => ele.id == fixtureId);
                     let index = 0;
                     for (let attribute of fixture.attribute) {
-                        if (!attribute.range && attribute.type == "ZOOM") {
+                        if (!attribute?.range && attribute?.type == "ZOOM") {
                             attribute.range = this.calculateRange({ lowValue: 0, highValue: 255 });
                         }
-                        if (attribute.type == "ZOOM" || attribute.name.toUpperCase() == "FOCUS" || attribute.name.toUpperCase().indexOf("FOCUS") !== -1) {
+                        if (attribute.type == "ZOOM" || (attribute.type == "STATIC" && attribute.name && attribute.name.toUpperCase().indexOf("FOCUS") !== -1)) {
                             tData.push(
                                 {
                                     id: fixture.id,
