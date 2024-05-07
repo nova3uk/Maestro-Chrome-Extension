@@ -114,7 +114,6 @@
             </div>
             <!-- Macro Info Panel -->
             <div class="tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-0a">
-                <h5>Creating Macros</h5>
                 <ol>
                     <li>For your convenience, before you start modifying, take a backup of your Stage, from the
                         MaestroDMX control panel,
@@ -159,7 +158,6 @@
             </div>
             <!-- AutoMacro Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-automacro" role="tabpanel" aria-labelledby="simple-tab-0b">
-                <h5>Enable Macro Triggering</h5>
                 <div>
                     You can trigger a macros activation or deactivation, based on the Activity Level of the music.<br>
                     <br>
@@ -213,13 +211,13 @@
             </div>
             <!-- Strobe Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
-                <h5>Enable Strobe Triggering</h5>
                 <div>
-                    If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or
-                    Shutter
-                    channel,
-                    you can set specific parameters in the Fixtures tab below to to fix it.
-                    <br>
+                    <p>
+                        If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or
+                        Shutter
+                        channel,
+                        you can set specific parameters in the Fixtures tab below to to fix it.
+                    </p>
                     <ol>
                         <li>
                             Set "Shutter Open" value, representing the normal open state for the Shutter or Strobe
@@ -246,7 +244,6 @@
             </div>
             <!-- Backup Panel -->
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
-                <h5>Backup & Restore</h5>
                 <ul>
                     <li>
                         Backup Now, will create a Snapshot of the currently loaded stage, plus all settings in this page
@@ -270,7 +267,8 @@
                         fixture settings!
                     </li>
                     <li>
-                        If you're not sure, go to <a id="downloadStage" target="_blank">Stages</a> and Download Stage
+                        Before making modifications it's highly reccomended that you go to <a id="downloadStage"
+                            target="_blank">Stages</a> and Download Stage
                         from the Maestro which will give you a backup of the current stage.
                     </li>
                 </ul>
@@ -284,22 +282,25 @@
                     <button class="btn btn-dark" id="downloadConfig">Download Config</button>
                     <button class="btn btn-danger" id="clearConfig">Clear Config</button>
                     <button class="btn btn-link" id="restoreBackup">Restore Backup</button><br><br>
-                    <span class="fst-italic me-2">Last backup date: <span id="backupDate"></span></span>
+                    <span class="fst-italic me-2">Last fixture backup date: <span id="backupDate"></span></span>
                 </div>
             </div>
             <!-- Fog Panel -->
             <div class="tab-pane" id="tabpanel-fog" role="tabpanel" aria-labelledby="simple-tab-2">
-                <h5>Autofog can be also switched on/off from the Icon Menu in the Chrome toolbar.</h5>
                 <p>
                     Activity trigger depends on the Audio Activity Level hitting the minimum peak you specify.<br>
                     The Duration is how long the Fog button will be pressed.<br>
                     The Interval is the minimum time between each execution of the Autofog.<br>
-                    Some music may have a lot of activity and it would trigger too many fog blasts, this interval
+                    Some music may have a lot of activity and it would trigger too many fog blasts, the interval
                     helps you avoid this.
                 </p>
                 <p>
                     You can activate both Fog on Timer, and Fog on Activity Peak, but only one will be executed at a
                     time and they will both respect each others interval settings.
+                </p>
+                <p>
+                    <i class="bi bi-info-circle"></i>
+                    Autofog can be also switched on/off from the Icon Menu in the Chrome toolbar.
                 </p>
                 <div class="text-danger my-1">
                     <i class="bi bi-exclamation-octagon-fill"></i>
@@ -355,8 +356,6 @@
             </div>
             <!-- Strobe & Effect Panel -->
             <div class="tab-pane" id="tabpanel-strobe" role="tabpanel" aria-labelledby="simple-tab-3">
-
-                <h5>The Strobe and Effect can be triggered based on audio Activity Level.</h5>
                 <p>
                     Activity trigger depends on the Audio Activity Level hitting the minimum peak you
                     specify.<br>
@@ -426,17 +425,17 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-12" data-bs-toggle="tab" href="#tabpanel-effects"
-                    role="tab" aria-controls="tabpanel-effects" aria-selected="true">
-                    <i class="bi bi-magic"></i>
-                    Move Effects
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
                 <a class="nav-link lower-panel" id="simple-tab-5" data-bs-toggle="tab" href="#tabpanel-fixtures"
                     role="tab" aria-controls="tabpanel-fixtures" aria-selected="false">
                     <i class="bi bi-projector"></i>
                     Fixtures
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link lower-panel" id="simple-tab-12" data-bs-toggle="tab" href="#tabpanel-effects"
+                    role="tab" aria-controls="tabpanel-effects" aria-selected="true">
+                    <i class="bi bi-magic"></i>
+                    Move Effects
                 </a>
             </li>
             <li class="nav-item" role="presentation">

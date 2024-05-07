@@ -27,7 +27,7 @@ class SettingsApp extends Globals {
         await this.getStages();
         this.activeStageId = this.stageId;
 
-        this.controlPageLink();
+        this.bindMaestroLinks();
         this.stageTable();
         this.fixtureTable(this.activeStage, this.activeStageFixtureGroups);
         this.togglesTable(this.activeStage, this.activeStageFixtureGroups);
@@ -76,6 +76,13 @@ class SettingsApp extends Globals {
                     console.error('Error in tooltip:', e);
             }
         }, 1000);
+    };
+    bindMaestroLinks = async () => {
+        var link = document.getElementById('downloadStage')
+        link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}`);
+
+        var link = document.getElementById('controlPageLink')
+        link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
     };
     bindEffects = async () => {
         let fixtures = await maestro.SettingsApp.getAllMovers();
@@ -480,7 +487,6 @@ class SettingsApp extends Globals {
             this.bindRestoreBackupBtn();
             this.bindConfigBtn();
             this.bindClearConfigBtn();
-            this.bindDownloadStage();
         }
 
         let backupDate = await this.getLocalSetting("fixture_backup").then(backupData => {
@@ -535,10 +541,6 @@ class SettingsApp extends Globals {
                 });
             };
         });
-    };
-    bindDownloadStage = async () => {
-        var link = document.getElementById('downloadStage')
-        link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}`);
     };
     //download eveyrthign except fixture backup
     bindConfigBtn = async () => {
@@ -835,10 +837,6 @@ class SettingsApp extends Globals {
             let autoFogOnActivityPeakInterval = this.safeMinMax(document.getElementById('autoFogOnActivityPeakInterval').value, 1, 30);
             await this.saveLocalSetting("autoFogOnActivityPeakInterval", autoFogOnActivityPeakInterval);
         });
-    }
-    controlPageLink = function () {
-        var link = document.getElementById('controlPageLink')
-        link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
     };
     loadMacros = async (callback) => {
         return await this.getLocalSetting("macros").then(macros => {
@@ -1925,7 +1923,7 @@ class SettingsApp extends Globals {
                         //timers
                         select += '<div class="border border-black rounded p-1 mt-1">';
                         select += '<span style="font-weight:bold;font-size:10px;">AutoStop Timer</span>';
-                        select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}">`;
+                        select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}" placeholder="AutoStop Timer in Seconds">`;
                         select += '</div>';
 
                         if (cues) {
