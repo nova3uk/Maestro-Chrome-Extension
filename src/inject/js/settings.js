@@ -496,8 +496,14 @@ class SettingsApp extends Globals {
         });
         if (backupDate) {
             backupDate = this.formatDate(new Date(JSON.parse(backupDate)));
-            backupDate = `${backupDate} - <a href="#" id="restoreBackup">Restore</a>`;
+            backupDate = `${backupDate} - <a href="#" id="restoreAllFixtures">Restore</a>`;
             document.getElementById('backupDate').innerHTML = backupDate;
+
+            document.getElementById('restoreAllFixtures').addEventListener('click', async () => {
+                if (confirm('Are you sure you want to restore all fixtures?\n\nThis will overwrite all current fixture settings.')) {
+                    await this.restoreAllFixtures();
+                }
+            });
         } else {
             document.getElementById('backupDate').innerText = "Never";
         }
@@ -720,7 +726,7 @@ class SettingsApp extends Globals {
             await this.saveLocalSetting("autoEffectsEnabled", autoEffectsEnabled);
         });
         document.getElementById('autoEffectsOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoEffectsOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoEffectsOnActivityPeakPercent').value, 80, 99);
+            let autoEffectsOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoEffectsOnActivityPeakPercent').value, 50, 99);
             await this.saveLocalSetting("autoEffectsOnActivityPeakPercent", autoEffectsOnActivityPeakPercent);
         });
         document.getElementById('autoEffectsOnActivityPeakDuration').addEventListener('change', async () => {
@@ -741,7 +747,7 @@ class SettingsApp extends Globals {
             await this.saveLocalSetting("autoStrobeEnabled", autoStrobeEnabled);
         });
         document.getElementById('autoStrobeOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoStrobeOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoStrobeOnActivityPeakPercent').value, 80, 99);
+            let autoStrobeOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoStrobeOnActivityPeakPercent').value, 50, 99);
             await this.saveLocalSetting("autoStrobeOnActivityPeakPercent", autoStrobeOnActivityPeakPercent);
         });
         document.getElementById('autoStrobeOnActivityPeakDuration').addEventListener('change', async () => {
@@ -826,11 +832,11 @@ class SettingsApp extends Globals {
             await this.saveLocalSetting("fogTimerDuration", fogTimerDuration);
         });
         document.getElementById('autoFogOnActivityPeakPercent').addEventListener('change', async () => {
-            let autoFogOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoFogOnActivityPeakPercent').value, 80, 99);
+            let autoFogOnActivityPeakPercent = this.safeMinMax(document.getElementById('autoFogOnActivityPeakPercent').value, 50, 99);
             await this.saveLocalSetting("autoFogOnActivityPeakPercent", autoFogOnActivityPeakPercent);
         });
         document.getElementById('autoFogOnActivityPeakDuration').addEventListener('change', async () => {
-            let autoFogOnActivityPeakDuration = this.safeMinMax(document.getElementById('autoFogOnActivityPeakDuration').value, 80, 99);
+            let autoFogOnActivityPeakDuration = this.safeMinMax(document.getElementById('autoFogOnActivityPeakDuration').value, 1, 30);
             await this.saveLocalSetting("autoFogOnActivityPeakDuration", autoFogOnActivityPeakDuration);
         });
         document.getElementById('autoFogOnActivityPeakInterval').addEventListener('change', async () => {
@@ -1121,14 +1127,14 @@ class SettingsApp extends Globals {
                     let activeEffect = await this.getLocalSetting("activeEffect");
                     if (activeEffect) {
                         //stop currently running effect
-                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectId}"]`);
+                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${m[0]?.macro.effectId}"]`);
                         if (effectBtn) {
                             let event = new Event('click');
                             effectBtn.dispatchEvent(event);
                         }
                     }
                     if (m[0]?.macro.effectIdEnd) {
-                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${macros[0]?.macro.effectIdEnd}"]`);
+                        let effectBtn = document.querySelector(`[data-type="effectBtn"][data-effect="${m[0]?.macro.effectIdEnd}"]`);
                         if (effectBtn) {
                             let event = new Event('click');
                             effectBtn.dispatchEvent(event);
@@ -2053,15 +2059,14 @@ class SettingsApp extends Globals {
 
             if (level == "") {
                 level = null;
+            } else {
+                if (Number(this.value) < Number(this.min)) {
+                    this.value = this.min;
+                }
+                if (Number(this.value) > Number(this.max)) {
+                    this.value = this.max;
+                }
             }
-
-            if (Number(this.value) < Number(this.min)) {
-                this.value = this.min;
-            }
-            if (Number(this.value) > Number(this.max)) {
-                this.value = this.max;
-            }
-
 
             maestro.SettingsApp.loadMacros().then(macros => {
                 for (let m of macros) {
