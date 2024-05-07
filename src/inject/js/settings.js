@@ -1687,36 +1687,41 @@ class SettingsApp extends Globals {
             document.getElementById('panFanRange').value = 0;
             document.getElementById('panFanRangeVal').value = 0;
         });
-        document.getElementById('panTiltSetDefault').addEventListener('click', async function () {
-            let fixtures = document.getElementById('panTiltFinder').dataset.id;
-            if (confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?')) {
-                if (Array.isArray(JSON.parse(fixtures))) {
-                    for (let fixture of JSON.parse(fixtures)) {
-                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
-                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
+        if (document.getElementById('panTiltSetDefault').getAttribute('listener') !== 'true') {
+            document.getElementById('panTiltSetDefault').setAttribute('listener', 'true');
+
+            document.getElementById('panTiltSetDefault').addEventListener('click', async function () {
+
+                let fixtures = document.getElementById('panTiltFinder').dataset.id;
+                if (confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?')) {
+                    if (Array.isArray(JSON.parse(fixtures))) {
+                        for (let fixture of JSON.parse(fixtures)) {
+                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
+                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                        }
+
+                        if (confirm('Would you also like to set the default Pan/Tilt for all Mover Effects?')) {
+                            maestro.SettingsApp.saveLocalSetting("ef8PanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("ef8TiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("ef8FPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("ef8FTiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efCFPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efCFTiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efCPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efCTiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efLRPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efUDTiltStart", document.getElementById('tiltRangeVal').value);
+
+                        }
+                    } else {
+                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
+                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
                     }
 
-                    if (confirm('Would you also like to set the default Pan/Tilt for all Mover Effects?')) {
-                        maestro.SettingsApp.saveLocalSetting("ef8PanStart", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("ef8TiltStart", document.getElementById('tiltRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("ef8FPanStart", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("ef8FTiltStart", document.getElementById('tiltRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efCFPanStart", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efCFTiltStart", document.getElementById('tiltRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efCPanStart", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efCTiltStart", document.getElementById('tiltRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efLRPanStart", document.getElementById('panRangeVal').value);
-                        maestro.SettingsApp.saveLocalSetting("efUDTiltStart", document.getElementById('tiltRangeVal').value);
-
-                    }
-                } else {
-                    await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
-                    await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                    document.location.reload();
                 }
-
-                document.location.reload();
-            }
-        });
+            });
+        }
     };
     setPanFanLimits = () => {
         document.getElementById('panFanRange').value = 0;
