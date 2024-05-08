@@ -188,7 +188,7 @@ class Effects extends Globals {
             }
         }
     };
-    animateUpDown = async (startTilt, delay, range, numSteps, startOrStop) => {
+    animateUpDown = async (startPan, startTilt, delay, range, numSteps, startOrStop) => {
         if (startOrStop === "start") {
             if (!this.canRun()) return;
             this.animationRunning = true;
@@ -205,6 +205,11 @@ class Effects extends Globals {
 
         let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
+
+        //set initial Pan/Tilt
+        for (let i = 0; i < numFixtures; i++) {
+            await maestro.Effects.setPanTiltD(fixtures[i].id, startPan, startTilt);
+        }
 
         while (this.animationRunning) {
             for (let step = 0; step < numSteps; step++) {
@@ -223,7 +228,7 @@ class Effects extends Globals {
             }
         }
     };
-    animateUpDownWithFan = async (startTilt, delay, range, numSteps, fanRate, startOrStop) => {
+    animateUpDownWithFan = async (startPan, startTilt, delay, range, numSteps, fanRate, startOrStop) => {
         if (startOrStop === "start") {
             if (!this.canRun()) return;
             this.animationRunning = true;
@@ -241,6 +246,11 @@ class Effects extends Globals {
 
         let fixtures = await this.getAllMovers();
         let numFixtures = fixtures.length;
+
+        //set initial Pan/Tilt
+        for (let i = 0; i < numFixtures; i++) {
+            await maestro.Effects.setPanTiltD(fixtures[i].id, startPan, startTilt);
+        }
 
         while (this.animationRunning) {
             for (let step = 0; step < numSteps; step++) {
@@ -260,7 +270,7 @@ class Effects extends Globals {
             }
         }
     };
-    animateLeftRight = async (startPan, delay, range, numSteps, startOrStop) => {
+    animateLeftRight = async (startPan, startTilt, delay, range, numSteps, startOrStop) => {
         if (startOrStop === "start") {
             if (!this.canRun()) return;
             this.animationRunning = true;
@@ -280,6 +290,11 @@ class Effects extends Globals {
 
         // Calculate the angle between each step
         let angleStep = (2 * Math.PI) / numSteps;
+
+        //set initial Pan/Tilt
+        for (let i = 0; i < numFixtures; i++) {
+            await maestro.Effects.setPanTiltD(fixtures[i].id, startPan, startTilt);
+        }
 
         while (this.animationRunning) {
             for (let step = 0; step < numSteps; step++) {

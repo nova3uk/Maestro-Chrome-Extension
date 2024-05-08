@@ -138,13 +138,13 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'stop');
                             break;
                         case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'stop');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDPanStart'), getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'stop');
                             break;
                         case "effectUpDownFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'stop');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFPanStart'), getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'stop');
                             break;
                         case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'stop');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRTiltStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'stop');
                             break;
                     }
                     inputElements.forEach(async input => {
@@ -193,13 +193,13 @@ class SettingsApp extends Globals {
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'start');
                             break;
                         case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'start');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDPanStart'), getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'start');
                             break;
                         case "effectUpDownFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'start');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFPanStart'), getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'start');
                             break;
                         case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'start');
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRTiltStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'start');
                             break;
                     }
 
@@ -1718,7 +1718,11 @@ class SettingsApp extends Globals {
                             maestro.SettingsApp.saveLocalSetting("efCPanStart", document.getElementById('panRangeVal').value);
                             maestro.SettingsApp.saveLocalSetting("efCTiltStart", document.getElementById('tiltRangeVal').value);
                             maestro.SettingsApp.saveLocalSetting("efLRPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efLRTiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efUDPanStart", document.getElementById('panRangeVal').value);
                             maestro.SettingsApp.saveLocalSetting("efUDTiltStart", document.getElementById('tiltRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efUDFPanStart", document.getElementById('panRangeVal').value);
+                            maestro.SettingsApp.saveLocalSetting("efUDFTiltStart", document.getElementById('tiltRangeVal').value);
 
                         }
                     } else {
