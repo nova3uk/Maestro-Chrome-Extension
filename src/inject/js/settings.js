@@ -1602,6 +1602,7 @@ class SettingsApp extends Globals {
             document.getElementById('panRangeVal').value = x;
             document.getElementById('tiltRangeVal').value = y;
             maestro.SettingsApp.panTiltHandler(document.getElementById('panTiltFinder').dataset.id);
+            maestro.SettingsApp.setPanFanLimits();
         }
 
         maestro.SettingsApp.loadCoordFinder(boxResponse);
