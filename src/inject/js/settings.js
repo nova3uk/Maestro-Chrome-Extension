@@ -140,6 +140,9 @@ class SettingsApp extends Globals {
                         case "effectUpDown":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'stop');
                             break;
+                        case "effectUpDownFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'stop');
+                            break;
                         case "effectLeftRight":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'stop');
                             break;
@@ -191,6 +194,9 @@ class SettingsApp extends Globals {
                             break;
                         case "effectUpDown":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'start');
+                            break;
+                        case "effectUpDownFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'start');
                             break;
                         case "effectLeftRight":
                             maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'start');

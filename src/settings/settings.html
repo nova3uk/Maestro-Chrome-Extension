@@ -883,6 +883,55 @@
                                     </tr>
                                     <tr>
                                         <td class="align-middle">
+                                            <img src="/src/img/arrow-down-up.svg" width="30" height="30"><br>
+                                            Up & Down - Fan
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDFTiltStart" class="form-control" type="number"
+                                                            min="0" max="255" value="80">
+                                                        <label for="efUDFTiltStart">Tilt Start</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDFDelay" class="form-control" type="number"
+                                                            min="1" max="500" value="10">
+                                                        <label for="efUDFDelay">Speed</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDFRadius" class="form-control" type="number"
+                                                            min="0" max="180" value="90">
+                                                        <label for="efUDFRadius">Size</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDFSteps" class="form-control" type="number"
+                                                            min="90" max="180" value="90">
+                                                        <label for="efUDFSteps">Steps</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="form-floating mb-1">
+                                                        <input id="efUDFFan" class="form-control" type="number" min="1"
+                                                            max="64" value="10">
+                                                        <label for="efUDFFan">Fan</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button id="effectUpDownFan" data-effect="animateUpDownWithFan"
+                                                data-type="effectBtn" class="btn btn-primary">Start</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
                                             <img src="/src/img/arrow-left-right.svg" width="30" height="30"><br>
                                             Left & Right
                                         </td>

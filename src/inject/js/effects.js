@@ -223,6 +223,43 @@ class Effects extends Globals {
             }
         }
     };
+    animateUpDownWithFan = async (startTilt, delay, range, numSteps, fanRate, startOrStop) => {
+        if (startOrStop === "start") {
+            if (!this.canRun()) return;
+            this.animationRunning = true;
+        } else {
+            this.animationRunning = false;
+            this.resetPanTiltD();
+            return;
+        }
+
+        startTilt = Number(startTilt);
+        delay = Number(delay);
+        range = Number(range);
+        numSteps = Number(numSteps);
+        fanRate = Number(fanRate);
+
+        let fixtures = await this.getAllMovers();
+        let numFixtures = fixtures.length;
+
+        while (this.animationRunning) {
+            for (let step = 0; step < numSteps; step++) {
+                if (!this.animationRunning) return;
+                for (let i = 0; i < numFixtures; i++) {
+                    // Calculate the tilt setting for this fixture using a sine wave function
+                    // Adjust t by the fixture's index and the fan rate to create the fan effect
+                    let t = (step + i * fanRate) / numSteps;
+                    let tilt = startTilt + range * Math.sin(t * 2 * Math.PI);
+
+                    // Apply the tilt setting to the fixture
+                    await maestro.Effects.setTiltD(fixtures[i].id, tilt);
+                }
+
+                // Wait for the specified delay before moving to the next step
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        }
+    };
     animateLeftRight = async (startPan, delay, range, numSteps, startOrStop) => {
         if (startOrStop === "start") {
             if (!this.canRun()) return;
