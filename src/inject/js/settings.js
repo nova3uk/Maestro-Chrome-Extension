@@ -153,14 +153,16 @@ class SettingsApp extends Globals {
                     return;
                 }
                 if (e.target.innerText == "Start") {
-                    if (macros.length > 0) {
-                        macros = macros.filter(macro => macro.macro.stageId == this.stageId);
-                        let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
-                        if (hasRunningMacro) {
-                            if (e.isTrusted)
-                                if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
-                                    return;
-                                }
+                    if (macros) {
+                        if (macros.length > 0) {
+                            macros = macros.filter(macro => macro.macro.stageId == this.stageId);
+                            let hasRunningMacro = macros.some(macro => macro.macro.macroRunning);
+                            if (hasRunningMacro) {
+                                if (e.isTrusted)
+                                    if (!confirm('There are Macros Active, if you start this effect whilst a macro is running which also controls the pan/til on the same fixtures it will cause conflicts.\n\nProceed or cancel?')) {
+                                        return;
+                                    }
+                            }
                         }
                     }
 

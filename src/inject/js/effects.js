@@ -24,7 +24,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -66,7 +66,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -109,7 +109,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -151,7 +151,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -194,7 +194,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -234,7 +234,7 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
@@ -276,13 +276,13 @@ class Effects extends Globals {
             this.animationRunning = true;
         } else {
             this.animationRunning = false;
-            this.resetPanTiltD();
+            setTimeout(() => { this.resetPanTiltD(); }, 200);
             return;
         }
 
         startPan = Number(startPan);
         delay = Number(delay);
-        range = Number(range);
+        range = Number(range) / 2; // Divide the range by 2
         numSteps = Number(numSteps);
 
         let fixtures = await this.getAllMovers();
@@ -301,7 +301,7 @@ class Effects extends Globals {
                 if (!this.animationRunning) return;
                 for (let i = 0; i < numFixtures; i++) {
                     // Calculate the pan setting for this fixture based on a sine wave
-                    let pan = startPan + range * (Math.sin(step * angleStep) / 2 + 0.5);
+                    let pan = startPan + range * Math.sin(step * angleStep);
 
                     // Apply the pan setting to the fixture
                     await maestro.Effects.setPanTiltD(fixtures[i].id, pan, fixtures[i].tilt);
