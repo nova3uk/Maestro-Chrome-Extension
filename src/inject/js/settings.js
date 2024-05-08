@@ -992,6 +992,7 @@ class SettingsApp extends Globals {
                     this.macroStopTimer(macros[0]?.macro.name, macros[0]?.macro.stageId);
                 }
             }
+
             this.logChanges(stageId, changeSet);
             this.hideLoader();
         } catch (e) {
@@ -1932,13 +1933,13 @@ class SettingsApp extends Globals {
                 },
                 {
                     field: 'fixtures',
-                    align: 'left',
-                    valign: 'middle',
+                    align: 'center',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         let fixtureNames = "";
                         for (let fixture of row.fixtureName) {
-                            fixtureNames += `<span>${fixture}</span><br>`;
+                            fixtureNames += `<span style="font-size: 0.875rem">${fixture}</span><br>`;
                         }
                         return fixtureNames;
                     }
@@ -1952,14 +1953,14 @@ class SettingsApp extends Globals {
                         let select = "";
 
                         //timers
-                        select += '<div class="border border-black rounded p-1 mt-1">';
+                        select += '<div class="border border-black rounded px-1 pb-1 mt-1">';
                         select += '<span style="font-weight:bold;font-size:10px;">AutoStop Trigger</span>';
                         select += `<input type="number" name="macroStopTimer" data-id="${row.name}" data-stageid="${row.stageId}" class="form-control form-control-sm text-center text-black" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the time in seconds for the Macro to run. Leave blank to run indefinitely (until stopped)." style="width: 100%;" min="1" max="3600" value="${row.macro.macro.autoStopTimer ? row.macro.macro.autoStopTimer : ""}" placeholder="AutoStop Time in Seconds">`;
                         select += '</div>';
 
                         if (cues) {
                             //cue triggers
-                            select += '<div class="border border-black rounded p-1 mt-1">';
+                            select += '<div class="border border-black rounded px-1 mt-1">';
                             select += '<span style="font-weight:bold;font-size:10px;">Cue Triggers</span>';
                             select += `<select name="startCueList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cue to trigger on Macro Start" id="startCueList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
                             select += '<option value="">-- Start Cue --</option>';
@@ -1978,7 +1979,7 @@ class SettingsApp extends Globals {
                         }
                         if (row.effects) {
                             //Effect Triggers
-                            select += '<div class="border border-black rounded p-1 mt-1">';
+                            select += '<div class="border border-black rounded px-1 mt-1">';
                             select += '<span style="font-weight:bold;font-size:10px;">Move Effect Triggers</span>';
 
                             select += `<select name="startEffectList" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Effect to trigger on Macro Start" id="startEffectList_${row.name}" data-id="${row.name}" data-stageid="${row.stageId}" class="form-select form-select-sm text-center text-black mb-1" style="width: 100%;">`;
@@ -2002,7 +2003,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'activityTriggerHigh',
                     align: 'center',
-                    valign: 'middle',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return `<label style="font-size:10px;font-weight:bold;position:relative;top:-7px;">On Level</label><br><input type="number" name="activityLevel" data-type="on" data-id="${row.name}" data-stageid="${row.stageId}" class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the audio Activity Level at which the trigger will come on. Leave blank to disable!" style="position:relative;top:-7px;width: 50px;" min="50" max="99" value="${row.activityLevelOn == null ? '' : row.activityLevelOn}">`;
@@ -2011,7 +2012,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'activityTriggerLow',
                     align: 'center',
-                    valign: 'middle',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return `<label style="font-size:10px;font-weight:bold;position:relative;top:-7px;">Off Level</label><br><input type="number" name="activityLevel" data-type="off" data-id="${row.name}" data-stageid="${row.stageId}" class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the audio Activity Level at which the trigger will switch off. Leave blank to disable!" style="position:relative;top:-7px;width: 50px;" min="10" max="99" value="${row.activityLevelOff == null ? '' : row.activityLevelOff}">`;
@@ -2020,7 +2021,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'button_apply',
                     align: 'center',
-                    valign: 'middle',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return `<button class="btn btn-danger" name="btn_apply" data-id="${row.name}" data-stageid="${row.stageId}"><img src="/src/img/play.svg" width="30" height="30"></button>`;
@@ -2029,7 +2030,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'button_clear',
                     align: 'center',
-                    valign: 'middle',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return `<button class="btn btn-success" name="btn_clr" data-id="${row.name}" data-stageid="${row.stageId}" disabled><img src="/src/img/stop-fill.svg" width="30" height="30"></button>`;
@@ -2038,7 +2039,7 @@ class SettingsApp extends Globals {
                 {
                     field: 'button_delete',
                     align: 'center',
-                    valign: 'middle',
+                    valign: 'top',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
                         return `<button class="btn btn-warning" name="btn_delete" data-id="${row.name}" data-stageid="${row.stageId}"><img src="/src/img/trash.svg" width="30" height="30"></button>`;
@@ -2210,6 +2211,9 @@ class SettingsApp extends Globals {
                 }
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
             });
+        });
+        $('button[name="updateMacro"]').on('click', function (btn) {
+            alert('Update Macro')
         });
         $('span[name="macroDiff"]').on('click', async function (btn) {
             let data = await maestro.SettingsApp.getMacroDiff(this.dataset.id, this.dataset.stageid);

@@ -195,7 +195,7 @@ class Globals {
             }
         });
     };
-    injectOverlay = function () {
+    injectOverlay = () => {
         var s = document.createElement("script");
         s.src = this.getFilePath("src/inject/js/overlay.js");
         (document.head || document.documentElement).appendChild(s);

@@ -231,3 +231,17 @@ input[type="range"] {
 #changeTable{
     font-size: 11px;
 }
+.form-select-sm {
+    padding-top: .15rem;
+    padding-bottom: .15rem;
+    padding-left: .5rem;
+    font-size: .775rem;
+    border-radius: var(--bs-border-radius-sm);
+}
+.form-control-sm {
+    padding-top: .15rem;
+    padding-bottom: .15rem;
+    padding-left: .5rem;
+    font-size: .775rem;
+    border-radius: var(--bs-border-radius-sm);
+}
