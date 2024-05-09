@@ -917,7 +917,7 @@ class SettingsApp extends Globals {
                 }
             }
 
-
+            const promiseArray = [];
             for (let fixture of macros[0]?.macro.fixtures || []) {
                 let currentProfile = await this.getFixture(fixture.id);
 
@@ -930,13 +930,21 @@ class SettingsApp extends Globals {
                     ignoredFixtures.push({ fixtureId: fixture.id, name: fixture.name });
                     continue;
                 }
-
-                let changes = await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
-                changeSet.push(...changes);
-                this.storeFixtureProfile(macroName, currentProfile);
+                promiseArray.push(
+                    new Promise(async (resolve, reject) => {
+                        try {
+                            let changes = await this.processAttributeChanges(diff, fixture.id, fixture, currentProfile);
+                            changeSet.push(...changes);
+                            this.storeFixtureProfile(macroName, currentProfile);
+                            resolve();
+                        } catch (e) {
+                            reject(e);
+                        }
+                    })
+                );
             }
 
-            //console.log(modifiedFixtures);
+            await Promise.all(promiseArray);
 
             if (ignoredFixtures.length > 0) {
                 if (ignoredFixtures.length === macros[0]?.macro.fixtures.length) {
