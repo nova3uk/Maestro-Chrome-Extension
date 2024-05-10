@@ -98,7 +98,8 @@
         "src/external/bootstrap-table.min.js",
         "src/external/bootstrap-table.min.css",
         "src/external/json-editor.js",
-        "src/external/loadash.min.js"
+        "src/external/loadash.min.js",
+        "src/external/bootbox.min.js"
       ],
       "matches": ["*://*/*"]
     }
