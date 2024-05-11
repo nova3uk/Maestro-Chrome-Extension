@@ -108,6 +108,38 @@ class SettingsApp extends Globals {
                 let table = document.getElementById("effects");
                 let inputElements = table.querySelectorAll("input");
 
+                function switchEffect(effect, startOrStop) {
+                    function getById(id) {
+                        return document.getElementById(id).value;
+                    };
+                    switch (effect) {
+                        case "effectCircle":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), startOrStop);
+                            break;
+                        case "effectCircleFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan'), startOrStop);
+                            break;
+                        case "effectEight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), startOrStop);
+                            break;
+                        case "effectEightFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), startOrStop);
+                            break;
+                        case "effectUpDown":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDPanStart'), getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), startOrStop);
+                            break;
+                        case "effectUpDownFan":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFPanStart'), getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), startOrStop);
+                            break;
+                        case "effectLeftRight":
+                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRTiltStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), startOrStop);
+                            break;
+                    }
+                    inputElements.forEach(async input => {
+                        input.disabled = startOrStop == 'start' ? true : false;
+                    });
+                };
+
                 if (e.target.innerText == "Stop") {
                     document.querySelectorAll('[data-type="effectBtn"]').forEach(btn => {
                         if (e.target.id != btn.id) {
@@ -120,36 +152,7 @@ class SettingsApp extends Globals {
 
                     await this.deleteLocalSetting("activeEffect");
 
-                    function getById(id) {
-                        return document.getElementById(id).value;
-                    }
-
-                    switch (e.target.id) {
-                        case "effectCircle":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'stop');
-                            break;
-                        case "effectCircleFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan'), 'stop');
-                            break;
-                        case "effectEight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'stop');
-                            break;
-                        case "effectEightFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'stop');
-                            break;
-                        case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDPanStart'), getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'stop');
-                            break;
-                        case "effectUpDownFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFPanStart'), getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'stop');
-                            break;
-                        case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRTiltStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'stop');
-                            break;
-                    }
-                    inputElements.forEach(async input => {
-                        input.disabled = false;
-                    });
+                    switchEffect(e.target.id, 'stop');
                     return;
                 }
                 if (e.target.innerText == "Start") {
@@ -177,40 +180,9 @@ class SettingsApp extends Globals {
 
                     await this.saveLocalSetting("activeEffect", e.target.id);
 
-                    function getById(id) {
-                        return document.getElementById(id).value;
-                    }
-
-                    switch (e.target.id) {
-                        case "effectCircle":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCPanStart'), getById('efCTiltStart'), getById('efCDelay'), getById('efCRadius'), getById('efCSteps'), 'start');
-                            break;
-                        case "effectCircleFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efCFPanStart'), getById('efCFTiltStart'), getById('efCFDelay'), getById('efCFRadius'), getById('efCFSteps'), getById('efCFFan'), 'start');
-                            break;
-                        case "effectEight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8PanStart'), getById('ef8TiltStart'), getById('ef8Delay'), getById('ef8Radius'), getById('ef8Steps'), 'start');
-                            break;
-                        case "effectEightFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('ef8FPanStart'), getById('ef8FTiltStart'), getById('ef8FDelay'), getById('ef8FRadius'), getById('ef8FSteps'), getById('ef8FFan'), 'start');
-                            break;
-                        case "effectUpDown":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDPanStart'), getById('efUDTiltStart'), getById('efUDDelay'), getById('efUDRadius'), getById('efUDSteps'), 'start');
-                            break;
-                        case "effectUpDownFan":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efUDFPanStart'), getById('efUDFTiltStart'), getById('efUDFDelay'), getById('efUDFRadius'), getById('efUDFSteps'), getById('efUDFFan'), 'start');
-                            break;
-                        case "effectLeftRight":
-                            maestro.Effects.startEffect(e.target.dataset.effect, getById('efLRPanStart'), getById('efLRTiltStart'), getById('efLRDelay'), getById('efLRRadius'), getById('efLRSteps'), 'start');
-                            break;
-                    }
-
-                    inputElements.forEach(async input => {
-                        input.disabled = true;
-                    });
+                    switchEffect(e.target.id, 'start');
                     return;
                 }
-
             });
         });
 
@@ -238,17 +210,6 @@ class SettingsApp extends Globals {
                 }
             });
         }
-    };
-    coordFinderSetPosition = async (x, y) => {
-        if (!document.getElementById('dot')) return;
-        const box = document.getElementById('box');
-
-        const boxWidth = box.offsetWidth;
-        const boxHeight = box.offsetHeight;
-        const xPixel = (x / 255) * boxWidth;
-        const yPixel = (y / 255) * boxHeight;
-        document.getElementById('dot').style.left = xPixel + 'px';
-        document.getElementById('dot').style.top = yPixel + 'px';
     };
     loadCoordFinder = async (callback = null) => {
         const box = document.getElementById('box');
@@ -297,6 +258,17 @@ class SettingsApp extends Globals {
         dot.ondragstart = function () {
             return false;
         };
+    };
+    coordFinderSetPosition = async (x, y) => {
+        if (!document.getElementById('dot')) return;
+        const box = document.getElementById('box');
+
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+        const xPixel = (x / 255) * boxWidth;
+        const yPixel = (y / 255) * boxHeight;
+        document.getElementById('dot').style.left = xPixel + 'px';
+        document.getElementById('dot').style.top = yPixel + 'px';
     };
     setDimmerValue = async (value) => {
         let brightness = maestro.SettingsApp.getScaledValue(value, 0, 255, 50, 100) + '%'
@@ -508,52 +480,58 @@ class SettingsApp extends Globals {
             document.getElementById('backupDate').innerHTML = backupDate;
 
             document.getElementById('restoreAllFixtures').addEventListener('click', async () => {
-                if (confirm('Are you sure you want to restore all fixtures?\n\nThis will overwrite all current fixture settings.')) {
-                    await this.restoreAllFixtures();
-                }
+                bootbox.confirm('Are you sure you want to restore all fixtures?<br>This will overwrite all current fixture settings.', function (result) {
+                    if (result) {
+                        maestro.SettingsApp.restoreAllFixtures();
+                    }
+                });
             });
         } else {
             document.getElementById('backupDate').innerText = "Never";
         }
         document.getElementById('backupFixtures').addEventListener('click', async () => {
-            if (confirm('Are you sure you want to backup all fixtures?\n\nThis will overwrite the current backup.')) {
-                await this.backupAllFixtures();
-                this.loadBackupRestoreBtns(this.stageId, false);
-            }
+            bootbox.confirm('Are you sure you want to backup all fixtures?<br>This will overwrite the current backup.', async (result) => {
+                if (result) {
+                    await maestro.SettingsApp.backupAllFixtures();
+                    maestro.SettingsApp.loadBackupRestoreBtns(maestro.SettingsApp.stageId, false);
+                }
+            });
         });
     }
     bindClearConfigBtn = async () => {
         document.getElementById('clearConfig').addEventListener('click', async () => {
-            if (confirm('Are you sure you want to clear the current config?')) {
-                chrome.storage.local.clear(function () {
-                    //local settings
-                    chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
+            bootbox.confirm("Are you sure you want to clear the current config?", function (result) {
+                if (result) {
+                    chrome.storage.local.clear(function () {
+                        //local settings
+                        chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
 
-                    chrome.storage.local.set({ autoFogOnActivityPeak: false });
-                    chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
-                    chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
-                    chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
-                    chrome.storage.local.set({ autoFogOnTimer: false });
-                    chrome.storage.local.set({ fogTimer: 10 });
-                    chrome.storage.local.set({ fogTimerDuration: 3 });
+                        chrome.storage.local.set({ autoFogOnActivityPeak: false });
+                        chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
+                        chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
+                        chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
+                        chrome.storage.local.set({ autoFogOnTimer: false });
+                        chrome.storage.local.set({ fogTimer: 10 });
+                        chrome.storage.local.set({ fogTimerDuration: 3 });
 
-                    chrome.storage.local.set({ autoEffectsEnabled: false });
-                    chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
-                    chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
-                    chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
+                        chrome.storage.local.set({ autoEffectsEnabled: false });
+                        chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
+                        chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
+                        chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
 
-                    chrome.storage.local.set({ autoStrobeEnabled: false });
-                    chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
-                    chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
-                    chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
+                        chrome.storage.local.set({ autoStrobeEnabled: false });
+                        chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
+                        chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
+                        chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
 
-                    chrome.storage.local.set({ autoMacroInterval: 5 });
-                    chrome.storage.local.set({ autoMacroRunTime: 30 });
-                    chrome.storage.local.set({ autoMacroEnabled: false });
+                        chrome.storage.local.set({ autoMacroInterval: 5 });
+                        chrome.storage.local.set({ autoMacroRunTime: 30 });
+                        chrome.storage.local.set({ autoMacroEnabled: false });
 
-                    document.location.reload();
-                });
-            };
+                        document.location.reload();
+                    });
+                }
+            });
         });
     };
     //download eveyrthign except fixture backup
@@ -620,16 +598,18 @@ class SettingsApp extends Globals {
                             let foreignFixtures = [...new Set(parse.macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id)).filter(fixtureId => !currentFixtureIds.includes(fixtureId)))];
 
                             if (foreignFixtures.length > 0) {
-                                return alert('This backup contains macros for fixtures that are not present in the currently active stage.\n\nRestoring this backup would have no effect on the current stage, and cannot continue.')
+                                return bootbox.alert('This backup contains macros for fixtures that are not present in the currently active stage.<br><br>Restoring this backup would have no effect on the current stage, and cannot continue.')
                             }
 
-                            if (confirm("Config file is ready to import.\n\nDo you want to continue and apply the new config?")) {
+                            bootbox.confirm("Config file is ready to import.<br><br>Do you want to continue and apply the new config?", function (result) {
+                                if (!result) return;
+
                                 chrome.storage.local.clear(function () {
                                     chrome.storage.local.set(parse);
                                     chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
-                                    if (!alert('Config restored successfully.')) { window.location.reload(); }
+                                    bootbox.alert('Config restored successfully.', function () { window.location.reload(); });
                                 });
-                            }
+                            })
                         }
                     }
 
@@ -639,7 +619,7 @@ class SettingsApp extends Globals {
             if (this.logging)
                 console.error('Error binding restoreConfig:', e);
 
-            return alert('Error processing Config File\n\n' + e);
+            return bootbox.alert('Error processing Config File<br><br>' + e);
         }
     };
     backupAllFixtures = async () => {
@@ -664,7 +644,7 @@ class SettingsApp extends Globals {
             await this.patchFixture(fixture.id, data);
         }
 
-        return alert('All fixtures have been restored to the backup state');
+        return bootbox.alert('All fixtures have been restored to the backup state');
     };
     bindAutoMacros = async () => {
         let autoMacrosEnabled = await this.getLocalSetting("autoMacrosEnabled");
@@ -910,7 +890,7 @@ class SettingsApp extends Globals {
                     this.hideLoader();
 
                     if (showLoader) {
-                        return alert('Another Macro is already running on fixtures with the same id as contained in this macro!\n\nRunning multiple macros on the same fixture simultaneously can cause issues!');
+                        return bootbox.alert('Another Macro is already running on fixtures with the same id as contained in this macro!<br><br>Running multiple macros on the same fixture simultaneously can cause issues!');
                     } else {
                         return false;
                     }
@@ -953,7 +933,7 @@ class SettingsApp extends Globals {
                     this.hideLoader();
 
                     if (showLoader) {
-                        alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
+                        bootbox.alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
                     }
 
                     return false;
@@ -961,7 +941,7 @@ class SettingsApp extends Globals {
 
                 if (showLoader) {
                     let ignoredFixtureNames = ignoredFixtures.map(fixture => fixture.name).join('\n');
-                    alert(`The following fixtures were ignored because they have the same settings as the macro:\n\n${ignoredFixtureNames}`);
+                    bootbox.alert(`The following fixtures were ignored because they have the same settings as the macro:<br><br>${ignoredFixtureNames}`);
                 }
             }
 
@@ -1016,7 +996,7 @@ class SettingsApp extends Globals {
                 console.error('Error applying Macro:', e);
             }
 
-            alert(this.fatalErrorMsg);
+            bootbox.alert(this.fatalErrorMsg);
         } finally {
             this.hideLoader();
         }
@@ -1178,7 +1158,7 @@ class SettingsApp extends Globals {
                 console.error('Error reverting Macro:', e);
             }
 
-            alert(this.fatalErrorMsg);
+            bootbox.alert(this.fatalErrorMsg);
         } finally {
             this.hideLoader();
         }
@@ -1260,15 +1240,16 @@ class SettingsApp extends Globals {
 
             let effectActive = await maestro.SettingsApp.getLocalSetting("activeEffect");
             if (effectActive) {
-                alert('There is an Effect active, you cannot create macros whilst an Effect is active.');
-                await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-effects");
-                document.location.reload();
-                return;
+                bootbox.alert('There is an Effect active, you cannot create macros whilst an Effect is active.', async function () {
+                    await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-effects");
+                    document.location.reload();
+                    return;
+                });
             }
 
             const checkboxes = document.querySelectorAll('input[name="fixture_cbx"]:checked');
             if (checkboxes.length === 0) {
-                return alert('Please select at least one fixture');
+                return bootbox.alert('Please select at least one fixture');
             }
             const values = Array.from(checkboxes).map(checkbox => checkbox.value);
 
@@ -1276,21 +1257,22 @@ class SettingsApp extends Globals {
 
             let macroFixtures = maestro.SettingsApp.activeStage.fixture.filter(fixture => values.includes(fixture.id.toString()));
 
-            var macroName = prompt('Enter a name for the macro', 'Macro Name');
-            if (!macroName) {
-                return;
-            }
+            bootbox.prompt('Enter a name for the macro', async function (macroName) {
+                if (!macroName || macroName == "") {
+                    return;
+                }
 
-            const macros = await maestro.SettingsApp.getLocalSetting("macros") || [];
-            const macroExists = macros.find(macro => macro.macro.name === macroName && macro.macro.stageId === this.stageId);
-            if (macroExists) {
-                return alert('Macro name already exists');
-            }
+                const macros = await maestro.SettingsApp.getLocalSetting("macros") || [];
+                const macroExists = macros.find(macro => macro.macro.name === macroName && macro.macro.stageId === maestro.SettingsApp.stageId);
+                if (macroExists) {
+                    return bootbox.alert('Macro name already exists');
+                }
 
-            macros.push({ "macro": { name: macroName, stageId: this.stageId, fixtures: macroFixtures } });
-            await maestro.SettingsApp.saveLocalSetting("macros", macros);
-            await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-macros");
-            document.location.reload();
+                macros.push({ "macro": { name: macroName, stageId: maestro.SettingsApp.stageId, fixtures: macroFixtures } });
+                await maestro.SettingsApp.saveLocalSetting("macros", macros);
+                await maestro.SettingsApp.saveLocalSetting("activeSettingsTab", "tabpanel-macros");
+                document.location.reload();
+            });
         });
     };
     changeStrobeParam = async (id, channelId, type, stageId = null) => {
@@ -1589,7 +1571,7 @@ class SettingsApp extends Globals {
         $('.panOrTilt').on('click', async function (btn) {
             let effectActive = await maestro.SettingsApp.getLocalSetting("activeEffect");
             if (effectActive) {
-                alert('There is an Effect active, you cannot modify the pan/tilt settings whilst an Effect is active.');
+                bootbox.alert('There is an Effect active, you cannot modify the pan/tilt settings whilst an Effect is active.');
                 return;
             }
             maestro.SettingsApp.panOrTiltOpen(this);
@@ -1711,37 +1693,41 @@ class SettingsApp extends Globals {
             document.getElementById('panTiltSetDefault').addEventListener('click', async function () {
 
                 let fixtures = document.getElementById('panTiltFinder').dataset.id;
-                if (confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?')) {
-                    if (Array.isArray(JSON.parse(fixtures))) {
-                        for (let fixture of JSON.parse(fixtures)) {
-                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
-                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
-                        }
+                bootbox.confirm('Are you sure you want to set the default Pan/Tilt values for the selected fixtures?', async function (result) {
+                    if (result == true) {
+                        if (Array.isArray(JSON.parse(fixtures))) {
+                            for (let fixture of JSON.parse(fixtures)) {
+                                await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultPan", document.getElementById('panRangeVal').value);
+                                await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixture, "defaultTilt", document.getElementById('tiltRangeVal').value);
+                            }
+                            bootbox.confirm('Would you also like to set the default Pan/Tilt for all Mover Effects?', function (result) {
+                                if (result == true) {
+                                    maestro.SettingsApp.saveLocalSetting("ef8PanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("ef8TiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("ef8FPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("ef8FTiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efCFPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efCFTiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efCPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efCTiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efLRPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efLRTiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efUDPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efUDTiltStart", document.getElementById('tiltRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efUDFPanStart", document.getElementById('panRangeVal').value);
+                                    maestro.SettingsApp.saveLocalSetting("efUDFTiltStart", document.getElementById('tiltRangeVal').value);
 
-                        if (confirm('Would you also like to set the default Pan/Tilt for all Mover Effects?')) {
-                            maestro.SettingsApp.saveLocalSetting("ef8PanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("ef8TiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("ef8FPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("ef8FTiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efCFPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efCFTiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efCPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efCTiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efLRPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efLRTiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efUDPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efUDTiltStart", document.getElementById('tiltRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efUDFPanStart", document.getElementById('panRangeVal').value);
-                            maestro.SettingsApp.saveLocalSetting("efUDFTiltStart", document.getElementById('tiltRangeVal').value);
+                                    document.location.reload();
+                                }
+                            });
+                        } else {
+                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
+                            await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
 
+                            document.location.reload();
                         }
-                    } else {
-                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultPan", document.getElementById('panRangeVal').value);
-                        await maestro.SettingsApp.saveFixtureSettings(maestro.SettingsApp.activeStage.id, fixtures, "defaultTilt", document.getElementById('tiltRangeVal').value);
                     }
-
-                    document.location.reload();
-                }
+                });
             });
         }
     };
@@ -2114,7 +2100,7 @@ class SettingsApp extends Globals {
                 let m = macros.find(macro => macro.macro.name == macroName && macro.macro.stageId == maestro.SettingsApp.activeStageId)
 
                 if (m.macro.macroRunning == true) {
-                    return alert('Cannot rename a macro while it is running');
+                    return bootbox.alert('Cannot rename a macro while it is running');
                 }
 
                 var newName = prompt('Enter a new name for the macro', macroName);
@@ -2125,12 +2111,12 @@ class SettingsApp extends Globals {
                 if (newName == macroName) return;
 
                 if (newName.length > 50) {
-                    return alert('Macro name must be less than 50 characters');
+                    return bootbox.alert('Macro name must be less than 50 characters');
                 }
 
                 maestro.SettingsApp.loadMacros().then(macros => {
                     if (macros.find(macro => macro.macro.name == newName && macro.macro.stageId == maestro.SettingsApp.activeStageId)) {
-                        return alert('Macro name already exists');
+                        return bootbox.alert('Macro name already exists');
                     }
                     for (let m of macros) {
                         if (m.macro.name == macroName && m.macro.stageId == maestro.SettingsApp.activeStageId) {
@@ -2151,9 +2137,11 @@ class SettingsApp extends Globals {
             maestro.SettingsApp.revertMacro(this.dataset.id, this.dataset.stageid);
         });
         $('button[name="btn_delete"]').on('click', function (btn) {
-            if (confirm('Are you sure you want to delete this macro?')) {
-                maestro.SettingsApp.deleteMacro(this.dataset.id, this.dataset.stageid);
-            }
+            bootbox.confirm('Are you sure you want to delete this macro?', function (result) {
+                if (result == true) {
+                    maestro.SettingsApp.deleteMacro(btn.currentTarget.dataset.id, btn.currentTarget.dataset.stageid);
+                }
+            });
         });
         $('select[name="startCueList"]').on('change', async function (btn) {
             if (this.value == "") {
@@ -2162,7 +2150,7 @@ class SettingsApp extends Globals {
                 let cues = await maestro.SettingsApp.getCues(true);
                 let uuid = document.querySelector(`select[name="startCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
 
-                if (uuid == "") return alert('Please select a macro');
+                if (uuid == "") return bootbox.alert('Please select a macro');
 
                 let cue = cues.find(cue => cue.uuid == uuid);
                 await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, false, false);
@@ -2176,7 +2164,7 @@ class SettingsApp extends Globals {
                 let cues = await maestro.SettingsApp.getCues(true);
                 let uuid = document.querySelector(`select[name="endCueList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
 
-                if (uuid == "") return alert('Please select a Cue');
+                if (uuid == "") return bootbox.alert('Please select a Cue');
 
                 let cue = cues.find(cue => cue.uuid == uuid);
                 await maestro.SettingsApp.applyCueToMacro(this.dataset.id, this.dataset.stageid, cue.uuid, true, false);
@@ -2189,7 +2177,7 @@ class SettingsApp extends Globals {
             } else {
                 let effect = document.querySelector(`select[name="startEffectList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
 
-                if (effect == "") return alert('Please select an Effect');
+                if (effect == "") return bootbox.alert('Please select an Effect');
 
                 await maestro.SettingsApp.applyEffectToMacro(this.dataset.id, this.dataset.stageid, effect, false, false);
             }
@@ -2201,7 +2189,7 @@ class SettingsApp extends Globals {
             } else {
                 let effect = document.querySelector(`select[name="endEffectList"][data-id="${this.dataset.id}"] option:checked`).dataset.uuid;
 
-                if (effect == "") return alert('Please select a macro');
+                if (effect == "") return bootbox.alert('Please select a macro');
 
                 await maestro.SettingsApp.applyEffectToMacro(this.dataset.id, this.dataset.stageid, effect, true, false);
             }
@@ -2232,17 +2220,14 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.saveLocalSetting("macros", macros);
             });
         });
-        $('button[name="updateMacro"]').on('click', function (btn) {
-            alert('Update Macro')
-        });
         $('span[name="macroDiff"]').on('click', async function (btn) {
             let data = await maestro.SettingsApp.getMacroDiff(this.dataset.id, this.dataset.stageid);
             let macro = document.querySelector("table#macros tr[data-id='" + this.dataset.id + "']");
             if (macro && macro.classList.contains('macro-active')) {
-                return alert("Macro is currently running, therefore no unapplied changes can be shown.");
+                return bootbox.alert("Macro is currently running, therefore no unapplied changes can be shown.");
             }
 
-            if (data.length == 0) return alert('Macro is the same as live settings');
+            if (data.length == 0) return bootbox.alert('Macro is the same as live settings');
 
             $('#changeTable').bootstrapTable({
                 columns: [{
@@ -2469,7 +2454,7 @@ class SettingsApp extends Globals {
                 let macroEnd = document.querySelector(`select[name="macroListEnd"][data-id="${this.dataset.id}"]`).value;
 
 
-                if (macroStart == "" && macroEnd == "") return alert('Please select a macro');
+                if (macroStart == "" && macroEnd == "") return bootbox.alert('Please select a macro');
 
                 if (macroStart != "") {
                     let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
@@ -2502,7 +2487,7 @@ class SettingsApp extends Globals {
     applyEffectToMacro = async (macroName, stageId, effectId, endEffect = false, reload = true) => {
         let row = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
         if (row.classList.contains('macro-active')) {
-            alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
+            bootbox.alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
             return false;
         }
 
@@ -2535,7 +2520,7 @@ class SettingsApp extends Globals {
     applyCueToMacro = async (macroName, stageId, cueId, endCue = false, reload = true) => {
         let row = document.querySelector(`[data-id="${macroName}"][data-stageid="${stageId}"]`);
         if (row.classList.contains('macro-active')) {
-            alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
+            bootbox.alert("The Macro is active, you need to clear the running macro before you can edit the cue.");
             return false;
         }
 
