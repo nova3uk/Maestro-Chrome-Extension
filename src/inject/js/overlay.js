@@ -491,18 +491,21 @@ class OverlayApp extends Globals {
             document.getElementById("maestroPauseBtn").style.color = 'white';
             document.getElementById("maestroStopBtn").disabled = true;
             document.getElementById("maestroStopBtn").style.backgroundColor = '#434647';
+            document.getElementById("maestroStopBtn").style.color = '#6d7071';
         }
         if (msg.type == "SHOW_PLAYING") {
             document.getElementById("maestroPlayBtnSpan").style.display = 'none';
             document.getElementById("maestroPauseBtnSpan").style.display = '';
             document.getElementById("maestroStopBtn").disabled = false;
             document.getElementById("maestroStopBtn").style.backgroundColor = '#778798';
+            document.getElementById("maestroStopBtn").style.color = '#ffffff';
         }
         if (msg.type == "SHOW_PAUSED") {
             document.getElementById("maestroPlayBtnSpan").style.display = '';
             document.getElementById("maestroPauseBtnSpan").style.display = 'none';
             document.getElementById("maestroStopBtn").disabled = false;
             document.getElementById("maestroStopBtn").style.backgroundColor = '#778798';
+            document.getElementById("maestroStopBtn").style.color = '#ffffff';
 
         }
     };
