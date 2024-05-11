@@ -245,3 +245,7 @@ input[type="range"] {
     font-size: .775rem;
     border-radius: var(--bs-border-radius-sm);
 }
+button.cueControlbtn {
+    background-color: #778798;
+    color: white;
+}

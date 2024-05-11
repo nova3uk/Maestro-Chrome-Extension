@@ -258,7 +258,7 @@ class OverlayApp extends Globals {
             console.log('Checkbox clicked:', item, status);
     };
     createCheckboxes = () => {
-        this.injectCSS('div[role=presentation]:not([id=basic-menu]) {height: calc(100vh - 150px); top:-100px;};#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1200px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1041px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 882px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 723px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 524px) {#div_maestro_ext_effect {display: none !important;}}');
+        this.injectCSS('div[role=presentation]:not([id=basic-menu]) {height: calc(100vh - 150px); top:-100px;};#div_maestro_ext_blackout {display: flex;} @media screen and (max-width: 1500px) {#div_maestro_ext_blackout {display: none !important;}}#div_maestro_ext_blinder {display: flex;} @media screen and (max-width: 1341px) {#div_maestro_ext_blinder {display: none !important;}}#div_maestro_ext_strobe {display: flex;} @media screen and (max-width: 1182px) {#div_maestro_ext_strobe {display: none !important;}}#div_maestro_ext_fog {display: flex;} @media screen and (max-width: 1023px) {#div_maestro_ext_fog {display: none !important;}}#div_maestro_ext_effect {display: flex;} @media screen and (max-width: 824px) {#div_maestro_ext_effect {display: none !important;}}');
 
         // Create the checkboxes
         this.blackoutCheckbox = this.createCheckbox('maestro_ext_blackout', 'BLACKOUT', function (checked) {
@@ -376,7 +376,7 @@ class OverlayApp extends Globals {
             this.cornerText.style.bottom = '10px';
             this.cornerText.style.left = '10px';
             this.cornerText.style.color = '#f4f5f5';
-            this.cornerText.style.width = '340px';
+            //this.cornerText.style.width = '340px';
             this.cornerText.style.height = '30px';
             this.cornerText.style.zIndex = '100001';
             this.cornerText.style.display = 'flex';
@@ -402,10 +402,18 @@ class OverlayApp extends Globals {
             audioLevelContainer.style.height = '22px';
             audioLevelContainer.style.display = 'inline-block';
             audioLevelContainer.style.marginLeft = '10px';
-
             this.cornerText.appendChild(audioLevelContainer);
 
+            let cueControlsContainer = document.createElement('div');
+            cueControlsContainer.id = 'playControlsContainer';
+            //cueControlsContainer.style.width = '120px';
+            cueControlsContainer.style.height = '22px';
+            cueControlsContainer.style.display = 'inline-block';
+            cueControlsContainer.style.marginLeft = '10px';
+            this.cornerText.appendChild(cueControlsContainer);
+
             maestro.OverlayApp.startNotifications();
+            maestro.OverlayApp.cueControls();
 
             function updateClock() {
                 let now = new Date();
@@ -420,6 +428,80 @@ class OverlayApp extends Globals {
         } catch (e) {
             if (this.logging)
                 console.error("Error loading corner text", e);
+        }
+    };
+    cueControls = async () => {
+        try {
+            let playControlsContainer = document.getElementById('playControlsContainer');
+            playControlsContainer.style.marginLeft = '20px';
+
+            if (!playControlsContainer) return;
+
+            let prevBtn = this.createHtml(`<button id="maestroPrevBtn" role="button" class="cueControlbtn" style="cursor:pointer;height:30px;width:60px;background-color: #778798;color:white;border-top-left-radius: 5px;border-bottom-left-radius: 5px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-start-fill" viewBox="0 0 16 16"><path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0z"/></svg></button>`, 'maestroPrevBtnSpan');
+            prevBtn.onclick = function () {
+                maestro.OverlayApp.postUrl(`${maestro.OverlayApp.maestroUrl}api/${maestro.OverlayApp.apiVersion}/show/cue/previous`);
+            }
+
+            playControlsContainer.appendChild(prevBtn);
+            let stopBtn = this.createHtml(`<button id="maestroStopBtn" role="button" class="cueControlbtn" style="cursor:pointer;height:30px;width:60px;position:relative;left:-6px;background-color: #778798;color:white;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5"/></svg></button>`, 'maestroStopBtnSpan');
+
+            stopBtn.onclick = function () {
+                maestro.OverlayApp.postUrl(`${maestro.OverlayApp.maestroUrl}api/${maestro.OverlayApp.apiVersion}/show/stop`);
+            }
+            playControlsContainer.appendChild(stopBtn);
+
+            let playBtn = this.createHtml(`<button id="maestroPlayBtn" role="button" class="cueControlbtn" style="cursor:pointer;height:30px;width:60px;position:relative;left:-8px;background-color: #778798;color:white;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/></svg></button>`, 'maestroPlayBtnSpan');
+            playBtn.onclick = function () {
+                maestro.OverlayApp.postUrl(`${maestro.OverlayApp.maestroUrl}api/${maestro.OverlayApp.apiVersion}/show/play`);
+            }
+            playControlsContainer.appendChild(playBtn);
+
+            let pauseBtn = this.createHtml(`<button id="maestroPauseBtn" role="button" class="cueControlbtn" style="cursor:pointer;height:30px;width:60px;position:relative;left:-8px;background-color: #778798;color:white;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5"/></svg>`, 'maestroPauseBtnSpan');
+            pauseBtn.style.display = 'none';
+
+            pauseBtn.onclick = function () {
+                maestro.OverlayApp.postUrl(`${maestro.OverlayApp.maestroUrl}api/${maestro.OverlayApp.apiVersion}/show/pause`);
+            }
+            playControlsContainer.appendChild(pauseBtn);
+
+            let nextBtn = this.createHtml(`<button id="maestroNextBtn" role="button" class="cueControlbtn" style="cursor:pointer;height:30px;width:60px;position:relative;left:-10px;background-color: #778798;color:white;border-top-right-radius: 5px;border-bottom-right-radius: 5px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-end-fill" viewBox="0 0 16 16"><path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0z"/></svg></button>`, 'maestroNextBtnSpan');
+            nextBtn.onclick = function () {
+                maestro.OverlayApp.postUrl(`${maestro.OverlayApp.maestroUrl}api/${maestro.OverlayApp.apiVersion}/show/cue/next`);
+            }
+            playControlsContainer.appendChild(nextBtn);
+
+            let cueName = this.createHtml('<span id="maestroCueName" style="font-size:14px;position:relative;top:-2px;color:white;"></span>', 'maestroCueNameSpan');
+            playControlsContainer.appendChild(cueName);
+
+            let showState = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
+            this.cueControlsNotificationHdlr(showState);
+        } catch (e) {
+            if (this.logging)
+                console.error("Error creating cue controls", e);
+        }
+    };
+    cueControlsNotificationHdlr = async (msg) => {
+        document.getElementById("maestroCueName").textContent = msg.currentCue.name;
+
+        if (msg.type == "SHOW_STOPPED") {
+            document.getElementById("maestroPlayBtnSpan").style.display = '';
+            document.getElementById("maestroPauseBtnSpan").style.display = 'none';
+            document.getElementById("maestroPauseBtn").style.color = 'white';
+            document.getElementById("maestroStopBtn").disabled = true;
+            document.getElementById("maestroStopBtn").style.backgroundColor = '#434647';
+        }
+        if (msg.type == "SHOW_PLAYING") {
+            document.getElementById("maestroPlayBtnSpan").style.display = 'none';
+            document.getElementById("maestroPauseBtnSpan").style.display = '';
+            document.getElementById("maestroStopBtn").disabled = false;
+            document.getElementById("maestroStopBtn").style.backgroundColor = '#778798';
+        }
+        if (msg.type == "SHOW_PAUSED") {
+            document.getElementById("maestroPlayBtnSpan").style.display = '';
+            document.getElementById("maestroPauseBtnSpan").style.display = 'none';
+            document.getElementById("maestroStopBtn").disabled = false;
+            document.getElementById("maestroStopBtn").style.backgroundColor = '#778798';
+
         }
     };
     startNotifications = async () => {
@@ -440,6 +522,16 @@ class OverlayApp extends Globals {
 
                 chrome.runtime.sendMessage(this.ExtensionId, { audioLevel: data.msg });
             }
+            if (data.type == "GLOBAL_STATE_NOTIFICATION") {
+                //not used now
+            }
+            if (data.type == "SHOW_STATE_NOTIFICATION") {
+                this.cueControlsNotificationHdlr(data.msg);
+            }
+            if (data.type == "LIVE_STATE_NOTIFICATION") {
+                //not used now
+            }
+
         };
     }
     audioLevelMeter = async (msg) => {

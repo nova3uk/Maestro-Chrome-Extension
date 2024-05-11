@@ -299,6 +299,22 @@ class Globals {
                 console.error("Cannot connect to the API, is Maestro running?", e);
         }
     };
+    postUrl = async (url, params = null) => {
+        try {
+            let options = {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            };
+
+            const response = await fetch(url, options);
+            const responseJson = await response.json();
+            return responseJson;
+        } catch (e) {
+            if (this.logging)
+                console.error("Cannot connect to the API, is Maestro running?", e);
+        }
+    };
     formatDate = (d, withSeconds = false) => {
         return d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + (withSeconds ? ":" + (d.getSeconds().toString().length == 2 ? d.getSeconds().toString() : "0" + d.getSeconds().toString()) : "");
     }
