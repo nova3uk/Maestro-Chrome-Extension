@@ -401,7 +401,9 @@ class OverlayApp extends Globals {
             audioLevelContainer.style.width = '120px';
             audioLevelContainer.style.height = '22px';
             audioLevelContainer.style.display = 'inline-block';
-            audioLevelContainer.style.marginLeft = '10px';
+            audioLevelContainer.style.marginLeft = '14px';
+            audioLevelContainer.style.position = 'relative';
+            audioLevelContainer.style.top = '3px';
             this.cornerText.appendChild(audioLevelContainer);
 
             let cueControlsContainer = document.createElement('div');
