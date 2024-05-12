@@ -12,6 +12,7 @@ class SettingsApp extends Globals {
     ignoredFixtures = [];
     holdFire = false;
     websocketEventsWatcherTimer = null;
+    websocketEvents = [];
     storageWatcher = null;
     autoMacroRoutineRunning = false;
     macrosToKill = [];
@@ -348,13 +349,25 @@ class SettingsApp extends Globals {
             //global dimmer hdlr
             this.getLocalSetting("globalStateNotification").then(async (globalStateNotification) => {
                 if (globalStateNotification) {
+                    if (this.websocketEvents["globalStateNotification"] == globalStateNotification.time) return;
+                    this.websocketEvents["globalStateNotification"] = globalStateNotification.time;
+
                     let val = Math.floor(globalStateNotification.brightness.value * 255);
                     document.getElementById('master_dimmer').value = val;
                     maestro.SettingsApp.setDimmerValue(val);
                 }
             });
+            //livestate
             this.getLocalSetting("liveStateNotification").then(async (liveStateNotification) => {
-                this.watchForStageChange();
+                if (this.websocketEvents["liveStateNotification"] == liveStateNotification.time) return;
+                this.websocketEvents["liveStateNotification"] = liveStateNotification.time;
+                await this.watchForStageChange();
+            });
+            //showstate
+            this.getLocalSetting("showStateNotification").then(async (showStateNotification) => {
+                if (this.websocketEvents["showStateNotification"] == showStateNotification.time) return;
+                this.websocketEvents["showStateNotification"] = showStateNotification.time;
+                await this.cuesTable();
             });
         }, 1000);
     }
@@ -2346,7 +2359,7 @@ class SettingsApp extends Globals {
     cuesTable = async (stages) => {
         try {
             let activeCue;
-            let cues = await this.getCues();
+            let cues = await this.getCues(true);
             let showState = await this.getShowState();
 
             if (showState.currentCue)
@@ -2359,9 +2372,9 @@ class SettingsApp extends Globals {
 
                     if (cue.uuid === activeCue.uuid) {
                         cue.active = true;
-                        cue.playInder = activeCue.playIndex;
-                        cue.playTime = activeCue.playTime;
-                        cue.type = activeCue.type;
+                        cue.playIndex = showState.playIndex;
+                        cue.playTime = showState.playTime;
+                        cue.type = showState.type;
                     }
                 }
             }
@@ -2380,74 +2393,78 @@ class SettingsApp extends Globals {
                 tData.push({
                     id: cue.uuid,
                     cueName: cue.name,
-                    active: cue.active,
+                    active: cue.active || false,
+                    playIndex: cue.playIndex,
+                    playTime: cue.playTime,
+                    type: cue.type,
                     status: cue.active ? "Active" : "",
                     groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`,
                     list: macroNames
                 });
             }
 
+            $('#cues').bootstrapTable('destroy');
+
             $('#cues').bootstrapTable({
                 data: tData,
-                columns: [{}, {}, {},
+                columns: [{}, {},
+                {
+                    field: 'status',
+                    align: 'center',
+                    valign: 'middle',
+                    clickToSelect: false,
+                    formatter: function (value, row, index) {
+                        return row.active ? "Active" : "";
+                    }
+                },
                 {
                     field: 'applyCue',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.list.length == 0) return;
-                        let select = `<select name="macroList" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
-                        select += '<option value="">-</option>';
-                        for (let item of row.list) {
-                            select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
+                        if (row.active) {
+                            switch (row.type) {
+                                case "SHOW_PLAYING":
+                                    return `<button class="btn btn-success" name="btn_show_apply" data-active="${row.active}" data-type="${row.type}" data-id="${row.id}" data-index="${index}"><i class="bi bi-pause-fill"></i></button>`;
+                                case "SHOW_PAUSED":
+                                    return `<button class="btn btn-secondary" name="btn_show_apply" data-active="${row.active}" data-type="${row.type}" data-id="${row.id}" data-index="${index}"><i class="bi bi-play-fill"></i></button>`;
+                                case "SHOW_STOPPED":
+                                    return `<button class="btn btn-secondary" name="btn_show_apply" data-active="${row.active}" data-type="${row.type}" data-id="${row.id}" data-index="${index}"><i class="bi bi-play-fill"></i></button>`;
+                            }
+                        } else {
+                            return `<button class="btn btn-primary" name="btn_show_apply" data-active="${row.active}" data-type="${row.type}" data-id="${row.id}" data-index="${index}"><i class="bi bi-play-fill"></i></button>`;
                         }
-                        select += '</select>';
-
-                        return select;
-                    }
-                },
-                {
-                    field: 'applyCueEnd',
-                    align: 'center',
-                    valign: 'middle',
-                    clickToSelect: false,
-                    formatter: function (value, row, index) {
-                        if (row.list.length == 0) return;
-                        let select = `<select name="macroListEnd" data-id="${row.id}" class="form-select text-center text-primary" style="width: 100%;">`;
-                        select += '<option value="">-</option>';
-                        for (let item of row.list) {
-                            select += `<option value="${item.text}" data-stageid="${item.value}">${item.text}</option>`;
-                        }
-                        select += '</select>';
-
-                        return select;
-                    }
-                },
-                {
-                    field: 'button_apply',
-                    title: '',
-                    align: 'center',
-                    valign: 'middle',
-                    clickToSelect: false,
-                    formatter: function (value, row, index) {
-                        if (row.list.length == 0) {
-                            return `<button class="btn btn-primary" disabled>Apply</button>`;
-                        }
-                        return `<button class="btn btn-primary" name="btn_show_apply" data-id="${row.id}">Apply</button>`;
                     }
                 }],
                 rowAttributes: function (row, index) {
                     return {
                         'data-id': row.id,
+                        'data-index': index,
                         'data-stage-active': row.active
                     }
                 },
                 rowStyle: function (row, index) {
                     if (row.active) {
-                        return {
-                            css: {
-                                'background-color': ''
+                        if (row.type == "SHOW_PAUSED") {
+                            return {
+                                css: {
+                                    'background-color': 'lightgrey'
+                                }
+                            }
+                        }
+                        if (row.type == "SHOW_PLAYING") {
+                            return {
+                                css: {
+                                    'background-color': 'lightgreen'
+                                }
+                            }
+                        }
+                        if (row.type == "SHOW_STOPPED") {
+                            return {
+                                css: {
+                                    'background-color': ''
+                                }
                             }
                         }
                     } else {
@@ -2461,22 +2478,21 @@ class SettingsApp extends Globals {
                 }
             });
             $('button[name="btn_show_apply"]').on('click', async function (btn) {
-                let cues = await maestro.SettingsApp.getCues();
-                let macroStart = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"]`).value;
-                let macroEnd = document.querySelector(`select[name="macroListEnd"][data-id="${this.dataset.id}"]`).value;
-
-
-                if (macroStart == "" && macroEnd == "") return bootbox.alert('Please select a macro');
-
-                if (macroStart != "") {
-                    let stageId = document.querySelector(`select[name="macroList"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
-                    let cue = cues.find(cue => cue.uuid == this.dataset.id);
-                    await maestro.SettingsApp.applyCueToMacro(macroStart, stageId, cue.uuid, false, true);
+                this.disabled = true;
+                if (this.dataset.active == "false") {
+                    maestro.SettingsApp.startCue(this.dataset.index);
+                    return;
                 }
-                if (macroEnd != "") {
-                    let stageId = document.querySelector(`select[name="macroListEnd"][data-id="${this.dataset.id}"] option:checked`).dataset.stageid;
-                    let cue = cues.find(cue => cue.uuid == this.dataset.id);
-                    await maestro.SettingsApp.applyCueToMacro(macroEnd, stageId, cue.uuid, true, true);
+                switch (this.dataset.type) {
+                    case "SHOW_PLAYING":
+                        maestro.SettingsApp.postUrl(`${maestro.SettingsApp.maestroUrl}api/${maestro.SettingsApp.apiVersion}/show/pause`);
+                        break;
+                    case "SHOW_PAUSED":
+                        maestro.SettingsApp.postUrl(`${maestro.SettingsApp.maestroUrl}api/${maestro.SettingsApp.apiVersion}/show/play`);
+                        break;
+                    case "SHOW_STOPPED":
+                        maestro.SettingsApp.startCue(this.dataset.index);
+                        break;
                 }
             });
         } catch (e) {

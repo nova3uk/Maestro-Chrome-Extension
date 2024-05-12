@@ -25,14 +25,22 @@ chrome.runtime.onMessageExternal.addListener(
             });
         }
         if (request.audioLevel) {
+            request.time = Date.now();
             chrome.storage.local.set({ audioLevel: request.audioLevel });
         }
         if (request.globalStateNotification) {
+            request.globalStateNotification.time = Date.now();
             chrome.storage.local.set({ globalStateNotification: request.globalStateNotification });
         }
         if (request.liveStateNotification) {
+            request.liveStateNotification.time = Date.now();
             chrome.storage.local.set({ liveStateNotification: request.liveStateNotification });
         }
+        if (request.showStateNotification) {
+            request.showStateNotification.time = Date.now();
+            chrome.storage.local.set({ showStateNotification: request.showStateNotification });
+        }
+
         if (request.ping) {
             return new Promise((resolve, reject) => {
                 chrome.storage.local.set({ activeTab: sender.tab.id }).then(() => {

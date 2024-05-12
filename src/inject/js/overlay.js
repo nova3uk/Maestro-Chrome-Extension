@@ -536,6 +536,7 @@ class OverlayApp extends Globals {
                 //not used now
             }
             if (data.type == "SHOW_STATE_NOTIFICATION") {
+                chrome.runtime.sendMessage(this.ExtensionId, { showStateNotification: data.msg });
                 this.cueControlsNotificationHdlr(data.msg);
             }
             if (data.type == "LIVE_STATE_NOTIFICATION") {
