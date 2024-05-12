@@ -11,7 +11,7 @@ class SettingsApp extends Globals {
     activeStageId;
     ignoredFixtures = [];
     holdFire = false;
-    autoMacrosTimer = null;
+    websocketEventsWatcherTimer = null;
     storageWatcher = null;
     autoMacroRoutineRunning = false;
     macrosToKill = [];
@@ -40,7 +40,7 @@ class SettingsApp extends Globals {
         this.bindAutoFog();
         this.bindAutoEffects();
         this.tabObserver();
-        this.autoMacrosWatcher();
+        this.websocketEventsWatcher();
         this.bindEffects();
 
         await this.loadMacros(async (macros) => {
@@ -51,19 +51,19 @@ class SettingsApp extends Globals {
             this.hideLoader();
         });
 
-        setInterval(async () => {
-            try {
-                this.watchForStageChange();
-                await this.getBrightness().then(() => {
-                    let val = Math.floor(this.brightness.value * 255);
-                    document.getElementById('master_dimmer').value = val;
-                    maestro.SettingsApp.setDimmerValue(val);
-                });
-            } catch (e) {
-                if (this.logging)
-                    console.error('Error in interval:', e);
-            }
-        }, 60000);
+        // setInterval(async () => {
+        //     try {
+        //         this.watchForStageChange();
+        //         await this.getBrightness().then(() => {
+        //             let val = Math.floor(this.brightness.value * 255);
+        //             document.getElementById('master_dimmer').value = val;
+        //             maestro.SettingsApp.setDimmerValue(val);
+        //         });
+        //     } catch (e) {
+        //         if (this.logging)
+        //             console.error('Error in interval:', e);
+        //     }
+        // }, 60000);
 
         setTimeout(() => {
             try {
@@ -328,8 +328,9 @@ class SettingsApp extends Globals {
             this.autoMacroRoutineRunning = false;
         }
     };
-    autoMacrosWatcher = () => {
-        this.autoMacrosTimer = setInterval(async () => {
+    websocketEventsWatcher = () => {
+        this.websocketEventsWatcherTimer = setInterval(async () => {
+            //audioLevelHdl for AutoMacros
             this.getLocalSetting("autoMacrosEnabled").then(async (autoMacrosEnabled) => {
                 if (autoMacrosEnabled) {
                     if (!maestro.SettingsApp.storageWatcher)
@@ -344,7 +345,18 @@ class SettingsApp extends Globals {
                     maestro.SettingsApp.storageWatcher = null;
                 }
             });
-        }, 10000);
+            //global dimmer hdlr
+            this.getLocalSetting("globalStateNotification").then(async (globalStateNotification) => {
+                if (globalStateNotification) {
+                    let val = Math.floor(globalStateNotification.brightness.value * 255);
+                    document.getElementById('master_dimmer').value = val;
+                    maestro.SettingsApp.setDimmerValue(val);
+                }
+            });
+            this.getLocalSetting("liveStateNotification").then(async (liveStateNotification) => {
+                this.watchForStageChange();
+            });
+        }, 1000);
     }
     showLoader = () => {
         return;

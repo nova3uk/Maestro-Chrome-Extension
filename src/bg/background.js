@@ -27,6 +27,12 @@ chrome.runtime.onMessageExternal.addListener(
         if (request.audioLevel) {
             chrome.storage.local.set({ audioLevel: request.audioLevel });
         }
+        if (request.globalStateNotification) {
+            chrome.storage.local.set({ globalStateNotification: request.globalStateNotification });
+        }
+        if (request.liveStateNotification) {
+            chrome.storage.local.set({ liveStateNotification: request.liveStateNotification });
+        }
         if (request.ping) {
             return new Promise((resolve, reject) => {
                 chrome.storage.local.set({ activeTab: sender.tab.id }).then(() => {

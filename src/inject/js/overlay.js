@@ -483,7 +483,11 @@ class OverlayApp extends Globals {
         }
     };
     cueControlsNotificationHdlr = async (msg) => {
-        document.getElementById("maestroCueName").textContent = msg.currentCue.name;
+        try {
+            document.getElementById("maestroCueName").textContent = msg.currentCue.name;
+        } catch (e) {
+            document.getElementById("maestroCueName").textContent = "";
+        }
 
         if (msg.type == "SHOW_STOPPED") {
             document.getElementById("maestroPlayBtnSpan").style.display = '';
@@ -528,13 +532,14 @@ class OverlayApp extends Globals {
                 chrome.runtime.sendMessage(this.ExtensionId, { audioLevel: data.msg });
             }
             if (data.type == "GLOBAL_STATE_NOTIFICATION") {
+                chrome.runtime.sendMessage(this.ExtensionId, { globalStateNotification: data.msg });
                 //not used now
             }
             if (data.type == "SHOW_STATE_NOTIFICATION") {
                 this.cueControlsNotificationHdlr(data.msg);
             }
             if (data.type == "LIVE_STATE_NOTIFICATION") {
-                //not used now
+                chrome.runtime.sendMessage(this.ExtensionId, { liveStateNotification: data.msg });
             }
 
         };
