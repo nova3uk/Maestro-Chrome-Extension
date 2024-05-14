@@ -13,10 +13,20 @@ class Globals {
                 this.ExtensionId = src.host;
                 this.Origin = src.origin;
                 this.Search = src.search;
+                if (scriptSource.indexOf("logging=true") !== -1) {
+                    this.logging = true
+                };
+
                 this.systemInfo = await this.getSystemInfo();
+                this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
+                this.maestroHost = new URL(this.maestroUrl).host;
+                this.saveRemoteSetting("maestroUrl", this.maestroUrl);
+                this.saveRemoteSetting("maestroHost", this.maestroHost);
 
                 this.loadScript(`${this.Origin}/src/inject/js/v/${this.systemInfo.version}/api.js`, this.Search).then(() => {
-                    this.loadScript(`${this.Origin}/src/inject/js/maestro-main.js`, this.Search);
+                    this.loadScript(`${this.Origin}/src/inject/js/maestro-main.js`, this.Search).then(() => {
+                        maestro.App.logging = this.logging;
+                    });
                 });
             };
         }
@@ -183,7 +193,7 @@ class Globals {
     getFilePath = (fileName) => `${this.Origin}/${fileName}`;
     loadScript = (scriptUrl, params = null) => {
         const script = document.createElement('script');
-        script.src = scriptUrl + params;
+        script.src = scriptUrl + (params !== null ? params : '');
         document.body.appendChild(script);
 
         return new Promise((res, rej) => {

@@ -1,11 +1,22 @@
 "use strict";
 var maestro = maestro || {};
 class SettingsApp extends Globals {
-    constructor(scriptSource, loggingOn = false) {
+    constructor(scriptSource) {
         super()
         this.scriptSource = scriptSource;
-        this.loggingOn = loggingOn;
+        // this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();
+        if (!this.maestroUrl) {
+            (async () => {
+                this.maestroUrl = await this.getLocalSetting("maestroUrl");
+                this.maestroHost = await this.getLocalSetting("maestroHost");
+                maestro.Globals.maestroUrl = this.maestroUrl;
+                maestro.Globals.maestroHost = this.maestroHost;
+                maestro.SettingsApp.init();
+            })();
+        } else {
+            this.init();
+        }
     }
 
     activeStageId;
@@ -24,7 +35,6 @@ class SettingsApp extends Globals {
         this.logging = await this.getSetting("loggingToggle");
 
         document.getElementById('versionNumber').innerText = `${this.version ? "v" + this.version : ""}`
-
         await this.getStages();
         this.activeStageId = this.stageId;
 
@@ -42,7 +52,11 @@ class SettingsApp extends Globals {
         this.bindAutoEffects();
         this.tabObserver();
         this.websocketEventsWatcher();
-        this.bindEffects();
+        this.bindLoggingBtn();
+
+        this.loadScript(`../../../src/inject/js/effects.js`).then(() => {
+            this.bindEffects();
+        });
 
         await this.loadMacros(async (macros) => {
             if (macros) {
@@ -51,20 +65,6 @@ class SettingsApp extends Globals {
             }
             this.hideLoader();
         });
-
-        // setInterval(async () => {
-        //     try {
-        //         this.watchForStageChange();
-        //         await this.getBrightness().then(() => {
-        //             let val = Math.floor(this.brightness.value * 255);
-        //             document.getElementById('master_dimmer').value = val;
-        //             maestro.SettingsApp.setDimmerValue(val);
-        //         });
-        //     } catch (e) {
-        //         if (this.logging)
-        //             console.error('Error in interval:', e);
-        //     }
-        // }, 60000);
 
         setTimeout(() => {
             try {
@@ -78,12 +78,31 @@ class SettingsApp extends Globals {
             }
         }, 1000);
     };
+    bindLoggingBtn = async () => {
+        let logging = await this.getLocalSetting("loggingToggle");
+        if (logging) {
+            document.getElementById('enableLoggingSwitch').innerHTML = '<span class="text-danger">Disable Logging</span>';
+        } else {
+            document.getElementById('enableLoggingSwitch').innerHTML = 'Enable Logging';
+        }
+
+        document.getElementById('enableLoggingSwitch').addEventListener('click', async () => {
+            let logging = await this.getLocalSetting("loggingToggle");
+            if (logging) {
+                await this.saveLocalSetting("loggingToggle", false);
+                document.getElementById('enableLoggingSwitch').innerHTML = 'Enable Logging';
+            } else {
+                await this.saveLocalSetting("loggingToggle", true);
+                document.getElementById('enableLoggingSwitch').innerHTML = '<span class="text-danger">Disable Logging</span>';
+            }
+        });
+    };
     bindMaestroLinks = async () => {
         var link = document.getElementById('downloadStage')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}`);
-
-        var link = document.getElementById('controlPageLink')
-        link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
+        //moved to info
+        // var link = document.getElementById('controlPageLink')
+        // link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
     };
     bindEffects = async () => {
         let fixtures = await maestro.SettingsApp.getAllMovers();
@@ -505,9 +524,11 @@ class SettingsApp extends Globals {
             document.getElementById('backupDate').innerHTML = backupDate;
 
             document.getElementById('restoreAllFixtures').addEventListener('click', async () => {
-                bootbox.confirm('Are you sure you want to restore all fixtures?<br>This will overwrite all current fixture settings.', function (result) {
-                    if (result) {
-                        maestro.SettingsApp.restoreAllFixtures();
+                bootbox.confirm({
+                    title: "Restore", message: 'Are you sure you want to restore all fixtures?<br>This will overwrite all current fixture settings.', callback: function (result) {
+                        if (result) {
+                            maestro.SettingsApp.restoreAllFixtures();
+                        }
                     }
                 });
             });
@@ -515,46 +536,50 @@ class SettingsApp extends Globals {
             document.getElementById('backupDate').innerText = "Never";
         }
         document.getElementById('backupFixtures').addEventListener('click', async () => {
-            bootbox.confirm('Are you sure you want to backup all fixtures?<br>This will overwrite the current backup.', async (result) => {
-                if (result) {
-                    await maestro.SettingsApp.backupAllFixtures();
-                    maestro.SettingsApp.loadBackupRestoreBtns(maestro.SettingsApp.stageId, false);
+            bootbox.confirm({
+                title: "Backup", message: 'Are you sure you want to backup all fixtures?<br>This will overwrite the current backup.', callback: async (result) => {
+                    if (result) {
+                        await maestro.SettingsApp.backupAllFixtures();
+                        maestro.SettingsApp.loadBackupRestoreBtns(maestro.SettingsApp.stageId, false);
+                    }
                 }
             });
         });
     }
     bindClearConfigBtn = async () => {
         document.getElementById('clearConfig').addEventListener('click', async () => {
-            bootbox.confirm("Are you sure you want to clear the current config?", function (result) {
-                if (result) {
-                    chrome.storage.local.clear(function () {
-                        //local settings
-                        chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
+            bootbox.confirm({
+                title: "Clear Config", message: "Are you sure you want to clear the current config?", callback: function (result) {
+                    if (result) {
+                        chrome.storage.local.clear(function () {
+                            //local settings
+                            chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
 
-                        chrome.storage.local.set({ autoFogOnActivityPeak: false });
-                        chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
-                        chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
-                        chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
-                        chrome.storage.local.set({ autoFogOnTimer: false });
-                        chrome.storage.local.set({ fogTimer: 10 });
-                        chrome.storage.local.set({ fogTimerDuration: 3 });
+                            chrome.storage.local.set({ autoFogOnActivityPeak: false });
+                            chrome.storage.local.set({ autoFogOnActivityPeakPercent: 95 });
+                            chrome.storage.local.set({ autoFogOnActivityPeakDuration: 3 });
+                            chrome.storage.local.set({ autoFogOnActivityPeakInterval: 2 });
+                            chrome.storage.local.set({ autoFogOnTimer: false });
+                            chrome.storage.local.set({ fogTimer: 10 });
+                            chrome.storage.local.set({ fogTimerDuration: 3 });
 
-                        chrome.storage.local.set({ autoEffectsEnabled: false });
-                        chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
-                        chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
-                        chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
+                            chrome.storage.local.set({ autoEffectsEnabled: false });
+                            chrome.storage.local.set({ autoEffectsOnActivityPeakPercent: 95 });
+                            chrome.storage.local.set({ autoEffectsOnActivityPeakDuration: 2 });
+                            chrome.storage.local.set({ autoEffectsOnActivityPeakInterval: 2 });
 
-                        chrome.storage.local.set({ autoStrobeEnabled: false });
-                        chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
-                        chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
-                        chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
+                            chrome.storage.local.set({ autoStrobeEnabled: false });
+                            chrome.storage.local.set({ autoStrobeOnActivityPeakPercent: 95 });
+                            chrome.storage.local.set({ autoStrobeOnActivityPeakDuration: 2 });
+                            chrome.storage.local.set({ autoStrobeOnActivityPeakInterval: 2 });
 
-                        chrome.storage.local.set({ autoMacroInterval: 5 });
-                        chrome.storage.local.set({ autoMacroRunTime: 30 });
-                        chrome.storage.local.set({ autoMacroEnabled: false });
+                            chrome.storage.local.set({ autoMacroInterval: 5 });
+                            chrome.storage.local.set({ autoMacroRunTime: 30 });
+                            chrome.storage.local.set({ autoMacroEnabled: false });
 
-                        document.location.reload();
-                    });
+                            document.location.reload();
+                        });
+                    }
                 }
             });
         });
@@ -623,7 +648,7 @@ class SettingsApp extends Globals {
                             let foreignFixtures = [...new Set(parse.macros.flatMap(macro => macro.macro.fixtures.map(fixture => fixture.id)).filter(fixtureId => !currentFixtureIds.includes(fixtureId)))];
 
                             if (foreignFixtures.length > 0) {
-                                return bootbox.alert('This backup contains macros for fixtures that are not present in the currently active stage.<br><br>Restoring this backup would have no effect on the current stage, and cannot continue.')
+                                return bootbox.alert({ title: "Stop!", message: 'This backup contains macros for fixtures that are not present in the currently active stage.<br><br>Restoring this backup would have no effect on the current stage, and cannot continue.' })
                             }
 
                             bootbox.confirm("Config file is ready to import.<br><br>Do you want to continue and apply the new config?", function (result) {
@@ -632,7 +657,7 @@ class SettingsApp extends Globals {
                                 chrome.storage.local.clear(function () {
                                     chrome.storage.local.set(parse);
                                     chrome.storage.local.set({ version: chrome.runtime.getManifest().version });
-                                    bootbox.alert('Config restored successfully.', function () { window.location.reload(); });
+                                    bootbox.alert({ title: "Config", message: 'Config restored successfully.', callback: function () { window.location.reload(); } });
                                 });
                             })
                         }
@@ -669,7 +694,7 @@ class SettingsApp extends Globals {
             await this.patchFixture(fixture.id, data);
         }
 
-        return bootbox.alert('All fixtures have been restored to the backup state');
+        return bootbox.alert({ title: "Done!", message: 'All fixtures have been restored to the backup state' });
     };
     bindAutoMacros = async () => {
         let autoMacrosEnabled = await this.getLocalSetting("autoMacrosEnabled");
@@ -915,7 +940,7 @@ class SettingsApp extends Globals {
                     this.hideLoader();
 
                     if (showLoader) {
-                        return bootbox.alert('Another Macro is already running on fixtures with the same id as contained in this macro!<br><br>Running multiple macros on the same fixture simultaneously can cause issues!');
+                        return bootbox.alert({ title: "Stop!", message: 'Another Macro is already running on fixtures with the same id as contained in this macro!<br><br>Running multiple macros on the same fixture simultaneously can cause issues!' });
                     } else {
                         return false;
                     }
@@ -958,7 +983,7 @@ class SettingsApp extends Globals {
                     this.hideLoader();
 
                     if (showLoader) {
-                        bootbox.alert(`The macro will not be applied because all fixtures have the same settings as currently live!`);
+                        bootbox.alert({ title: "Stop!", message: `The macro will not be applied because all fixtures have the same settings as currently live!` });
                     }
 
                     return false;
@@ -3526,4 +3551,3 @@ class SettingsApp extends Globals {
     };
 };
 maestro.SettingsApp = new SettingsApp(document.currentScript.src);
-maestro.SettingsApp.init();

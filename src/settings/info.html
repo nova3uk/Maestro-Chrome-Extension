@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maestro Extension - Setings</title>
+    <link rel="stylesheet" href="../external/bootstrap.min.css">
+    <link rel="stylesheet" href="../external/bootstrap-icons.css">
+    <link rel="stylesheet" href="../external/bootstrap-table.min.css">
+    <link rel="stylesheet" href="/src/inject/css/settings.css">
+    <link rel="icon" href="/src/img/favicon-maestro.png" />
+</head>
+
+<body>
+    <nav class="navbar navbar-expand navbar-dark fixed-top"
+        style="background-color: #081728 !important;font-family:Roboto, Helvetica, Arial, sans-serif;">
+        <div class="container">
+            <h4 class="text-light">
+                <span class="ms-2" style="position:relative;bottom:-5px;">Maestro Chrome Extension</span>
+            </h4>
+            <span class="me-3"></span>
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html"><i class="bi bi-house-fill"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="info.html"><i class="bi bi-question-circle-fill"></i> Help</a>
+                </li>
+            </ul>
+            <h6 class="text-light me-2">
+                <span id="versionNumber" class="me-1" style="font-size: 0.6em;position:relative;bottom:-5px;"></span>
+            </h6>
+            <span id="menuIcons" class="">
+                <a href="https://www.facebook.com/groups/295672492496021" id="facebookLink"
+                    title="Maestro Facebook Group" class="fb-icon me-1" target="_blank" class="text-light">
+                    <i class="bi bi-facebook" style="font-size:30px;"></i>
+                </a>
+                <a href="https://m.me/nova3uk" id="helpLink" title="Need Help? Contact me on Messenger"
+                    class="messenger-icon me-1" target="_blank">
+                    <i class="bi bi-messenger" style="font-size:30px;"></i>
+                </a>
+                <a href="https://github.com/nova3uk/Maestro-Chrome-Extension" id="gitLink" title="GitHub Repo"
+                    class="help-icon" target="_blank">
+                    <i class="bi bi-github" style="font-size:30px;"></i>
+                </a>
+            </span>
+        </div>
+    </nav>
+    <div role="main" class="container mt-5">
+        <!-- Upper Navigation Menu -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link upper-panel active" id="simple-tab-0" data-bs-toggle="tab" href="#tabpanel-info"
+                    role="tab" aria-controls="tabpanel-info" aria-selected="true">
+                    <i class="bi bi-info-circle"></i>
+                    Getting Started
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link upper-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-macrohelp"
+                    role="tab" aria-controls="tabpanel-macrohelp" aria-selected="true">
+                    <i class="bi bi-info-circle"></i>
+                    Creating Macros
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link upper-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-triggers"
+                    role="tab" aria-controls="tabpanel-triggers" aria-selected="true">
+                    <i class="bi bi-info-circle"></i>
+                    Triggers & Auto
+                </a>
+            </li>
+        </ul>
+        <!-- Info Panel -->
+        <div class="tab-content">
+            <div class="tab-pane active collapse" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
+                <h5>Connecting to the MaestroDMX</h5>
+                The plugin will work when your MaestroDMX is running and available on the network.<br>
+                It can work with http://maestro.local or http://10.0.0.200 or http://192.168.37.1 which are the
+                deafult
+                address and ips of the MaestroDMX. By deafult it's looking for maestro.local which should work in
+                most
+                cases<br><br>
+                If you are using a different IP, you may need to modify your hosts file to point to the correct
+                IP.<br>
+                Instructions on how to modify the hosts file can be found, for example at
+                <a href="https://docs.rackspace.com/docs/modify-your-hosts-file" target="_blank">How to Edit
+                    Hosts File</a><br>
+                where if your maestro was working for example at ip address 192.168.100.100, you would add a line to
+                hosts file like:
+                <span
+                    style="border: 1px solid black; background-color: lightgrey;padding-left: 3px;padding-right:3px">maestro.local
+                    192.168.100.100</span>
+                <br>
+            </div>
+            <!-- Macro Info Panel -->
+            <div class="tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-1">
+                <ol>
+                    <li>For your convenience, before you start modifying, take a backup of your Stage, from the
+                        MaestroDMX control panel,
+                        from this extension, you can take a backup of all the fixture settings and macros via the
+                        Backup
+                        & Restore tab.</li>
+                    <li>You can set toggles via the <a id="controlPageLink" target="_blank">Control Page</a> Page
+                        on
+                        the Stages
+                        tab. You can also set Pan/Tilt positions via the Pan/Tilt Finder, on the Fixtures Tab
+                        below.<br>
+                        If your fixture(s) have Gobo or Prism, you can disable or enable all of them using the
+                        Fixture
+                        Toggles tab below.
+                    </li>
+                    <li>Set all the toggles the way you want them, for each fixture you want to include in the
+                        Macro.
+                    </li>
+                    <li>Come back to this page and select the fixtures on the Fixtures tab below you want to include
+                        in
+                        your Macro.</li>
+                    <li>Click "Add Macro" to create it.</li>
+                    <li>Once you have created the macros you can at any time click Restore below to restore all
+                        the
+                        fixtures back to their normal state before you began.</li>
+                </ol>
+                <p>To use the Macro:</p>
+                <ol>
+                    <li>Use it to set the toggles to the stored state.</li>
+                    <li>Clear the Macro to revert all toggles to the previous state.</li>
+                    <li>Macros are specific to the currently active Stage.</li>
+                    <li>Remember - the Macro applies ALL modified current settings, so if you have modified the
+                        Control
+                        page, the
+                        Pan/Tilt or used a Fixture Toggle below it will be recorded to the macro!</li>
+                </ol>
+                <p class="text-danger font-weight-bold">Remember to back up your Stage and Fixtures before
+                    testing
+                    this
+                    feature for your own security.
+                </p>
+            </div>
+            <div class="tab-pane collapse" id="tabpanel-triggers" role="tabpanel" aria-labelledby="simple-tab-3">
+                <p class="h6">
+                    <span class="text-success">
+                        <i class="bi bi-info-circle"></i>
+                    </span>
+                    <i>You can create macros via the Fixtures Tab</i>
+                </p>
+                <p>
+                    See "Creating Macros" Section above for information on how to create a macro and how they
+                    work.
+                </p>
+                <h6><strong>Triggers</strong></h6>
+                <p>
+                    The AutoStop trigger will stop the macro after the specified time (in seconds, max
+                    3600(1hr)).<br>
+                    Leave blank to disable.
+                </p>
+                <p>
+                    You can "apply" a cue when a macro is triggered or cleared (Start Cue or End Cue).<br>
+                    You can select only a Start Cue or an End Cue, or both.<br>
+                    If another macro is triggered which also has a Start or End Cue whilst the first is still
+                    active, it will take over.
+                </p>
+                <p>
+                    You can "apply" a Move Effect when a macro is triggered or cleared (Start Effect or End
+                    Effect).<br>
+                    You can select only a Start Effect or an End Effect, or both.<br>
+                    If another macro is triggered which also has a Start or End Effect whilst the first is still
+                    active, it will take over.
+                </p>
+                <h6><strong>Auto Macros</strong></h6>
+                <p>
+                    You can specify the On and Off Activity Level for the macro to be triggered.<br>
+                    Macro Triggering can be enabled/disabled globally via the "Auto Macros" tab above.<br>
+                    <i>If a macro has an AutoStop timer, it may stop
+                        the macro before the Auto Macro off trigger.</i>
+                </p>
+            </div>
+        </div>
+        <script src="../external/jquery.min.js"></script>
+        <script src="../external/bootstrap.bundle.min.js"></script>
+        <script src="../external/bootstrap-table.min.js"></script>
+        <script src="../external/bootbox.min.js"></script>
+        <script src="../inject/js/globals.js"></script>
+</body>
+
+</html>

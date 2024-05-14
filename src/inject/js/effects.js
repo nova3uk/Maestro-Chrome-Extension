@@ -1,12 +1,20 @@
 "use strict";
 var maestro = maestro || {};
 class Effects extends Globals {
-    constructor(scriptSource, loggingOn = false) {
+    constructor(scriptSource) {
         super();
         this.scriptSource = scriptSource;
-        this.loggingOn = loggingOn;
-        this.maestroUrl = this.parseMaestroUrl();
-        if (!this.stage) this.getStages();
+        this.loggingOn = maestro.SettingsApp.loggingOn;
+        this.maestroUrl = maestro.SettingsApp.maestroUrl;
+
+        if (!this.stage) {
+            this.stage = maestro.SettingsApp.stage;
+            this.stageId = maestro.SettingsApp.activeStageId;
+            this.activeStage = maestro.SettingsApp.activeStage;
+            this.fixtures = maestro.SettingsApp.fixtures;
+            this.groups = maestro.SettingsApp.groups;
+            this.activeStageFixtureGroups = maestro.SettingsApp.activeStageFixtureGroups;
+        }
     }
     animationRunning = false;
 

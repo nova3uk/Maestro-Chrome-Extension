@@ -5,9 +5,6 @@ class App extends Globals {
     constructor(scriptSource, loggingOn = false) {
         super();
 
-        this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
-        this.maestroHost = new URL(this.maestroUrl).host;
-
         if (scriptSource) {
             var src = new URL(scriptSource);
             this.ExtensionId = src.host;
