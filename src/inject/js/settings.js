@@ -479,7 +479,7 @@ class SettingsApp extends Globals {
                             td.style.backgroundColor = "lightgrey";
                             break;
                         case "SHOW_STOPPED":
-                            td.style.backgroundColor = "#edebe6";
+                            td.style.backgroundColor = "lightgrey";
                             break;
                     }
                 }
@@ -2600,7 +2600,7 @@ class SettingsApp extends Globals {
                         if (row.type == "SHOW_STOPPED") {
                             return {
                                 css: {
-                                    'background-color': '#edebe6'
+                                    'background-color': 'lightgrey'
                                 }
                             }
                         }
