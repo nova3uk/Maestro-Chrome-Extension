@@ -122,7 +122,21 @@ class SettingsApp extends Globals {
         } else {
             document.getElementById('enableLoggingSwitch').innerHTML = 'Enable Logging';
         }
-
+        document.getElementById("deleteLogs").addEventListener('click', async () => {
+            let logging = await this.getLocalSetting("loggingToggle");
+            if (logging) {
+                bootbox.alert({ title: "Disable Logging", message: "Please disable logging before deleting logs." });
+                return;
+            }
+            bootbox.confirm({
+                title: "Delete Logs", message: "Are you sure you want to delete all logs?", callback: async (result) => {
+                    if (result) {
+                        await this.deleteLocalSetting("changeLog");
+                        bootbox.alert({ title: "Logs Deleted", message: "All logs have been deleted." });
+                    }
+                }
+            });
+        });
         document.getElementById('enableLoggingSwitch').addEventListener('click', async () => {
             let logging = await this.getLocalSetting("loggingToggle");
             if (logging) {
@@ -131,6 +145,8 @@ class SettingsApp extends Globals {
             } else {
                 await this.saveLocalSetting("loggingToggle", true);
                 document.getElementById('enableLoggingSwitch').innerHTML = '<span class="text-danger">Disable Logging</span>';
+
+                bootbox.alert({ title: "Logging Enabled", message: "Logs will be collected for every activity which you generate via the Extension.<br>These logs can consume a large amount of storage space, please remember to turn them off when not needed, as otherwise you may run into technical difficulties with a lack of space.<br><br>You can download the Logs as part of the Config Backup, available from the Backup Tab." });
             }
         });
     };
