@@ -148,39 +148,6 @@
         </ul>
 
         <div class="tab-content">
-            <!-- Strobe Triggering Panel -->
-            <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
-                <div>
-                    <p>
-                        If the MaestroDMX Strobe function doesn't work, and your fixture has a dedicated Strobe or
-                        Shutter
-                        channel,
-                        you can set specific parameters in the Fixtures tab below to to fix it.
-                    </p>
-                    <ol>
-                        <li>
-                            Set "Shutter Open" value, representing the normal open state for the Shutter or Strobe
-                        </li>
-                        <li>
-                            Set "Strobe" value, corresponding to the strobe function of the fixture. You can
-                            fine-tune
-                            the Strobe value according to the DMX values specified in the fixture's manual, enabling
-                            adjustment for strobe speed.
-                        </li>
-                        <li>
-                            If your fixture has multiple Strobe or Shutter channels, you can set some or all of them
-                            in
-                            the Fixtures tab (For example, the Gigbar Move ILS has more than 10!).<br>
-                            Refer to your fixtures DMX Table in the manual to determine the correct Open and Strobe
-                            values for each channel.
-                        </li>
-                    </ol>
-                    Once the parameters are set correctly, when you use the "Strobe" button on the footer, or in the
-                    Show Page it should cause your fixture to strobe. If it doesn't work, try adjusting the values
-                    or
-                    refreshing the main MaestroDMX page to ensure you have the latest config.
-                </div>
-            </div>
             <!-- Backup Panel -->
             <div class="tab-pane" id="tabpanel-backup" role="tabpanel" aria-labelledby="simple-tab-1">
                 <ul>
@@ -353,6 +320,9 @@
             <!-- Macro Controls -->
             <div class="tab-pane active" id="tabpanel-macros" role="tabpanel" aria-labelledby="simple-tab-4">
                 <div class="px-3 py-1 border border-dark">
+                    <div class="text-primary my-1 float-end">
+                        <a href="info.html#tabpanel-macrotriggers"><i class="bi bi-patch-question-fill"></i></a>
+                    </div>
                     <h6 class="fw-bold">Auto Macro Triggers</h6>
                     <div class="row my-3">
                         <div class="col-auto">
@@ -418,25 +388,16 @@
                         <span class="text-success">
                             <i class="bi bi-info-circle"></i>
                         </span>
-                        See "Creating Macros" Section above for information on how to create a macro and how they
+                        See <a href="info.html#tabpanel-macrohelp">Creating Macros</a> for information on how to create
+                        a macro and how they
                         work.
                     </p>
                     <p class="h6">
                         <span class="text-success">
                             <i class="bi bi-info-circle"></i>
                         </span>
-                        See "Strobe Triggering" Section above for information on how to setup the strobe or shutter.
-                    </p>
-                    <p class="h6">
-                        <span class="text-success">
-                            <i class="bi bi-info-circle"></i>
-                        </span>
-                        Pan/Tilt are the default Center Point used for Effects. You can set this using the
-                        <span role="button" class="panOrTilt cursor-pointer link" data-id="panOrTiltAll"
-                            data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Set Pan/Tilt for All Movers"
-                            data-bs-original-title="Set Pan/Tilt for All Movers"
-                            aria-describedby="tooltip580652">Pan/Tilt Finder
-                        </span>
+                        See <a href="info.html#tabpanel-strobing">Strobe Triggering</a> on how to setup the strobe or
+                        shutter.
                     </p>
                 </div>
                 <table id="fixtures" class="table" data-classes="table table-bordered my-1 table-primary">
@@ -463,49 +424,17 @@
             </div>
             <!-- Effects -->
             <div class="tab-pane" id="tabpanel-effects" role="tabpanel" aria-labelledby="simple-tab-12">
-                <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
-                    href="#effectControlsInfoPane" role="button" aria-expanded="false"
-                    aria-controls="effectControlsInfoPane">
-                    <span class="text-primary">
-                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
-                    </span>
-                </a>
                 <div data-id="noMovers" class="text-dark my-1" style="display: none;">
                     <i class="bi bi-exclamation-triangle" style="font-size: 20px;"></i>
                     <i style="font-size:20px;">No Fixtures with Pan or Tilt found. Move Effects are disabled. </i>
                 </div>
-                <div class="collapse" id="effectControlsInfoPane" data-type="collapsable">
-                    <div class="text-danger my-1">
-                        <i class="bi bi-exclamation-triangle" style="font-size: 20px;"></i>
-                        <i style="font-size:20px;">Experimental Functionality!</i>
-                    </div>
-                    <p>
-                        Only one effect can be run at a time. The effect will run on all fixtures with a Pan/Tilt
-                        channel.
-                        <br>
-                        Effects use a lot of network bandwidth - highly reccomended to use Ethernet and not
-                        wifi!
-                        <br>
-                    <ul>
-                        <li>Pan/Tilt Start: The central point the effect will move around. Usually, this is movers
-                            pointing straight forward.<br>
-                            You can find and set the Center point using the
-                            <span role="button" class="panOrTilt cursor-pointer link" data-id="panOrTiltAll"
-                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                aria-label="Set Pan/Tilt for All Movers"
-                                data-bs-original-title="Set Pan/Tilt for All Movers"
-                                aria-describedby="tooltip580652">Pan/Tilt Finder
-                            </span>
-                        </li>
-                        <li>Speed: Lower = faster.</li>
-                        <li>Size: The size of the effect, higher = bigger.</li>
-                        <li>Steps: The number of points along the axis of travel. More = Smoother & Slower, Less = More
-                            abrupt but faster.</li>
-                        <li>Fan: The size of the gap between each fixture in the effect, higher = bigger.</li>
-                        <li><b>Effects will only work if this settings page is open!</b></li>
-                    </ul>
-                    </p>
-                </div>
+                <p class="h6">
+                    <span class="text-success">
+                        <i class="bi bi-info-circle"></i>
+                    </span>
+                    See <a href="info.html#tabpanel-effects">Mover Effects</a> for more information on how to use
+                    Effects.
+                </p>
                 <div class="text-danger my-1">
                     <i class="bi bi-exclamation-octagon-fill"></i>
                     <i>These switches are live edits, and will take effect immediately</i>

@@ -521,10 +521,13 @@ class SettingsApp extends Globals {
             var id = $(e.target).attr("href").substr(1);
             await this.saveLocalSetting('activeSettingsTab', id);
         });
-        this.getLocalSetting('activeSettingsTab').then(tab => {
-            $('.nav-tabs a[href="#' + tab + '"]').tab('show');
-        });
-
+        if (document.location.hash) {
+            $('.nav-tabs a[href="' + document.location.hash + '"]').tab('show');
+        } else {
+            this.getLocalSetting('activeSettingsTab').then(tab => {
+                $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+            });
+        }
         $('div[data-type="collapsable"]').on("shown.bs.collapse", async (e) => {
             var id = $(e.target).attr("id");
             await this.saveLocalSetting(id, true);
