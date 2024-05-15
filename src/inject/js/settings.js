@@ -1489,9 +1489,7 @@ class SettingsApp extends Globals {
                         pantilt: panOrTilt,
                         channels: channels,
                         ignore: ignore,
-                        shutterParams: shutterParams,
-                        pan: panOrTilt ? await this.getFixtureSettings(activeStage.id, fixture.id, "defaultPan") : null,
-                        tilt: panOrTilt ? await this.getFixtureSettings(activeStage.id, fixture.id, "defaultTilt") : null
+                        shutterParams: shutterParams
                     });
                     i++;
                 }
@@ -1535,35 +1533,23 @@ class SettingsApp extends Globals {
                         return `<span id="name_${row.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.active ? "" : "Fixture is Disabled"}">${value}</span>`;
                     }
                 },
-                {}, {},
                 {
-                    field: 'fixturePan',
+                    field: 'fixtureGroup',
                     align: 'center',
                     valign: 'middle',
-                    clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.pantilt) {
-                            let response = "";
-                            response += `<label style="font-size:10px;position:relative;top:-10px;" for="pan_${row.id}">Pan</label><br>`;
-                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="fixture_default_pan" data-id="${row.id}" data-stageid="${row.stageId}" id="pan_${row.id}" min="0" max="255" value="${row.pan ? row.pan : ""}">`;
-                            return response;
-                        }
-
+                        return row.fixtureGroup;
                     }
-                }, {
-                    field: 'fixtureTilt',
+                },
+                {
+                    field: 'fixturePosition',
                     align: 'center',
                     valign: 'middle',
-                    clickToSelect: false,
                     formatter: function (value, row, index) {
-                        if (row.pantilt) {
-                            let response = "";
-                            response += `<label style="font-size:10px;position:relative;top:-10px;" for="tilt_${row.id}">Tilt</label><br>`;
-                            response += `<input class="text-center" type="number" style="width:70px;position:relative;top:-10px;" name="fixture_default_tilt" data-id="${row.id}" data-stageid="${row.stageId}" id="tilt_${row.id}" min="0" max="255" value="${row.tilt ? row.tilt : ""}">`;
-                            return response;
-                        }
+                        return row.fixturePosition;
                     }
-                }, {
+                },
+                {
                     field: 'channelType',
                     align: 'center',
                     valign: 'middle',
