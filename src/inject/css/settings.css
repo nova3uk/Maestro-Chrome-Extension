@@ -267,3 +267,6 @@ button.cueControlbtn {
 .nav-tabs {
   border-bottom: 1px solid transparent;
 }
+.nav-item {
+  cursor: pointer;
+}

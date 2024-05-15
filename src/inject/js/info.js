@@ -19,14 +19,10 @@ class InfoPage extends Globals {
         link.setAttribute("href", `${this.maestroUrl}/#/stages/${this.stageId}/control/`);
     };
     tabObserver = () => {
-        $('.nav-tabs a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        });
         $("ul.nav-tabs > li > a").on("shown.bs.tab", async (e) => {
             var id = $(e.target).attr("href").substr(1);
             await this.saveLocalSetting('activeInfoTab', id);
-            document.location.hash = `${id}`;
+            history.pushState("", document.title, window.location.pathname + window.location.search);
         });
         if (document.location.hash) {
             $('.nav-tabs a[href="' + document.location.hash + '"]').tab('show');
