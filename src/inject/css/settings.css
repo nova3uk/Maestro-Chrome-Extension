@@ -1,251 +1,269 @@
 html {
-    scrollbar-gutter: stable;
-  }
-body{
-    font-family: 'Roboto', sans-serif;
-    overflow-y: scroll !important;
-    background-color: rgb(199, 198, 198);
-    padding-top: 60px;
-}   
+  scrollbar-gutter: stable;
+}
+body {
+  font-family: "Roboto", sans-serif;
+  overflow-y: scroll !important;
+  background-color: rgb(199, 198, 198);
+  padding-top: 60px;
+}
 .tab-content .tab-pane {
-    background-color: rgb(199, 198, 198) !important;
+  background-color: rgb(199, 198, 198) !important;
 }
-.nav-tabs .nav-link{
-    border: 0px;
-    margin-right: 1px;
+.nav-tabs .nav-link {
+  border: 0px;
+  margin-right: 1px;
 }
-.table>thead>tr>th{
-    background-color: rgb(222, 222, 222);
+.table > thead > tr > th {
+  background-color: rgb(222, 222, 222);
 }
-.table>tbody>tr>td{
-    background-color: rgb(222, 222, 222);
+.table > tbody > tr > td {
+  background-color: rgb(222, 222, 222);
 }
-.macro-active td{
-    background-color: lightgreen !important;
+.macro-active td {
+  background-color: lightgreen !important;
 }
 .help-icon {
-    color: lightgray;
-    text-decoration: none;
+  color: lightgray;
+  text-decoration: none;
 }
 .fb-icon {
-    color: lightgray;
-    text-decoration: none;
+  color: lightgray;
+  text-decoration: none;
 }
 .messenger-icon {
-    color: lightgray;
-    text-decoration: none;
+  color: lightgray;
+  text-decoration: none;
 }
 .nav-tabs .nav-item .upper-panel {
-    /* background-color: #0080FF; */
-    background-color: #133964;
-    color: #FFF;
+  /* background-color: #0080FF; */
+  background-color: #133964;
+  color: #fff;
 }
 .nav-tabs .nav-item .lower-panel {
-    /* background-color: #0080FF; */
-    background-color: rgb(32, 25, 133);
-    color: #FFF;
+  /* background-color: #0080FF; */
+  background-color: rgb(32, 25, 133);
+  color: #fff;
 }
 .nav-tabs .nav-item .lower-panel.active {
-    /* background-color: #0080FF; */
-    background-color: rgb(166, 159, 255);
-    color: #FFF;
+  /* background-color: #0080FF; */
+  background-color: rgb(166, 159, 255);
+  color: #fff;
 }
 .nav-tabs .nav-item .upper-panel.active {
-    color: #fff;
-    background-color: rgb(43, 108, 182);
+  color: #fff;
+  background-color: rgb(43, 108, 182);
 }
 
 .tab-content {
-    border: 1px solid #d1d1d1;
-    border-top: transparent;
-    padding: 15px;
+  border: 1px solid #d1d1d1;
+  border-top: transparent;
+  padding: 15px;
 }
 
 .tab-content .tab-pane {
-    background-color: #FFF;
-    color: #000000;
-    min-height: 200px;
-    height: auto;
+  background-color: #fff;
+  color: #000000;
+  min-height: 200px;
+  height: auto;
 }
 table.table-bordered {
-    border: 1px solid #454444;
-    margin-top: 20px;
+  border: 1px solid #454444;
+  margin-top: 20px;
 }
 
-table.table-bordered>thead>tr>th {
-    border: 1px solid #454444;
+table.table-bordered > thead > tr > th {
+  border: 1px solid #454444;
 }
 
-table.table-bordered>tbody>tr>td {
-    border: 1px solid #454444;
+table.table-bordered > tbody > tr > td {
+  border: 1px solid #454444;
 }
 custom-range {
-    background: gray;
+  background: gray;
 }
 
-table.bg-red>tbody>tr>td {
-    background-color: red;
+table.bg-red > tbody > tr > td {
+  background-color: red;
 }
 
-table.bg-green>tbody>tr>td {
-    background-color: green;
+table.bg-green > tbody > tr > td {
+  background-color: green;
 }
 
-table.bg-blue>tbody>tr>td {
-    background-color: blue;
+table.bg-blue > tbody > tr > td {
+  background-color: blue;
 }
-table.bg-white>tbody>tr>td {
-    background-color: white;
+table.bg-white > tbody > tr > td {
+  background-color: white;
 }
-table.bg-amber>tbody>tr>td {
-    background-color: #FFBF00;
+table.bg-amber > tbody > tr > td {
+  background-color: #ffbf00;
 }
-table.bg-orange>tbody>tr>td {
-    background-color: orange;
-}
-
-table.bg-yellow>tbody>tr>td {
-    background-color: yellow;
+table.bg-orange > tbody > tr > td {
+  background-color: orange;
 }
 
-table.bg-white>tbody>tr>td {
-    background-color: white;
-}
-table.bg-cool_white>tbody>tr>td {
-    background-color: white;
-}
-table.bg-warm_white>tbody>tr>td {
-    background-color: white;
-}   
-table.bg-uv>tbody>tr>td {
-    background-color: #7b6d8d;
-}
-table.bg-purple>tbody>tr>td {
-    background-color: purple;
-}
-table.bg-cyan>tbody>tr>td {
-    background-color: cyan;
+table.bg-yellow > tbody > tr > td {
+  background-color: yellow;
 }
 
-table.bg-magenta>tbody>tr>td {
-    background-color: magenta;
+table.bg-white > tbody > tr > td {
+  background-color: white;
 }
-table.bg-lightgrey>tbody>tr>td {
-    background-color: rgb(245, 240, 245);
+table.bg-cool_white > tbody > tr > td {
+  background-color: white;
+}
+table.bg-warm_white > tbody > tr > td {
+  background-color: white;
+}
+table.bg-uv > tbody > tr > td {
+  background-color: #7b6d8d;
+}
+table.bg-purple > tbody > tr > td {
+  background-color: purple;
+}
+table.bg-cyan > tbody > tr > td {
+  background-color: cyan;
+}
+
+table.bg-magenta > tbody > tr > td {
+  background-color: magenta;
+}
+table.bg-lightgrey > tbody > tr > td {
+  background-color: rgb(245, 240, 245);
 }
 input[type="range"] {
-    -webkit-appearance: none;
-     appearance: none;
-     background: transparent;
-     cursor: pointer;
-     width: 100%;
- }
- 
- /* Removes default focus */
- input[type="range"]:focus {
-   outline: none;
- }
- 
- /***** Chrome, Safari, Opera and Edge Chromium styles *****/
- /* slider track */
- input[type="range"]::-webkit-slider-runnable-track {
-    background-color: #308fe8;
-    border-radius: 0.5rem;
-    height: 0.8rem;  
- }
- 
- /* slider thumb */
- input[type="range"]::-webkit-slider-thumb {
-   -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    margin-top: -5px; /* Centers thumb on the track */
- 
-    /*custom styles*/
-    background-color: darkgray;
-    height: 1.5rem;
-    width: 1.5rem;
- }
- 
- input[type="range"]:focus::-webkit-slider-thumb {   
-   border: 1px solid #292c2e;
-   outline: 3px solid #fff;
-   outline-offset: 0.025rem; 
- }
- 
- /******** Firefox styles ********/
- /* slider track */
- input[type="range"]::-moz-range-track {
-    background-color: #053a5f;
-    border-radius: 0.5rem;
-    height: 0.5rem;
- }
- 
- /* slider thumb */
- input[type="range"]::-moz-range-thumb {
-    border: none; /*Removes extra border that FF applies*/
-    border-radius: 0; /*Removes default border-radius that FF applies*/
- 
-    /*custom styles*/
-    background-color: #5cd5eb;
-    height: 2rem;
-    width: 1rem;
- }
- 
- input[type="range"]:focus::-moz-range-thumb {
-   border: 1px solid #053a5f;
-   outline: 3px solid #053a5f;
-   outline-offset: 0.125rem; 
- }
- #box {
-    width: 450px;
-    height: 200px;
-    margin-left: auto;
-    margin-right: auto;
-    background: white;
-    border: 1px solid black;
-    position: relative;
-    background-image: linear-gradient(0deg, transparent 24px, #000 25px, #000 26px, transparent 27px), linear-gradient(90deg, transparent 24px, #000 25px, #000 26px, transparent 27px);
-    background-size: 25px 25px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Removes default focus */
+input[type="range"]:focus {
+  outline: none;
+}
+
+/***** Chrome, Safari, Opera and Edge Chromium styles *****/
+/* slider track */
+input[type="range"]::-webkit-slider-runnable-track {
+  background-color: #308fe8;
+  border-radius: 0.5rem;
+  height: 0.8rem;
+}
+
+/* slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  margin-top: -5px; /* Centers thumb on the track */
+
+  /*custom styles*/
+  background-color: darkgray;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+  border: 1px solid #292c2e;
+  outline: 3px solid #fff;
+  outline-offset: 0.025rem;
+}
+
+/******** Firefox styles ********/
+/* slider track */
+input[type="range"]::-moz-range-track {
+  background-color: #053a5f;
+  border-radius: 0.5rem;
+  height: 0.5rem;
+}
+
+/* slider thumb */
+input[type="range"]::-moz-range-thumb {
+  border: none; /*Removes extra border that FF applies*/
+  border-radius: 0; /*Removes default border-radius that FF applies*/
+
+  /*custom styles*/
+  background-color: #5cd5eb;
+  height: 2rem;
+  width: 1rem;
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+  border: 1px solid #053a5f;
+  outline: 3px solid #053a5f;
+  outline-offset: 0.125rem;
+}
+#box {
+  width: 450px;
+  height: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  background: white;
+  border: 1px solid black;
+  position: relative;
+  background-image: linear-gradient(
+      0deg,
+      transparent 24px,
+      #000 25px,
+      #000 26px,
+      transparent 27px
+    ),
+    linear-gradient(
+      90deg,
+      transparent 24px,
+      #000 25px,
+      #000 26px,
+      transparent 27px
+    );
+  background-size: 25px 25px;
 }
 
 #dot {
-    width: 20px;
-    height: 20px;
-    background: #308fe8;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    cursor: move;
+  width: 20px;
+  height: 20px;
+  background: #308fe8;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: move;
 }
 #fixtureName {
-    font-size: 0.7rem;
-    font-weight: bold;
+  font-size: 0.7rem;
+  font-weight: bold;
 }
 .link {
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
 }
-#changeTable{
-    font-size: 11px;
+#changeTable {
+  font-size: 11px;
 }
 .form-select-sm {
-    padding-top: .15rem;
-    padding-bottom: .15rem;
-    padding-left: .5rem;
-    font-size: .775rem;
-    border-radius: var(--bs-border-radius-sm);
+  padding-top: 0.15rem;
+  padding-bottom: 0.15rem;
+  padding-left: 0.5rem;
+  font-size: 0.775rem;
+  border-radius: var(--bs-border-radius-sm);
 }
 .form-control-sm {
-    padding-top: .15rem;
-    padding-bottom: .15rem;
-    padding-left: .5rem;
-    font-size: .775rem;
-    border-radius: var(--bs-border-radius-sm);
+  padding-top: 0.15rem;
+  padding-bottom: 0.15rem;
+  padding-left: 0.5rem;
+  font-size: 0.775rem;
+  border-radius: var(--bs-border-radius-sm);
 }
 button.cueControlbtn {
-    background-color: #778798;
-    color: white;
+  background-color: #778798;
+  color: white;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover,
+.nav-tabs {
+  border-bottom: 1px solid transparent;
 }

@@ -6,6 +6,7 @@ class SettingsApp extends Globals {
         this.scriptSource = scriptSource;
         // this.loggingOn = loggingOn;
         this.maestroUrl = this.parseMaestroUrl();
+
         if (!this.maestroUrl) {
             (async () => {
                 this.maestroUrl = await this.getLocalSetting("maestroUrl");
@@ -15,6 +16,8 @@ class SettingsApp extends Globals {
                 maestro.SettingsApp.init();
             })();
         } else {
+            let url = new URL(this.maestroUrl);
+            this.maestroHost = url.host;
             this.init();
         }
     }
@@ -51,8 +54,9 @@ class SettingsApp extends Globals {
         this.bindAutoFog();
         this.bindAutoEffects();
         this.tabObserver();
-        this.websocketEventsWatcher();
+        //this.websocketEventsWatcher();
         this.bindLoggingBtn();
+        this.startNotifications();
 
         this.loadScript(`../../../src/inject/js/effects.js`).then(() => {
             this.bindEffects();
@@ -100,9 +104,6 @@ class SettingsApp extends Globals {
     bindMaestroLinks = async () => {
         var link = document.getElementById('downloadStage')
         link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}`);
-        //moved to info
-        // var link = document.getElementById('controlPageLink')
-        // link.setAttribute("href", `${maestro.SettingsApp.maestroUrl}/#/stages/${maestro.SettingsApp.stageId}/control/`);
     };
     bindEffects = async () => {
         let fixtures = await maestro.SettingsApp.getAllMovers();
@@ -386,10 +387,122 @@ class SettingsApp extends Globals {
             this.getLocalSetting("showStateNotification").then(async (showStateNotification) => {
                 if (this.websocketEvents["showStateNotification"] == showStateNotification.time) return;
                 this.websocketEvents["showStateNotification"] = showStateNotification.time;
-                await this.cuesTable();
+                try {
+                    await this.cuesTableLoad();
+                } catch (e) {
+                    if (this.logging)
+                        console.error('Error in showStateNotification:', e);
+                }
             });
         }, 1000);
-    }
+    };
+    startNotifications = async () => {
+        var ws = new WebSocket("ws://" + this.maestroHost + "/notifications");
+
+        ws.onopen = (event) => {
+            if (this.logging)
+                console.log("Opening Notifications WebSocket", event);
+        };
+        ws.onerror = (event) => {
+            if (this.logging)
+                console.log("Opening Notifications WebSocket", event);
+        };
+
+        ws.onmessage = async (event) => {
+
+            let data = JSON.parse(event.data);
+            if (data.type == "AUDIO_LEVEL_NOTIFICATION") {
+                this.getLocalSetting("autoMacrosEnabled").then(async (autoMacrosEnabled) => {
+                    if (!autoMacrosEnabled) return;
+                    await maestro.SettingsApp.audioLevelHdlr(data.msg);
+                });
+            }
+            if (data.type == "GLOBAL_STATE_NOTIFICATION") {
+                let val = Math.floor(data.msg.brightness.value * 255);
+                document.getElementById('master_dimmer').value = val;
+                maestro.SettingsApp.setDimmerValue(val);
+            }
+            if (data.type == "SHOW_STATE_NOTIFICATION") {
+                await this.updateCueTable(data.msg);
+            }
+            if (data.type == "LIVE_STATE_NOTIFICATION") {
+                (async () => {
+                    await maestro.SettingsApp.watchForStageChange();
+                })();
+            }
+        };
+    };
+    updateCueTable = async (showState) => {
+        let rows = document.querySelectorAll(`table[id='cues'] tbody tr`);
+        for (let row of rows) {
+            if (row.dataset.id == showState.currentCue.uuid) {
+                row.dataset.stageActive = true;
+                for (let td of row.children) {
+                    switch (showState.type) {
+                        case "SHOW_PLAYING":
+                            td.style.backgroundColor = "lightgreen";
+                            break;
+                        case "SHOW_PAUSED":
+                            td.style.backgroundColor = "lightgrey";
+                            break;
+                        case "SHOW_STOPPED":
+                            td.style.backgroundColor = "#edebe6";
+                            break;
+                    }
+                }
+                let badge = row.querySelector(`span[data-id="${row.dataset.id}"]`);
+                switch (showState.type) {
+                    case "SHOW_PLAYING":
+                        badge.outerHTML = `<span data-type="${row.type}" data-id="${row.dataset.id}" class="badge bg-success">Playing</span>`;
+                        break;
+                    case "SHOW_PAUSED":
+                        badge.outerHTML = `<span data-type="${row.type}" data-id="${row.dataset.id}" class="badge bg-secondary">Paused</span>`;
+                        break;
+                    case "SHOW_STOPPED":
+                        badge.outerHTML = `<span data-type="${row.type}" data-id="${row.dataset.id}" class="badge bg-dark">Stopped</span>`;
+                        break;
+                }
+
+                let btn = row.querySelector(`button[data-id="${row.dataset.id}"]`);
+                btn.dataset.active = true;
+                btn.dataset.type = showState.type;
+                btn.classList.remove(...btn.classList);
+                btn.disabled = false;
+
+                switch (showState.type) {
+                    case "SHOW_PLAYING":
+                        btn.innerHTML = `<i class="bi bi-pause-fill"></i>`;
+                        btn.classList.add("btn", "btn-success");
+                        break;
+                    case "SHOW_PAUSED":
+                        btn.innerHTML = `<i class="bi bi-play-fill"></i>`;
+                        btn.classList.add("btn", "btn-secondary");
+                        break;
+                    case "SHOW_STOPPED":
+                        btn.innerHTML = `<i class="bi bi-play-fill"></i>`;
+                        btn.classList.add("btn", "btn-secondary");
+                        break;
+                }
+            } else {
+                row.dataset.stageActive = false;
+                for (let td of row.children) {
+                    td.style.backgroundColor = "#edebe6";
+                }
+
+                let badge = row.querySelector(`span[data-id="${row.dataset.id}"]`);
+                badge.outerHTML = `<span data-type="disabled" data-id="${row.dataset.id}" class="badge bg-dark" style="display:none;"></span>`;
+
+                let btn = row.querySelector(`button[data-id="${row.dataset.id}"]`);
+                btn.innerHTML = `<i class="bi bi-play-fill"></i>`;
+                btn.dataset.active = false;
+                btn.dataset.type = "";
+                btn.classList.remove(...btn.classList);
+                btn.classList.add("btn", "btn-primary");
+                btn.disabled = false;
+            }
+
+        }
+    };
     showLoader = () => {
         return;
         document.body.style.overflow = "hidden";
@@ -433,21 +546,6 @@ class SettingsApp extends Globals {
             });
 
         })
-    };
-    watchOffline = async () => {
-        try {
-            await this.getShowState();
-            $('#modalDown').modal('hide');
-            return true;
-        } catch (e) {
-            if ($('#modalDown').hasClass('show')) {
-                return false
-            };
-            setTimeout(() => {
-                $('#modalDown').modal('show');
-            }, 500);
-            return false;
-        }
     };
     cleanupStorage = async () => {
         this.retrieveAllKeys().then(keys => {
@@ -2381,55 +2479,43 @@ class SettingsApp extends Globals {
         });
 
     };
-    cuesTable = async (stages) => {
-        try {
-            let activeCue;
-            let cues = await this.getCues(true);
-            let showState = await this.getShowState();
+    cuesTable = async (showState = null) => {
+        let activeCue;
+        let cues = await this.getCues(true);
 
-            if (showState.currentCue)
-                activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
+        if (showState == null)
+            showState = await this.getShowState();
 
-            let macroNames = [];
+        if (showState.currentCue)
+            activeCue = cues.find(cue => cue.uuid == showState.currentCue.uuid);
 
-            if (activeCue) {
-                for (let cue of cues) {
+        if (activeCue) {
+            for (let cue of cues) {
 
-                    if (cue.uuid === activeCue.uuid) {
-                        cue.active = true;
-                        cue.playIndex = showState.playIndex;
-                        cue.playTime = showState.playTime;
-                        cue.type = showState.type;
-                    }
+                if (cue.uuid === activeCue.uuid) {
+                    cue.active = true;
+                    cue.playIndex = showState.playIndex;
+                    cue.playTime = showState.playTime;
+                    cue.type = showState.type;
                 }
             }
+        }
 
-            let macros = await this.loadMacros();
+        var tData = [];
 
-            if (macros) {
-                for (let macro of macros) {
-                    macroNames.push({ value: macro.macro.stageId, text: macro.macro.name });
-                };
-            }
-
-            var tData = [];
-
-            for (let cue of cues) {
-                tData.push({
-                    id: cue.uuid,
-                    cueName: cue.name,
-                    active: cue.active || false,
-                    playIndex: cue.playIndex,
-                    playTime: cue.playTime,
-                    type: cue.type,
-                    status: cue.active ? "Active" : "",
-                    groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`,
-                    list: macroNames
-                });
-            }
-
-            $('#cues').bootstrapTable('destroy');
-
+        for (let cue of cues) {
+            tData.push({
+                id: cue.uuid,
+                cueName: cue.name,
+                active: cue.active || false,
+                playIndex: cue.playIndex,
+                playTime: cue.playTime,
+                type: cue.type,
+                status: cue.active ? "Active" : "",
+                groupModes: `${cue.params.patternId} / ${cue.secondaryParams.patternId} / ${cue.tertiaryParams.patternId}`
+            });
+        }
+        try {
             $('#cues').bootstrapTable({
                 data: tData,
                 columns: [{}, {},
@@ -2438,12 +2524,23 @@ class SettingsApp extends Globals {
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
-                    formatter: function (value, row, index) {
-                        return row.active ? "Active" : "";
+                    formatter: function (value, row) {
+                        if (row.active) {
+                            switch (row.type) {
+                                case "SHOW_PLAYING":
+                                    return `<span data-type="${row.type}" data-id="${row.id}" class="badge bg-success">Playing</span>`;
+                                case "SHOW_PAUSED":
+                                    return `<span data-type="${row.type}" data-id="${row.id}" class="badge bg-secondary">Paused</span>`;
+                                case "SHOW_STOPPED":
+                                    return `<span data-type="${row.type}" data-id="${row.id}" class="badge bg-dark">Stopped</span>`;
+                            }
+                        } else {
+                            return `<span data-type="disabled" data-id="${row.id}" class="badge bg-dark" style="display:none;"></span>`;
+                        }
                     }
                 },
                 {
-                    field: 'applyCue',
+                    field: 'button_apply',
                     align: 'center',
                     valign: 'middle',
                     clickToSelect: false,
@@ -2469,7 +2566,7 @@ class SettingsApp extends Globals {
                         'data-stage-active': row.active
                     }
                 },
-                rowStyle: function (row, index) {
+                rowStyle: function (row) {
                     if (row.active) {
                         if (row.type == "SHOW_PAUSED") {
                             return {
@@ -2488,7 +2585,7 @@ class SettingsApp extends Globals {
                         if (row.type == "SHOW_STOPPED") {
                             return {
                                 css: {
-                                    'background-color': ''
+                                    'background-color': '#edebe6'
                                 }
                             }
                         }
@@ -2502,7 +2599,8 @@ class SettingsApp extends Globals {
                     }
                 }
             });
-            $('button[name="btn_show_apply"]').on('click', async function (btn) {
+
+            $('button[name="btn_show_apply"]').on('click', async function () {
                 this.disabled = true;
                 if (this.dataset.active == "false") {
                     maestro.SettingsApp.startCue(this.dataset.index);

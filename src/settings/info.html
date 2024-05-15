@@ -66,6 +66,13 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
+                <a class="nav-link upper-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-macrotriggers"
+                    role="tab" aria-controls="tabpanel-macrotriggers" aria-selected="true">
+                    <i class="bi bi-info-circle"></i>
+                    Macros Triggers
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
                 <a class="nav-link upper-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-triggers"
                     role="tab" aria-controls="tabpanel-triggers" aria-selected="true">
                     <i class="bi bi-info-circle"></i>
@@ -75,6 +82,7 @@
         </ul>
         <!-- Info Panel -->
         <div class="tab-content">
+            <!-- Connecting to Maestro -->
             <div class="tab-pane active collapse" id="tabpanel-info" role="tabpanel" aria-labelledby="simple-tab-0">
                 <h5>Connecting to the MaestroDMX</h5>
                 The plugin will work when your MaestroDMX is running and available on the network.<br>
@@ -90,13 +98,46 @@
                     Hosts File</a><br>
                 where if your maestro was working for example at ip address 192.168.100.100, you would add a line to
                 hosts file like:
-                <span
-                    style="border: 1px solid black; background-color: lightgrey;padding-left: 3px;padding-right:3px">maestro.local
-                    192.168.100.100</span>
+                <span style="border: 1px solid black; background-color: lightgrey;padding-left: 3px;padding-right:3px">
+                    192.168.100.100 maestro.local
+                </span>
+                <br><br>
+                <p>Once you have edited your hosts file, it should look something like below: <br>
+                    (example from Windows, added line highlighted red)</p>
+
+                <div style="width:800px; height:600px;padding:30px;background-color: black;border: 1px solid white;">
+                    <div style="color:white;">
+                        <!-- prettier-ignore -->
+                        # Copyright (c) 1993-2009 Microsoft Corp.<br>
+                        #<br>
+                        # This is a sample HOSTS file used by Microsoft TCP/IP for Windows.<br>
+                        #<br>
+                        # This file contains the mappings of IP addresses to host names. Each<br>
+                        # entry should be kept on an individual line. The IP address should<br>
+                        # be placed in the first column followed by the corresponding host name.<br>
+                        # The IP address and the host name should be separated by at least one<br>
+                        # space.<br>
+                        #<br>
+                        # Additionally, comments (such as these) may be inserted on individual<br>
+                        # lines or following the machine name denoted by a '#' symbol.<br>
+                        #<br>
+                        # For example:<br>
+                        #<br>
+                        # 102.54.94.97 rhino.acme.com # source server<br>
+                        # 38.25.63.10 x.acme.com # x client host<br>
+                        <br>
+                        # localhost name resolution is handled within DNS itself.<br>
+                        # 127.0.0.1 localhost<br>
+                        # ::1 localhost<br>
+                        #127.0.0.1 localhost<br>
+                        <span style="color:red;">192.168.100.100 maestro.local</span>
+                    </div>
+                </div>
                 <br>
             </div>
             <!-- Macro Info Panel -->
-            <div class="tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-1">
+            <div class=" tab-pane collapse" id="tabpanel-macrohelp" role="tabpanel" aria-labelledby="simple-tab-1">
+                <br>
                 <ol>
                     <li>For your convenience, before you start modifying, take a backup of your Stage, from the
                         MaestroDMX control panel,
@@ -118,10 +159,12 @@
                     <li>Come back to this page and select the fixtures on the Fixtures tab below you want to include
                         in
                         your Macro.</li>
-                    <li>Click "Add Macro" to create it.</li>
+                    <li>Click "Add Macro" at the bottom of the Fixtures list to create it.</li>
                     <li>Once you have created the macros you can at any time click Restore below to restore all
                         the
                         fixtures back to their normal state before you began.</li>
+                    <li>Remember: at the moment you create the Macro, its coppying the current settings, so it will have
+                        no effect until your settings have been restored to normal.</li>
                 </ol>
                 <p>To use the Macro:</p>
                 <ol>
@@ -139,17 +182,59 @@
                     feature for your own security.
                 </p>
             </div>
+            <!-- Auto Macro Panel -->
+            <div class="tab-pane collapse" id="tabpanel-macrotriggers" role="tabpanel" aria-labelledby="simple-tab-2">
+                <div>
+                    <p class="h6">
+                        <span class="text-success">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                        <i>
+                            See "Creating Macros" Section above for information on how to create a macro and how they
+                            work.
+                        </i>
+                    </p>
+                    <br>
+                    <h5>
+                        You can trigger a macros activation or deactivation, based on the Activity Level of the music.
+                    </h5>
+                    <ol>
+                        <li>
+                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
+                            ON.
+                        </li>
+                        <li>
+                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
+                            OFF.
+                        </li>
+                        <li>
+                            If you configure ON/OFF parameters for multiple Macros, which affect the same fixtures, then
+                            the first macro will win. (Higher in the list of macros will take precedence)
+                        </li>
+                        <li>
+                            Adjust the Minimum Interval, to prevent the macro from being triggered too often.
+                        </li>
+                        <li>
+                            Adjust the Minimum Run Time, to prevent the macro from being stopped too quickly.
+                        </li>
+                        <li>
+                            <b>Unlike other triggers, the Macro trigger will only work if this settings page is
+                                open!</b>
+                        </li>
+                    </ol>
+                </div>
+            </div>
             <div class="tab-pane collapse" id="tabpanel-triggers" role="tabpanel" aria-labelledby="simple-tab-3">
                 <p class="h6">
                     <span class="text-success">
                         <i class="bi bi-info-circle"></i>
                     </span>
-                    <i>You can create macros via the Fixtures Tab</i>
+                    <i>
+                        See "Creating Macros" Section above for information on how to create a macro and how they
+                        work.
+                    </i>
                 </p>
-                <p>
-                    See "Creating Macros" Section above for information on how to create a macro and how they
-                    work.
-                </p>
+                <br>
                 <h6><strong>Triggers</strong></h6>
                 <p>
                     The AutoStop trigger will stop the macro after the specified time (in seconds, max
@@ -183,6 +268,7 @@
         <script src="../external/bootstrap-table.min.js"></script>
         <script src="../external/bootbox.min.js"></script>
         <script src="../inject/js/globals.js"></script>
+        <script src="../inject/js/info.js"></script>
 </body>
 
 </html>

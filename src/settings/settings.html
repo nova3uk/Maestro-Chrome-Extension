@@ -68,35 +68,28 @@
         <!-- Lower Navigation Menu -->
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active lower-panel" id="simple-tab-4" data-bs-toggle="tab" href="#tabpanel-macros"
+                <a class="nav-link active upper-panel" id="simple-tab-4" data-bs-toggle="tab" href="#tabpanel-macros"
                     role="tab" aria-controls="tabpanel-macros" aria-selected="true">
                     <i class="bi bi-gear-fill"></i>
                     Macros
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-5" data-bs-toggle="tab" href="#tabpanel-fixtures"
+                <a class="nav-link upper-panel" id="simple-tab-5" data-bs-toggle="tab" href="#tabpanel-fixtures"
                     role="tab" aria-controls="tabpanel-fixtures" aria-selected="false">
                     <i class="bi bi-projector"></i>
                     Fixtures
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-11" data-bs-toggle="tab" href="#tabpanel-automacro"
-                    role="tab" aria-controls="tabpanel-automacro" aria-selected="false">
-                    <i class="bi bi-gear"></i>
-                    Auto
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-2" data-bs-toggle="tab" href="#tabpanel-fog" role="tab"
+                <a class="nav-link upper-panel" id="simple-tab-2" data-bs-toggle="tab" href="#tabpanel-fog" role="tab"
                     aria-controls="tabpanel-fog" aria-selected="false">
                     <i class="bi bi-cloud-haze"></i>
                     Fog
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-3" data-bs-toggle="tab" href="#tabpanel-strobe"
+                <a class="nav-link upper-panel" id="simple-tab-3" data-bs-toggle="tab" href="#tabpanel-strobe"
                     role="tab" aria-controls="tabpanel-strobe" aria-selected="false">
                     <i class="bi bi-lightbulb"></i>
                     <i class="bi bi-fire"></i>
@@ -104,110 +97,57 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-backup"
-                    role="tab" aria-controls="tabpanel-backup" aria-selected="false">
-                    <i class="bi bi-database-fill-check"></i>
-                    Backup
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-12" data-bs-toggle="tab" href="#tabpanel-effects"
+                <a class="nav-link upper-panel" id="simple-tab-12" data-bs-toggle="tab" href="#tabpanel-effects"
                     role="tab" aria-controls="tabpanel-effects" aria-selected="true">
                     <i class="bi bi-magic"></i>
                     Effects
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-9" data-bs-toggle="tab" href="#tabpanel-dimmers"
+                <a class="nav-link upper-panel" id="simple-tab-9" data-bs-toggle="tab" href="#tabpanel-dimmers"
                     role="tab" aria-controls="tabpanel-dimmers" aria-selected="false">
                     <i class="bi bi-brightness-high"></i>
                     Dimmer
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-10" data-bs-toggle="tab" href="#tabpanel-focus"
+                <a class="nav-link upper-panel" id="simple-tab-10" data-bs-toggle="tab" href="#tabpanel-focus"
                     role="tab" aria-controls="tabpanel-dimmers" aria-selected="false">
                     <i class="bi bi-zoom-in"></i>
                     Focus
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles"
+                <a class="nav-link upper-panel" id="simple-tab-8" data-bs-toggle="tab" href="#tabpanel-toggles"
                     role="tab" aria-controls="tabpanel-toggles" aria-selected="false">
                     <i class="bi bi-sliders"></i>
                     Toggles
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-7" data-bs-toggle="tab" href="#tabpanel-cues" role="tab"
+                <a class="nav-link upper-panel" id="simple-tab-7" data-bs-toggle="tab" href="#tabpanel-cues" role="tab"
                     aria-controls="tabpanel-cues" aria-selected="false">
                     <i class="bi bi-music-note-list"></i>
                     Cues
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link lower-panel" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-stages"
+                <a class="nav-link upper-panel" id="simple-tab-6" data-bs-toggle="tab" href="#tabpanel-stages"
                     role="tab" aria-controls="tabpanel-stages" aria-selected="false">
                     <i class="bi bi-shop-window"></i>
                     Stages
                 </a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link upper-panel" id="simple-tab-1" data-bs-toggle="tab" href="#tabpanel-backup"
+                    role="tab" aria-controls="tabpanel-backup" aria-selected="false">
+                    <i class="bi bi-database-fill-check"></i>
+                    Backup
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content">
-            <!-- AutoMacro Triggering Panel -->
-            <div class="tab-pane collapse" id="tabpanel-automacro" role="tabpanel" aria-labelledby="simple-tab-0b">
-                <div>
-                    You can trigger a macros activation or deactivation, based on the Activity Level of the music.<br>
-                    <br>
-                    <ol>
-                        <li>
-                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
-                            ON.
-                        </li>
-                        <li>
-                            Set the Activity Level Threshold on the Macros Tab for the macro you want to be triggered
-                            OFF.
-                        </li>
-                        <li>
-                            If you configure ON/OFF parameters for multiple Macros, which affect the same fixtures, then
-                            the first macro will win. (Higher in the list of macros will take precedence)
-                        </li>
-                        <li>
-                            Adjust the Minimum Interval, to prevent the macro from being triggered too often.
-                        </li>
-                        <li>
-                            Adjust the Minimum Run Time, to prevent the macro from being stopped too quickly.
-                        </li>
-                        <li>
-                            <b>Unlike other triggers, the Macro trigger will only work if this settings page is
-                                open!</b>
-                        </li>
-                    </ol>
-                </div>
-                <div class="mx-3">
-                    <div class="row">
-                        <div class="form-check form-switch col-auto">
-                            <input class="form-check-input" type="checkbox" id="autoMacrosEnabled">
-                            <label class="form-check-label" for="autoMacrosEnabled">Enabled</label>
-                        </div>
-                    </div>
-                    <div class="row my-3">
-                        <div class="col-auto">
-                            Minimum Interval(mins) <input type="number" min="1" max="30" style="width:70px;"
-                                class="form-control" id="autoMacroInterval">
-                        </div>
-                        <div class="col-auto">
-                            Minimum Run Time(secs) <input type="number" min="1" max="600" style="width:70px;"
-                                class="form-control" id="autoMacroRunTime">
-                        </div>
-                    </div>
-                </div>
-                <div class="text-danger my-1">
-                    <i class="bi bi-exclamation-octagon-fill"></i>
-                    <i>These switches are live edits, and will take effect immediately</i>
-                </div>
-            </div>
             <!-- Strobe Triggering Panel -->
             <div class="tab-pane collapse" id="tabpanel-strobing" role="tabpanel" aria-labelledby="simple-tab-0b">
                 <div>
@@ -412,6 +352,26 @@
             </div>
             <!-- Macro Controls -->
             <div class="tab-pane active" id="tabpanel-macros" role="tabpanel" aria-labelledby="simple-tab-4">
+                <div class="px-3 py-1 border border-dark">
+                    <h6 class="fw-bold">Auto Macro Triggers</h6>
+                    <div class="row my-3">
+                        <div class="col-auto">
+                            <div class="form-check form-switch col-auto">
+                                <label class="form-check-label" for="autoMacrosEnabled">Enabled</label>
+                                <input class="form-check-input" type="checkbox" id="autoMacrosEnabled">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            Minimum Interval(mins)
+                            <input type="number" min="1" max="30" style="width:70px;" class="form-control"
+                                id="autoMacroInterval">
+                        </div>
+                        <div class="col-auto">
+                            Minimum Run Time(secs) <input type="number" min="1" max="600" style="width:70px;"
+                                class="form-control" id="autoMacroRunTime">
+                        </div>
+                    </div>
+                </div>
                 <div class="text-danger my-1">
                     <i class="bi bi-exclamation-octagon-fill"></i>
                     <i>These switches are live edits, and will take effect immediately</i>
@@ -443,6 +403,65 @@
                         </tr>
                     </thead>
                 </table>
+            </div>
+            <!-- Fixture Controls -->
+            <div class="tab-pane" id="tabpanel-fixtures" role="tabpanel" aria-labelledby="simple-tab-5">
+                <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
+                    href="#fixtureControlsInfoPanel" role="button" aria-expanded="false"
+                    aria-controls="fixtureControlsInfoPanel">
+                    <span class="text-primary">
+                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
+                    </span>
+                </a>
+                <div class="collapse" id="fixtureControlsInfoPanel" data-type="collapsable">
+                    <p class="h6">
+                        <span class="text-success">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                        See "Creating Macros" Section above for information on how to create a macro and how they
+                        work.
+                    </p>
+                    <p class="h6">
+                        <span class="text-success">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                        See "Strobe Triggering" Section above for information on how to setup the strobe or shutter.
+                    </p>
+                    <p class="h6">
+                        <span class="text-success">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                        Pan/Tilt are the default Center Point used for Effects. You can set this using the
+                        <span role="button" class="panOrTilt cursor-pointer link" data-id="panOrTiltAll"
+                            data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Set Pan/Tilt for All Movers"
+                            data-bs-original-title="Set Pan/Tilt for All Movers"
+                            aria-describedby="tooltip580652">Pan/Tilt Finder
+                        </span>
+                    </p>
+                </div>
+                <table id="fixtures" class="table" data-classes="table table-bordered my-1 table-primary">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-field="pantilt"></th>
+                            <th data-field="name">Name</th>
+                            <th data-field="fixtureGroup">Group</th>
+                            <th data-field="fixturePosition">Order</th>
+                            <th data-field="fixturePan" width="50" data-width="50">Pan</th>
+                            <th data-field="fixtureTilt" width="50" data-width="50">Tilt</th>
+                            <th data-field="channelType">Type</th>
+                            <th data-field="shutter" width="50" data-width="50">Open</th>
+                            <th data-field="strobe" width="50" data-width="50">Strobe</th>
+                            <th data-field="ignore"></th>
+                            <th data-field="select"></th>
+                        </tr>
+                        <tr>
+                            <td colspan="10">No fixtures defined yet.</td>
+                        </tr>
+                    </thead>
+                </table>
+                <div style="width:100%;text-align: right;" class="my-2">
+                    <button id="addMacro" class="btn btn-primary">Add Macro</button>
+                </div>
             </div>
             <!-- Effects -->
             <div class="tab-pane" id="tabpanel-effects" role="tabpanel" aria-labelledby="simple-tab-12">
@@ -893,65 +912,6 @@
                     </div>
                 </div>
                 <div class="my-5"></div>
-            </div>
-            <!-- Fixture Controls -->
-            <div class="tab-pane" id="tabpanel-fixtures" role="tabpanel" aria-labelledby="simple-tab-5">
-                <a class="float-end" style="position:relative;top:-15px;right:-10px;" data-bs-toggle="collapse"
-                    href="#fixtureControlsInfoPanel" role="button" aria-expanded="false"
-                    aria-controls="fixtureControlsInfoPanel">
-                    <span class="text-primary">
-                        <i class="bi bi-chevron-contract" style="font-size:20px;"></i>
-                    </span>
-                </a>
-                <div class="collapse" id="fixtureControlsInfoPanel" data-type="collapsable">
-                    <p class="h6">
-                        <span class="text-success">
-                            <i class="bi bi-info-circle"></i>
-                        </span>
-                        See "Creating Macros" Section above for information on how to create a macro and how they
-                        work.
-                    </p>
-                    <p class="h6">
-                        <span class="text-success">
-                            <i class="bi bi-info-circle"></i>
-                        </span>
-                        See "Strobe Triggering" Section above for information on how to setup the strobe or shutter.
-                    </p>
-                    <p class="h6">
-                        <span class="text-success">
-                            <i class="bi bi-info-circle"></i>
-                        </span>
-                        Pan/Tilt are the default Center Point used for Effects. You can set this using the
-                        <span role="button" class="panOrTilt cursor-pointer link" data-id="panOrTiltAll"
-                            data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Set Pan/Tilt for All Movers"
-                            data-bs-original-title="Set Pan/Tilt for All Movers"
-                            aria-describedby="tooltip580652">Pan/Tilt Finder
-                        </span>
-                    </p>
-                </div>
-                <table id="fixtures" class="table" data-classes="table table-bordered my-1 table-primary">
-                    <thead class="table-light">
-                        <tr>
-                            <th data-field="pantilt"></th>
-                            <th data-field="name">Name</th>
-                            <th data-field="fixtureGroup">Group</th>
-                            <th data-field="fixturePosition">Order</th>
-                            <th data-field="fixturePan" width="50" data-width="50">Pan</th>
-                            <th data-field="fixtureTilt" width="50" data-width="50">Tilt</th>
-                            <th data-field="channelType">Type</th>
-                            <th data-field="shutter" width="50" data-width="50">Open</th>
-                            <th data-field="strobe" width="50" data-width="50">Strobe</th>
-                            <th data-field="ignore"></th>
-                            <th data-field="select"></th>
-                        </tr>
-                        <tr>
-                            <td colspan="10">No fixtures defined yet.</td>
-                        </tr>
-                    </thead>
-                </table>
-                <div style="width:100%;text-align: right;" class="my-2">
-                    <button id="addMacro" class="btn btn-primary">Add Macro</button>
-                </div>
             </div>
             <!-- Stages -->
             <div class="tab-pane" id="tabpanel-stages" role="tabpanel" aria-labelledby="simple-tab-6">

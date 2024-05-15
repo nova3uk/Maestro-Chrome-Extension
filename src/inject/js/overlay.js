@@ -96,7 +96,7 @@ class OverlayApp extends Globals {
         option.text = "-";
         select.appendChild(option);
 
-        for (let color of maestro.App.commonColors) {
+        for (let color of maestro.Globals.commonColors) {
             let option = document.createElement('option');
             option.value = color;
             option.text = color;
@@ -278,7 +278,7 @@ class OverlayApp extends Globals {
         });
 
         // Append the controls to the container
-        if (maestro.App.colorPicker)
+        if (maestro.Globals.colorPicker)
             this.container.appendChild(this.colorDropdown);
 
         this.container.appendChild(this.blackoutCheckbox);
@@ -287,7 +287,7 @@ class OverlayApp extends Globals {
         this.container.appendChild(this.fogCheckbox);
         this.container.appendChild(this.effectCheckbox);
 
-        if (maestro.App.logging)
+        if (maestro.Globals.logging)
             console.log('Checkboxes created');
     };
     clearCheckbox = (btnId) => {
@@ -296,7 +296,7 @@ class OverlayApp extends Globals {
     };
     clearCheckboxes = (checkedBox) => {
         if (checkedBox !== "maestro_ext_strobe" && checkedBox.toLowerCase() !== "strobe") {
-            maestro.App.latchedOn = false;
+            maestro.Globals.latchedOn = false;
             maestro.App.setStrobe(
                 false, false);
         }
@@ -324,7 +324,7 @@ class OverlayApp extends Globals {
 
         buttonNames.forEach((buttonName) => {
             let observer = new MutationObserver(function (mutations) {
-                let btn = maestro.App.findByText(buttonName, 'button')[0];
+                let btn = maestro.Globals.findByText(buttonName, 'button')[0];
                 if (btn && !btn.clearCheckboxesMousedownEventAdded) {
                     btn.addEventListener('mousedown', () => maestro.OverlayApp.clearCheckboxes(buttonName), false);
                     btn.clearCheckboxesMousedownEventAdded = true;
@@ -475,7 +475,7 @@ class OverlayApp extends Globals {
             let cueName = this.createHtml('<span id="maestroCueName" style="font-size:14px;position:relative;top:-2px;color:white;"></span>', 'maestroCueNameSpan');
             playControlsContainer.appendChild(cueName);
 
-            let showState = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/show/state`);
+            let showState = await this.getShowState();
             this.cueControlsNotificationHdlr(showState);
         } catch (e) {
             if (this.logging)
@@ -528,21 +528,19 @@ class OverlayApp extends Globals {
             let data = JSON.parse(event.data);
             if (data.type == "AUDIO_LEVEL_NOTIFICATION") {
                 this.audioLevelMeter(data.msg);
-
                 chrome.runtime.sendMessage(this.ExtensionId, { audioLevel: data.msg });
             }
             if (data.type == "GLOBAL_STATE_NOTIFICATION") {
                 chrome.runtime.sendMessage(this.ExtensionId, { globalStateNotification: data.msg });
-                //not used now
             }
             if (data.type == "SHOW_STATE_NOTIFICATION") {
+                console.log(data.msg);
                 chrome.runtime.sendMessage(this.ExtensionId, { showStateNotification: data.msg });
                 this.cueControlsNotificationHdlr(data.msg);
             }
             if (data.type == "LIVE_STATE_NOTIFICATION") {
                 chrome.runtime.sendMessage(this.ExtensionId, { liveStateNotification: data.msg });
             }
-
         };
     }
     audioLevelMeter = async (msg) => {

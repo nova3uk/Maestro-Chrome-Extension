@@ -17,18 +17,24 @@ class Globals {
                     this.logging = true
                 };
 
-                this.systemInfo = await this.getSystemInfo();
                 this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
                 this.maestroHost = new URL(this.maestroUrl).host;
                 this.saveRemoteSetting("maestroUrl", this.maestroUrl);
                 this.saveRemoteSetting("maestroHost", this.maestroHost);
+
+                this.systemInfo = await this.getSystemInfo();
 
                 this.loadScript(`${this.Origin}/src/inject/js/v/${this.systemInfo.version}/api.js`, this.Search).then(() => {
                     this.loadScript(`${this.Origin}/src/inject/js/maestro-main.js`, this.Search).then(() => {
                         maestro.App.logging = this.logging;
                     });
                 });
-            };
+            } else {
+                this.maestroUrl = await this.getLocalSetting('maestroUrl');
+                this.maestroHost = await this.getLocalSetting('maestroHost');
+                this.logging = await this.getLocalSetting('loggingToggle');
+                this.systemInfo = await this.getSystemInfo();
+            }
         }
     };
 
@@ -450,7 +456,7 @@ class Globals {
 
     getSystemInfo = async () => {
         try {
-            return await this.getUrl(`/api/${this.apiVersion}/system_info`);
+            return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/system_info`);
         } catch (e) {
             if (this.logging) {
                 console.error("Cannot connect to the API, is Maestro running?", e);
@@ -534,6 +540,7 @@ class Globals {
             this.groups = stage.stage.find(ele => ele.id == stage.activeStageId).fixtureGroup;
             this.activeStage = stage.stage.find(ele => ele.id == stage.activeStageId);
             this.activeStageFixtureGroups = this.activeStage.fixtureGroup;
+            this.saveLocalSetting("activeStage", this.activeStage);
         }
         return this.stage;
     };
@@ -666,6 +673,13 @@ class Globals {
         el.innerText = css;
         document.head.appendChild(el);
         return el;
+    };
+    findByText = (needle, query = "*", haystack = document) => {
+        return [...haystack.querySelectorAll(query)].filter(val =>
+            Array.from(val.childNodes).some(({ nodeType, textContent, parentElement }) =>
+                nodeType === 3 && textContent.includes(needle) && !(parentElement.tagName === 'SCRIPT')
+            )
+        );
     };
     openSettingsWindow = async () => {
         chrome.runtime.sendMessage(this.ExtensionId, { openSettingsWindow: this.maestroUrl },

@@ -251,13 +251,6 @@ class App extends Globals {
                 console.error('Fatal error updating fixture data:', error);
         }
     };
-    findByText = (needle, query = "*", haystack = document) => {
-        return [...haystack.querySelectorAll(query)].filter(val =>
-            Array.from(val.childNodes).some(({ nodeType, textContent, parentElement }) =>
-                nodeType === 3 && textContent.includes(needle) && !(parentElement.tagName === 'SCRIPT')
-            )
-        );
-    };
     bindStrobeButton = () => {
         try {
             this.pageObserver = new MutationObserver((mutations) => {
