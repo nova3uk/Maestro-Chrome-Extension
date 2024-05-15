@@ -54,9 +54,9 @@ class SettingsApp extends Globals {
         this.bindAutoFog();
         this.bindAutoEffects();
         this.tabObserver();
-        //this.websocketEventsWatcher();
         this.bindLoggingBtn();
         this.startNotifications();
+        this.autoActionsHistory();
 
         this.loadScript(`../../../src/inject/js/effects.js`).then(() => {
             this.bindEffects();
@@ -82,6 +82,39 @@ class SettingsApp extends Globals {
             }
         }, 1000);
     };
+    autoActionsHistory = async () => {
+        let effect = document.getElementById('activePeakEffectsLastExecution');
+        let effectTime = await this.getLocalSetting("activePeakEffectsLastExecution");
+        if (effectTime) {
+            effect.innerText = `${this.formatDate(new Date(effectTime))} (${this.timeAgo(new Date(effectTime))})`;
+        } else {
+            effect.innerText = "Never";
+        }
+        let strobe = document.getElementById('activePeakStrobeLastExecution');
+        let strobeTime = await this.getLocalSetting("activePeakStrobeLastExecution");
+        if (strobeTime) {
+            strobe.innerText = `${this.formatDate(new Date(effectTime))} (${this.timeAgo(new Date(effectTime))})`;
+        } else {
+            strobe.innerText = "Never";
+        }
+        let fogOnPeak = document.getElementById('activePeakFogLastExecution');
+        let fogOnPeakTime = await this.getLocalSetting("activePeakFogLastExecution");
+        if (fogOnPeakTime) {
+            fogOnPeak.innerText = `${this.formatDate(new Date(effectTime))} (${this.timeAgo(new Date(effectTime))})`;
+        } else {
+            fogOnPeak.innerText = "Never";
+        }
+        let fogOnTimer = document.getElementById('activeFogOnTimerLastExecution');
+        let fogOnTimerTime = await this.getLocalSetting("activeFogOnTimerLastExecution");
+        if (fogOnTimerTime) {
+            fogOnTimer.innerText = `${this.formatDate(new Date(effectTime))} (${this.timeAgo(new Date(effectTime))})`;
+        } else {
+            fogOnTimer.innerText = "Never";
+        }
+        setInterval(async () => {
+            this.autoActionsHistory();
+        }, 60000);
+    }
     bindLoggingBtn = async () => {
         let logging = await this.getLocalSetting("loggingToggle");
         if (logging) {

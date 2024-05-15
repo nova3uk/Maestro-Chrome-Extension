@@ -172,6 +172,30 @@ class Globals {
         document.getElementById('modalLoading').style.display = "none";
         document.body.style.overflow = "auto";
     };
+    timeAgo = (time) => {
+        const currentTime = new Date();
+        const diff = currentTime - time;
+
+        const minute = 60 * 1000;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+        const week = 7 * day;
+        const month = 30 * day;
+
+        if (diff < minute) {
+            return Math.floor(diff / 1000) + " seconds ago";
+        } else if (diff < hour) {
+            return Math.floor(diff / minute) + " minutes ago";
+        } else if (diff < day) {
+            return Math.floor(diff / hour) + " hours ago";
+        } else if (diff < week) {
+            return Math.floor(diff / day) + " days ago";
+        } else if (diff < month) {
+            return Math.floor(diff / week) + " weeks ago";
+        } else {
+            return Math.floor(diff / month) + " months ago";
+        }
+    };
     replaceFetch = () => {
         const originalFetch = window.fetch;
 
@@ -657,6 +681,17 @@ class Globals {
             });
         });
     };
+    sendRemoteMessage = (type, message) => {
+        try {
+            chrome.runtime.sendMessage(this.ExtensionId, { type: type, message: message },
+                function (response) {
+                    return response;
+                });
+        } catch (e) {
+            if (logging)
+                console.error(e);
+        }
+    }
     getRemoteSetting = async (key) => {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage(this.ExtensionId, { getLocalSetting: true, key: key },
@@ -677,6 +712,7 @@ class Globals {
                 });
         });
     }
+
     prettyJSON = (data) => {
         return JSON.stringify(data, null, '\t');
     };

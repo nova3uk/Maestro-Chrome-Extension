@@ -40,6 +40,9 @@ chrome.runtime.onMessageExternal.addListener(
             request.showStateNotification.time = Date.now();
             chrome.storage.local.set({ showStateNotification: request.showStateNotification });
         }
+        if (request.automationEvent) {
+
+        }
 
         if (request.ping) {
             return new Promise((resolve, reject) => {

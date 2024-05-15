@@ -237,7 +237,7 @@ input[type="range"]:focus::-moz-range-thumb {
   font-weight: bold;
 }
 .link {
-  color: blue;
+  color: #308fe8;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -269,4 +269,9 @@ button.cueControlbtn {
 }
 .nav-item {
   cursor: pointer;
+}
+.lastExecTime {
+  font-size: 12px;
+  font-weight: bold;
+  color: #308fe8;
 }

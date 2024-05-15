@@ -435,7 +435,7 @@ class App extends Globals {
 
                 //activate Strobe
                 this.activePeakStrobeLastExecution = Date.now();
-                await maestro.Globals.saveRemoteSetting("activePeakStrobeLastExecution", this.activePeakStrobeLastExecution);
+                await maestro.Globals.saveRemoteSetting("automationEvent", t);
 
                 await maestro.OverlayApp.checkBoxClick("STROBE_ON", true, 'div_maestro_ext_strobe');
 
