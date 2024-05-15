@@ -8,15 +8,15 @@ class Globals {
 
     init = async (scriptSource = null, logging = false) => {
         if (scriptSource) {
-            if (scriptSource.indexOf("main=true") !== -1) {
-                var src = new URL(scriptSource);
-                this.ExtensionId = src.host;
-                this.Origin = src.origin;
-                this.Search = src.search;
-                if (scriptSource.indexOf("logging=true") !== -1) {
-                    this.logging = true
-                };
+            var src = new URL(scriptSource);
+            this.ExtensionId = src.host;
+            this.Origin = src.origin;
+            this.Search = src.search;
 
+            if (scriptSource.indexOf("logging=true") !== -1) {
+                this.logging = true
+            };
+            if (scriptSource.indexOf("main=true") !== -1) {
                 this.maestroUrl = (document.location.origin).endsWith("/") ? document.location.origin : document.location.origin + "/";
                 this.maestroHost = new URL(this.maestroUrl).host;
                 this.saveRemoteSetting("maestroUrl", this.maestroUrl);
@@ -34,6 +34,9 @@ class Globals {
                 this.maestroHost = await this.getLocalSetting('maestroHost');
                 this.logging = await this.getLocalSetting('loggingToggle');
                 this.systemInfo = await this.getSystemInfo();
+            }
+            if (scriptSource.indexOf("info=true") !== -1) {
+                this.loadScript(`${this.Origin}/src/inject/js/info.js`)
             }
         }
     };
@@ -160,6 +163,15 @@ class Globals {
     // Variable to be monitored
     activityLevelRoot = 0;
     arrActivityLevelCallbacks = []
+    showLoader = () => {
+        return;
+        document.body.style.overflow = "hidden";
+        document.getElementById('modalLoading').style.display = "block";
+    };
+    hideLoader = () => {
+        document.getElementById('modalLoading').style.display = "none";
+        document.body.style.overflow = "auto";
+    };
     replaceFetch = () => {
         const originalFetch = window.fetch;
 

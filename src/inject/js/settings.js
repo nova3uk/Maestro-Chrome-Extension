@@ -503,18 +503,13 @@ class SettingsApp extends Globals {
 
         }
     };
-    showLoader = () => {
-        return;
-        document.body.style.overflow = "hidden";
-        document.getElementById('modalLoading').style.display = "block";
-    };
-    hideLoader = () => {
-        document.getElementById('modalLoading').style.display = "none";
-        document.body.style.overflow = "auto";
-    };
     tabObserver = () => {
+        $('.nav-tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
         $("ul.nav-tabs > li > a").on("shown.bs.tab", async (e) => {
-            var id = $(e.target).data("bs-target").substr(1);
+            var id = $(e.target).attr("href").substr(1);
             await this.saveLocalSetting('activeSettingsTab', id);
             history.pushState("", document.title, window.location.pathname + window.location.search);
         });
@@ -522,7 +517,8 @@ class SettingsApp extends Globals {
             $('.nav-tabs a[href="' + document.location.hash + '"]').tab('show');
         } else {
             this.getLocalSetting('activeSettingsTab').then(tab => {
-                $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+                if (tab)
+                    $('.nav-tabs a[href="#' + tab + '"]').tab('show');
             });
         }
         $('div[data-type="collapsable"]').on("shown.bs.collapse", async (e) => {
@@ -1035,7 +1031,7 @@ class SettingsApp extends Globals {
                 if (runningMacroIds.length > 0) {
                     deleteButton.disabled = false;
                     applyButton.disabled = false;
-                    this.hideLoader();
+                    //this.hideLoader();
 
                     if (showLoader) {
                         return bootbox.alert({ title: "Stop!", message: 'Another Macro is already running on fixtures with the same id as contained in this macro!<br><br>Running multiple macros on the same fixture simultaneously can cause issues!' });
@@ -1078,7 +1074,7 @@ class SettingsApp extends Globals {
                 if (ignoredFixtures.length === macros[0]?.macro.fixtures.length) {
                     deleteButton.disabled = false;
                     applyButton.disabled = false;
-                    this.hideLoader();
+                    //this.hideLoader();
 
                     if (showLoader) {
                         bootbox.alert({ title: "Stop!", message: `The macro will not be applied because all fixtures have the same settings as currently live!` });
@@ -1138,7 +1134,7 @@ class SettingsApp extends Globals {
             }
 
             this.logChanges(stageId, changeSet);
-            this.hideLoader();
+            //this.hideLoader();
         } catch (e) {
             if (this.logging) {
                 console.error('Error applying Macro:', e);
@@ -1146,7 +1142,7 @@ class SettingsApp extends Globals {
 
             bootbox.alert(this.fatalErrorMsg);
         } finally {
-            this.hideLoader();
+            //this.hideLoader();
         }
     }
     getMacroDiff = async (macroName, stageId) => {
@@ -1308,7 +1304,7 @@ class SettingsApp extends Globals {
 
             bootbox.alert(this.fatalErrorMsg);
         } finally {
-            this.hideLoader();
+            //this.hideLoader();
         }
     };
     deleteMacro = async (macroName, stageId) => {
@@ -2961,7 +2957,7 @@ class SettingsApp extends Globals {
                 index++;
             }
         }
-        this.hideLoader();
+        //this.hideLoader();
     };
     switchPrisms = async (fixtureId, onOrOff = true, exceptOpen = true) => {
         this.showLoader();
@@ -2989,7 +2985,7 @@ class SettingsApp extends Globals {
                 index++;
             }
         }
-        this.hideLoader();
+        //this.hideLoader();
     };
     getGroupAvgDimmer = (activeStage, fixtureGroup, currGroupName) => {
         let values = [];

@@ -13,6 +13,7 @@ class InfoPage extends Globals {
 
         this.bindBtns();
         this.tabObserver();
+        this.hideLoader();
     };
     bindBtns = () => {
         var link = document.getElementById('controlPageLink')
@@ -28,7 +29,8 @@ class InfoPage extends Globals {
             $('.nav-tabs a[href="' + document.location.hash + '"]').tab('show');
         } else {
             this.getLocalSetting('activeInfoTab').then(tab => {
-                $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+                if (tab)
+                    $('.nav-tabs a[href="#' + tab + '"]').tab('show');
             });
         }
     };

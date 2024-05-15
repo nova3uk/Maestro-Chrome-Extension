@@ -34,6 +34,7 @@
         "src/inject/js/maestro-main.js",
         "src/inject/js/overlay.js",
         "src/inject/js/effects.js",
+        "src/inject/js/info.js",
         "src/inject/js/v/1.2.0/api.js",
         "src/inject/js/v/1.3.0/api.js",
         "src/inject/css/overlay.css",
