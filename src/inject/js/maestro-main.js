@@ -14,11 +14,6 @@ class App extends Globals {
             this.logging = true
             console.log("Maestro Interceptor Logging Enabled!")
         };
-        if (scriptSource.indexOf("footer=true") !== -1) {
-            this.injectOverlay();
-            if (this.logging)
-                console.log("Footer loaded.")
-        };
         if (scriptSource.indexOf("color=true") !== -1) {
             this.colorPicker = true;
             if (this.logging)
@@ -34,7 +29,13 @@ class App extends Globals {
             if (this.logging)
                 console.log("AutoFog toggle active.")
         };
-        this.init();
+        this.init().then(() => {
+            if (scriptSource.indexOf("footer=true") !== -1) {
+                this.injectOverlay();
+                if (this.logging)
+                    console.log("Footer loaded.")
+            };
+        });
     }
     intervalRefresh = null;
     intervalRefreshTime = 5 * 1000;
@@ -60,7 +61,7 @@ class App extends Globals {
             this.messageHdlr();
             this.getIgnoreFixtures();
             this.getAutoParams();
-            this.getStage();
+            await this.getStage();
             this.bindStrobeButton();
             this.reloadMonitor();
         } catch (e) {

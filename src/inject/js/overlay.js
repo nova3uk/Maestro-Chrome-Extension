@@ -34,6 +34,8 @@ class OverlayApp extends Globals {
 
         await this.getButtonNames();
 
+        await this.getMacros();
+
         // Create the dropdown
         this.colorDropdown = this.createDropdown('maestro_ext_color', function (selectedColor) {
             if (selectedColor === "") {
@@ -60,6 +62,62 @@ class OverlayApp extends Globals {
                     document.getElementById('maestroMacrosRunning').textContent = "";
                 }
             });
+    };
+    getMacros = async () => {
+        var msg = { getMacros: true };
+        await chrome.runtime.sendMessage(this.ExtensionId, msg,
+            function (response) {
+                if (response) {
+                    let macros = response.filter(macro => macro.macro.stageId == maestro.App.stageId);
+                    maestro.Globals.macros = response;
+                    maestro.OverlayApp.injectMacros();
+                }
+            });
+    };
+    injectMacros = async () => {
+        if (maestro.Globals.macros) {
+            let macroContainer = document.createElement('div');
+            macroContainer = document.createElement('div');
+            macroContainer.id = 'macroContainer';
+            macroContainer.style.position = 'fixed';
+            macroContainer.style.top = '20px';
+            macroContainer.style.right = '200px';
+            macroContainer.style.color = '#f4f5f5';
+            macroContainer.style.zIndex = '100002';
+            macroContainer.style.display = 'flex';
+            macroContainer.style.flexDirection = 'column';
+            document.body.appendChild(macroContainer);
+
+            let select = document.createElement('select');
+            select.id = 'macroDropdown';
+            select.style.backgroundColor = '#0f1827';
+            select.style.color = '#f4f5f5';
+            select.style.border = 'none';
+            select.style.padding = '5px';
+            select.style.marginBottom = '10px';
+
+            let defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Select Macro';
+            select.appendChild(defaultOption);
+
+            for (let macro of maestro.Globals.macros) {
+                let option = document.createElement('option');
+                option.value = macro.macro.name;
+                option.text = macro.macro.name;
+                select.appendChild(option);
+            }
+
+            select.addEventListener('change', function () {
+                let selectedMacro = this.value;
+                if (selectedMacro) {
+                    let macro = maestro.Globals.macros.find(m => m.name === selectedMacro);
+                    //maestro.App.runMacro(macro);
+                }
+            });
+
+            macroContainer.appendChild(select);
+        }
     };
     // Function to create an overlay
     createOverlay = () => {
@@ -140,7 +198,6 @@ class OverlayApp extends Globals {
 
         let checkboxContainer = document.createElement('div');
         checkboxContainer.id = `div_${id}`;
-        //checkboxContainer.style.display = 'flex';
         checkboxContainer.style.justifyContent = 'center';
         checkboxContainer.style.alignItems = 'center';
         checkboxContainer.style.width = '150px';

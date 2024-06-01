@@ -67,6 +67,7 @@ class Globals {
     strobeFixtures = [];
     currentCue = [];
     cues;
+    macros;
     activeStageFixtureGroups = [];
     eventManual;
     pageObserver;
