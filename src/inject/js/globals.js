@@ -540,6 +540,10 @@ class Globals {
     getFixture = async (fixtureId) => {
         return await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${this.stageId}/fixture/${fixtureId}`);
     };
+    getFixtures = async (stageId) => {
+        const fixtures = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage/${stageId}`);
+        return fixtures;
+    };
     getAllMovers = async () => {
         if (!this.activeStage)
             await this.getStages();
@@ -571,11 +575,13 @@ class Globals {
             const stage = await this.getUrl(`${this.maestroUrl}api/${this.apiVersion}/output/stage`);
 
             this.stageId = stage.activeStageId;
-            this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
+            let fixtures = await this.getFixtures(this.stageId);
+            this.fixtures = fixtures.fixture;
             this.stage = stage;
-            this.groups = stage.stage.find(ele => ele.id == stage.activeStageId).fixtureGroup;
+            this.groups = fixtures.fixtureGroup;
             this.activeStage = stage.stage.find(ele => ele.id == stage.activeStageId);
-            this.activeStageFixtureGroups = this.activeStage.fixtureGroup;
+            this.activeStage.fixture = fixtures.fixture;
+            this.activeStageFixtureGroups = fixtures.fixtureGroup;
             this.saveLocalSetting("activeStage", this.activeStage);
         }
         return this.stage;

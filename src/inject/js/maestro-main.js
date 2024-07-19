@@ -98,7 +98,9 @@ class App extends Globals {
 
         const stage = await this.getUrl(`/api/${this.apiVersion}/output/stage`);
         this.stageId = stage.activeStageId;
-        this.fixtures = stage.stage.find(ele => ele.id == stage.activeStageId).fixture;
+        const fixtures = await this.getFixtures();
+
+        this.fixtures = fixtures.fixture;
 
         this.shutterFixtures = this.fixtures.filter(fixture =>
             fixture.enabled &&
@@ -114,6 +116,10 @@ class App extends Globals {
                 fixture.attribute.some(attr => attr.type === type)
             )
         );
+    };
+    getFixtures = async () => {
+        const fixtures = await this.getUrl(`/api/${this.apiVersion}/output/stage/${this.stageId}`);
+        return fixtures;
     };
     setColorAll = async (onOrOff, color = [...this.allColors]) => {
         //const delay = ms => new Promise(res => setTimeout(res, ms));
