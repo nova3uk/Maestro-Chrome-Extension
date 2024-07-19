@@ -40,8 +40,10 @@ chrome.runtime.onMessageExternal.addListener(
             request.showStateNotification.time = Date.now();
             chrome.storage.local.set({ showStateNotification: request.showStateNotification });
         }
-        if (request.automationEvent) {
-
+        if (request.getMacros) {
+            return await this.getLocalSetting("macros").then(macros => {
+                return sendResponse(macros);
+            });
         }
 
         if (request.ping) {
