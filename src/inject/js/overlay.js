@@ -34,7 +34,7 @@ class OverlayApp extends Globals {
 
         await this.getButtonNames();
 
-        await this.getMacros();
+        //await this.getMacros();
 
         // Create the dropdown
         this.colorDropdown = this.createDropdown('maestro_ext_color', function (selectedColor) {
